@@ -1,0 +1,110 @@
+<div class="carta">
+
+    <div class="usuarios-header">
+
+        <h1>Carta</h1>
+
+        <div>
+
+            <input
+    type="text"
+    id="buscarProducto"
+    placeholder="Buscar producto">
+
+<label class="checkDisponible">
+
+    <input
+        type="checkbox"
+        id="mostrarNoDisponibles">
+
+    Mostrar no disponibles
+
+</label>
+
+<button id="nuevoProducto">
+
+    + Nuevo Producto
+
+</button>
+
+        </div>
+
+    </div>
+
+    <hr><br>
+
+    <div id="listaProductos">
+
+    </div>
+
+</div>
+
+<div id="modalProducto" class="modal oculto">
+
+    <div class="modal-contenido">
+
+        <h2 id="tituloModalProducto">Nuevo Producto</h2>
+
+        <div class="campo">
+
+            <label>Nombre</label>
+
+            <input type="text" id="nombreProducto">
+
+        </div>
+
+        <div class="campo">
+
+            <label>Categoría</label>
+
+            <select id="categoriaProducto">
+
+                <option>Pizza</option>
+                <option>Hamburguesa</option>
+                <option>Sandwiches</option>
+                <option>Milanesa</option>
+                <option>Ensaladas</option>
+                <option>Fritas</option>
+                <option>Tostones</option>
+                <option>Minutas</option>
+                <option>Pastas</option>
+                <option>Salsas</option>
+                <option>Menu Infantil</option>
+                <option>Picadas y Cazuelas</option>
+                <option>Adicional Huevo Frito</option>
+                <option>Dulce</option>
+                <option>Cerveza Artesanal</option>
+                <option>Con Alcohol</option>
+                <option>Sin Alcohol</option>
+
+            </select>
+
+        </div>
+
+        <div class="campo">
+
+            <label>Precio</label>
+
+            <input type="number" id="precioProducto">
+
+        </div>
+
+        <div class="botones">
+
+            <button id="guardarProducto">
+
+                Guardar
+
+            </button>
+
+            <button id="cancelarProducto">
+
+                Cancelar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

@@ -37,15 +37,35 @@ opciones[datos.perfil].forEach(opcion => {
 
 boton.onclick = async () => {
 
-    if (opcion === "Usuarios") {
+if (opcion === "Usuarios") {
 
-        const modulo = await import("../modules/usuarios.js");
+    const modulo = await import("../modules/usuarios.js");
 
-        modulo.default();
+    modulo.default();
 
-        return;
+    return;
 
-    }
+}
+
+if (opcion === "Carta") {
+
+    const modulo = await import("../modules/carta.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if (opcion === "Salón") {
+
+    const modulo = await import("../modules/salon.js");
+
+    modulo.default();
+
+    return;
+
+}
 
     document.querySelector("#contenido").innerHTML = `
         <h1>${opcion}</h1>

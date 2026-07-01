@@ -1,0 +1,133 @@
+.salon-container{
+
+    width:100%;
+
+    padding:30px;
+
+}
+
+.salon-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.leyenda{
+
+    display:flex;
+
+    gap:20px;
+
+}
+
+.leyenda span{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+.estado{
+
+    width:16px;
+
+    height:16px;
+
+    border-radius:50%;
+
+}
+
+.libre{
+
+    background:#2ecc71;
+
+}
+
+.ocupada{
+
+    background:#3498db;
+
+}
+
+.cocina{
+
+    background:#f39c12;
+
+}
+
+.cuenta{
+
+    background:#e74c3c;
+
+}
+
+.planoSalon{
+
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    gap:30px;
+
+}
+
+.mesa{
+
+    height:120px;
+
+    border-radius:18px;
+
+    cursor:pointer;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    transition:.25s;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+
+}
+
+.mesa:hover{
+
+    transform:scale(1.05);
+
+}
+
+.numero{
+
+    width:65px;
+
+    height:65px;
+
+    border-radius:50%;
+
+    background:white;
+
+    color:#202938;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}

@@ -25,6 +25,9 @@ export default async function () {
         .addEventListener("click", validarFormulario);
 
     await cargarUsuarios();
+    document
+.getElementById("buscarUsuario")
+.addEventListener("keyup",filtrarUsuarios);
 
 }
 
@@ -101,5 +104,26 @@ function validarFormulario(){
     }
 
     alert("Usuario listo para crear.");
+
+}
+
+function filtrarUsuarios(){
+
+    const texto=this.value.toLowerCase();
+
+    document
+    .querySelectorAll(".cardUsuario")
+    .forEach(card=>{
+
+        card.style.display=
+            card.innerText
+            .toLowerCase()
+            .includes(texto)
+
+            ? "flex"
+
+            : "none";
+
+    });
 
 }
