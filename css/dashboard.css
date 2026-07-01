@@ -1,0 +1,459 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Poppins,sans-serif;
+}
+
+body{
+
+    background:#f3f4f6;
+
+}
+
+.contenedor{
+
+    display:flex;
+
+    height:100vh;
+
+}
+
+.sidebar{
+
+    width:250px;
+
+    background:#202938;
+
+    color:white;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.logo{
+
+    text-align:center;
+
+    padding:25px;
+
+}
+
+.logo img{
+
+    width:90px;
+
+    margin-bottom:10px;
+
+}
+
+.logo h2{
+
+    font-size:22px;
+
+}
+
+nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    margin-top:20px;
+
+}
+
+nav button{
+
+    background:none;
+
+    border:none;
+
+    color:white;
+
+    padding:18px;
+
+    text-align:left;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+}
+
+nav button:hover{
+
+    background:#30405a;
+
+}
+
+.principal{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+header{
+
+    height:80px;
+
+    background:white;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:25px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+}
+
+.usuario{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+.usuario img{
+
+    width:50px;
+
+    border-radius:50%;
+
+}
+
+.usuario button{
+
+    padding:10px 20px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#d32f2f;
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+#contenido{
+
+    flex:1;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-direction:column;
+
+}
+
+.logoCentral{
+
+    width:180px;
+
+    opacity:.20;
+
+    margin-bottom:20px;
+
+}
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.oculto{
+
+    display:none;
+
+}
+
+.modal-contenido{
+
+    width:500px;
+
+    background:white;
+
+    border-radius:10px;
+
+    padding:25px;
+
+}
+
+.modal-contenido h2{
+
+    margin-bottom:20px;
+
+}
+
+.campo{
+
+    margin-bottom:15px;
+
+}
+
+.campo label{
+
+    display:block;
+
+    margin-bottom:5px;
+
+    font-weight:600;
+
+}
+
+.campo input,
+.campo select{
+
+    width:100%;
+
+    padding:10px;
+
+}
+
+.botones{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:10px;
+
+    margin-top:20px;
+
+}
+
+.cardUsuario{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:15px;
+
+    margin-bottom:12px;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+}
+
+.activo{
+
+    color:#18a558;
+
+    font-weight:bold;
+
+}
+
+.inactivo{
+
+    color:#d62828;
+
+    font-weight:bold;
+
+}
+
+.titulo{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#202938;
+
+}
+
+.usuarios{
+
+    width:100%;
+
+    max-width:950px;
+
+}
+
+.usuarios-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.usuarios-header button{
+
+    background:#202938;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 20px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+}
+
+.usuarios-header button:hover{
+
+    background:#30405a;
+
+}
+
+.cardUsuario{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:15px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.datosUsuario{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:5px;
+
+}
+
+.estadoUsuario{
+
+    font-weight:bold;
+
+}
+
+.nombreUsuario{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+.detalleUsuario{
+
+    color:#555;
+
+    margin-bottom:5px;
+
+}
+
+.accionesUsuario{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:15px;
+
+}
+
+.botonesUsuario{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.btnEditar,
+.btnEstado{
+
+    border:none;
+
+    padding:10px 14px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+}
+
+.btnEditar{
+
+    background:#1e88e5;
+
+    color:white;
+
+}
+
+.btnEstado{
+
+    background:#555;
+
+    color:white;
+
+}
+
+.btnEditar:hover{
+
+    background:#1565c0;
+
+}
+
+.btnEstado:hover{
+
+    background:#333;
+
+}

@@ -1,0 +1,162 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+
+    background:#f5f7fa;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    height:100vh;
+
+}
+
+.login-container{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+}
+
+.login-card{
+
+    width:420px;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:40px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.12);
+
+}
+
+.logo{
+
+    width:120px;
+
+    display:block;
+
+    margin:auto;
+
+    margin-bottom:20px;
+
+}
+
+h1{
+
+    text-align:center;
+
+    color:#22313f;
+
+}
+
+.subtitulo{
+
+    text-align:center;
+
+    color:#777;
+
+    margin-bottom:35px;
+
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+input,select{
+
+    width:100%;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    border:1px solid #ccc;
+
+    margin-bottom:20px;
+
+    font-size:15px;
+
+}
+
+button{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+}
+
+#btnEntrar{
+
+    background:#1976d2;
+
+    color:white;
+
+}
+
+#btnEntrar:hover{
+
+    background:#1565c0;
+
+}
+
+#btnCrear{
+
+    margin-top:12px;
+
+    background:#2e7d32;
+
+    color:white;
+
+}
+
+.olvido{
+
+    display:block;
+
+    text-align:center;
+
+    margin-top:20px;
+
+    text-decoration:none;
+
+    color:#1976d2;
+
+}
+
+.oculto{
+
+    display:none;
+
+}
