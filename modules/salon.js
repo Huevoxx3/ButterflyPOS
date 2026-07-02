@@ -1,6 +1,7 @@
 import {
     agregarProductoPedido,
-    obtenerItemsPedido
+    obtenerItemsPedido,
+    guardarEdicionPedido
 } from "../js/services/pedidoService.js";
 import { registrarActividad } from "../js/services/actividadService.js";
 
@@ -21,6 +22,14 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+let pedidoTemporal = [];
+
+let pedidoOriginal = [];
+
+let itemsEliminados = [];
+
+let totalTemporal = 0;
+
 export default async function () {
 
     const respuesta = await fetch("../modules/salon.html");
@@ -29,6 +38,9 @@ export default async function () {
         await respuesta.text();
 
     await dibujarMesas();
+
+    document.getElementById("btnReiniciarSistema").onclick =
+    reiniciarSistema;
 
 }
 
@@ -236,6 +248,26 @@ async function mostrarModalMesa(mesa){
     document.getElementById("tituloMesa").textContent =
         "Mesa " + mesa.numero;
 
+    const guardar = document.getElementById("btnGuardarCambios");
+
+if (guardar) {
+
+    guardar.remove();
+
+}
+
+document.getElementById("btnAgregarProducto").style.display = "";
+
+document.getElementById("btnEditarPedido").style.display = "";
+
+document.getElementById("btnCobrar").style.display = "";
+
+const volver = document.getElementById("btnVolverSalon");
+
+volver.textContent = "← Volver";
+
+volver.onclick = cerrarModalMesa;    
+
     document.getElementById("datosMesa").innerHTML = `
 
     <div class="datoCard">
@@ -428,7 +460,16 @@ function cerrarModalMesa(){
 }
 function activarModoEdicion(mesa){
 
-    document.getElementById("btnAgregarProducto").style.display = "none";
+    mostrarPedidoEdicion(mesa);
+
+}
+
+async function mostrarPedidoEdicion(mesa){  
+
+    document.getElementById("btnAgregarProducto").style.display = "";
+
+document.getElementById("btnAgregarProducto").textContent =
+    "➕ Agregar Producto";
 
     document.getElementById("btnEditarPedido").style.display = "none";
 
@@ -440,9 +481,270 @@ function activarModoEdicion(mesa){
 
     volver.onclick = () => {
 
-        salirModoEdicion(mesa);
+    pedidoTemporal = [];
+
+    mostrarModalMesa(mesa);
+
+};
+document.getElementById("btnAgregarProducto").onclick = () => {
+
+    abrirCartaEdicion(mesa);
+
+};
+
+    if(!document.getElementById("btnGuardarCambios")){
+
+        const boton = document.createElement("button");
+
+        boton.id = "btnGuardarCambios";
+
+        boton.onclick = () => {
+
+    guardarPedidoTemporal(mesa);
+
+};
+
+        boton.className = "btnPrincipal";
+
+        boton.innerHTML = "💾 Guardar Cambios";
+
+        document
+            .querySelector(".accionesMesa")
+            .prepend(boton);
+
+    }
+if (pedidoTemporal.length === 0) {
+
+    const items = await obtenerItemsPedido(mesa.pedidoId);
+    itemsEliminados = [];
+
+    pedidoOriginal = structuredClone(items);
+
+    pedidoTemporal = structuredClone(items);
+
+    totalTemporal = pedidoTemporal.reduce(
+
+    (total, item) => total + (item.precio * item.cantidad),
+
+    0
+
+);
+
+}
+
+let html = "";
+
+pedidoTemporal.forEach(item => {
+
+    html += `
+
+    <div class="cardUsuario">
+
+        <div style="flex:1;">
+
+            <strong>${item.nombre}</strong>
+
+            <br><br>
+
+            <div class="editorCantidad">
+
+                <button
+                    class="btnMenos"
+                    data-id="${item.id}">
+
+                    −
+
+                </button>
+
+                <span>
+
+                    ${item.cantidad}
+
+                </span>
+
+                <button
+                    class="btnMas"
+                    data-id="${item.id}">
+
+                    +
+
+                </button>
+
+            </div>
+
+            <br>
+
+            <textarea
+                class="txtObservacion"
+                data-id="${item.id}"
+                placeholder="Observaciones...">${item.observacion || ""}</textarea>
+
+            <br><br>
+
+            <button
+                class="btnEliminarProducto"
+                data-id="${item.id}">
+
+                🗑 Eliminar producto
+
+            </button>
+
+        </div>
+
+        <div>
+
+            <strong>
+
+                $ ${(item.precio * item.cantidad).toLocaleString()}
+
+            </strong>
+
+        </div>
+
+    </div>
+
+    `;
+
+});
+
+document.getElementById("productosMesa").innerHTML = html;
+
+console.log(document.querySelectorAll(".btnMas"));
+document.querySelectorAll(".btnMas").forEach(boton => {
+
+    boton.onclick = () => {
+
+        const item = pedidoTemporal.find(
+
+            p => p.id === boton.dataset.id
+
+        );
+
+        if(!item) return;
+
+        item.cantidad++;
+
+        renderPedidoEdicion(mesa);
 
     };
+
+});
+
+document.querySelectorAll(".btnMenos").forEach(boton => {
+
+    boton.onclick = () => {
+
+        const item = pedidoTemporal.find(
+
+            p => p.id === boton.dataset.id
+
+        );
+
+        if (!item) return;
+
+        // Nunca permitir menos de 1
+        if (item.cantidad > 1) {
+
+            item.cantidad--;
+
+        }
+
+        renderPedidoEdicion(mesa);
+
+    };
+
+});
+
+document.querySelectorAll(".btnEliminarProducto").forEach(boton => {
+
+    boton.onclick = () => {
+
+        const eliminado = pedidoTemporal.find(
+
+            item => item.id === boton.dataset.id
+
+        );
+
+        if(eliminado){
+
+            itemsEliminados.push(eliminado);
+
+        }
+
+        pedidoTemporal = pedidoTemporal.filter(
+
+            item => item.id !== boton.dataset.id
+
+        );
+
+        renderPedidoEdicion(mesa);
+
+    };
+
+});
+
+document.querySelectorAll(".txtObservacion").forEach(texto => {
+
+    texto.oninput = () => {
+
+        const item = pedidoTemporal.find(
+
+            p => p.id === texto.dataset.id
+
+        );
+
+        if (!item) return;
+
+        item.observacion = texto.value;
+
+    };
+
+});
+
+}
+
+function renderPedidoEdicion(mesa){
+
+    totalTemporal = pedidoTemporal.reduce(
+
+        (total, item) => total + (item.precio * item.cantidad),
+
+        0
+
+    );
+
+    document.getElementById("totalMesa").textContent =
+        "Total: $" + totalTemporal.toLocaleString();
+
+    mostrarPedidoEdicion(mesa);
+
+}
+
+async function abrirCartaEdicion(mesa){
+
+    alert("Carta en modo edición");
+
+}
+
+async function guardarPedidoTemporal(mesa){
+
+    await guardarEdicionPedido(
+    mesa,
+    pedidoTemporal,
+    itemsEliminados
+);
+
+// Limpiar memoria
+pedidoTemporal = [];
+pedidoOriginal = [];
+itemsEliminados = [];
+
+// Volver a leer la mesa
+const referencia = await getDoc(
+    doc(db, "mesas", String(mesa.numero))
+);
+
+await mostrarModalMesa(referencia.data());
 
 }
 
@@ -641,5 +943,102 @@ buscador.oninput = () => {
         });
 
 };
+
+}
+
+async function reiniciarSistema(){
+
+    const confirmar = confirm(
+
+        "¿Desea reiniciar el sistema?\n\nSe eliminará toda la actividad."
+
+    );
+
+    if(!confirmar) return;
+
+    // ==========================
+    // BORRAR ACTIVIDAD
+    // ==========================
+
+    const actividad = await getDocs(
+
+        collection(db,"actividad")
+
+    );
+
+    for(const documento of actividad.docs){
+
+        await deleteDoc(documento.ref);
+
+    }
+
+
+    // ==========================
+// BORRAR PEDIDOS
+// ==========================
+
+const pedidos = await getDocs(
+
+    collection(db,"pedidos")
+
+);
+
+for(const pedido of pedidos.docs){
+
+    const items = await getDocs(
+
+        collection(
+            db,
+            "pedidos",
+            pedido.id,
+            "items"
+        )
+
+    );
+
+    for(const item of items.docs){
+
+        await deleteDoc(item.ref);
+
+    }
+
+    await deleteDoc(pedido.ref);
+
+}
+
+// ==========================
+// REINICIAR MESAS
+// ==========================
+
+const mesas = await getDocs(
+
+    collection(db,"mesas")
+
+);
+
+for(const mesa of mesas.docs){
+
+    await updateDoc(
+
+        mesa.ref,
+
+        {
+
+            estado: "Libre",
+
+            personas: 0,
+
+            mozo: "",
+
+            pedidoId: "",
+
+            total: 0
+
+        }
+
+    );
+
+}
+    alert("Sistema reiniciado correctamente.");
 
 }

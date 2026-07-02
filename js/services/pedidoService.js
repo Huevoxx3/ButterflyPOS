@@ -222,3 +222,108 @@ export async function eliminarItem(item, mesa){
     );
 
 }
+
+export async function guardarEdicionPedido(
+    mesa,
+    pedidoTemporal,
+    itemsEliminados
+){
+
+    // ===========================
+    // ACTUALIZAR ITEMS
+    // ===========================
+
+    for(const item of pedidoTemporal){
+
+        await updateDoc(
+
+            doc(
+                db,
+                "pedidos",
+                mesa.pedidoId,
+                "items",
+                item.id
+            ),
+
+            {
+
+                cantidad: item.cantidad,
+
+                observacion: item.observacion || ""
+
+            }
+
+        );
+
+    }
+
+    // ===========================
+    // ELIMINAR ITEMS BORRADOS
+    // ===========================
+
+    for(const item of itemsEliminados){
+
+        await deleteDoc(
+
+            doc(
+                db,
+                "pedidos",
+                mesa.pedidoId,
+                "items",
+                item.id
+            )
+
+        );
+
+    }
+
+    // ===========================
+    // RECALCULAR TOTAL
+    // ===========================
+
+const snapshot = await getDocs(
+
+    collection(
+        db,
+        "pedidos",
+        mesa.pedidoId,
+        "items"
+    )
+
+);
+
+let total = 0;
+
+snapshot.forEach(doc => {
+
+    const item = doc.data();
+
+    total += item.precio * item.cantidad;
+
+});
+
+    await updateDoc(
+
+        doc(db,"pedidos",mesa.pedidoId),
+
+        {
+
+            total
+
+        }
+
+    );
+
+    await updateDoc(
+
+        doc(db,"mesas",String(mesa.numero)),
+
+        {
+
+            total
+
+        }
+
+    );
+
+}
