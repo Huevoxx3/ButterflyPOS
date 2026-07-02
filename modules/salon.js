@@ -1011,6 +1011,22 @@ for(const pedido of pedidos.docs){
 }
 
 // ==========================
+// BORRAR COCINA
+// ==========================
+
+const cocina = await getDocs(
+
+    collection(db,"cocina")
+
+);
+
+for(const producto of cocina.docs){
+
+    await deleteDoc(producto.ref);
+
+}
+
+// ==========================
 // REINICIAR MESAS
 // ==========================
 
