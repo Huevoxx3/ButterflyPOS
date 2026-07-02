@@ -356,31 +356,34 @@ if(items.length === 0){
     `;
 
 });*/
+//let modoEdicion = false;
+
 items.forEach(item => {
 
     html += `
 
-    <div class="cardUsuario">
+<div class="cardUsuario">
 
-        <div>
+    <div>
 
-            <strong>${item.nombre}</strong>
+        <strong>${item.nombre}</strong>
 
-            <br>
+        <br>
 
-            Cantidad: ${item.cantidad}
-
-        </div>
-
-        <div>
-
-            $ ${(item.precio * item.cantidad).toLocaleString()}
-
-        </div>
+        Cantidad: ${item.cantidad}
 
     </div>
 
-    `;
+    <div>
+
+        $ ${(item.precio * item.cantidad).toLocaleString()}
+
+    </div>
+
+</div>
+
+
+`;
 
 });
 
@@ -400,16 +403,64 @@ document.getElementById("productosMesa").innerHTML = html;
     .getElementById("btnAgregarProducto")
     .onclick = () => abrirCarta(mesa);
 
+    document.getElementById("btnEditarPedido").onclick = () => {
+
+    activarModoEdicion(mesa);
+
+};
+
 }
 
 function cerrarModalMesa(){
+
+    document.getElementById("btnAgregarProducto").style.display = "";
+
+    document.getElementById("btnEditarPedido").style.display = "";
+
+    document.getElementById("btnCobrar").style.display = "";
+
+    document.getElementById("btnVolverSalon").textContent = "← Volver";
 
     document
         .getElementById("modalMesa")
         .classList.add("oculto");
 
 }
+function activarModoEdicion(mesa){
 
+    document.getElementById("btnAgregarProducto").style.display = "none";
+
+    document.getElementById("btnEditarPedido").style.display = "none";
+
+    document.getElementById("btnCobrar").style.display = "none";
+
+    const volver = document.getElementById("btnVolverSalon");
+
+    volver.textContent = "❌ Cancelar";
+
+    volver.onclick = () => {
+
+        salirModoEdicion(mesa);
+
+    };
+
+}
+
+function salirModoEdicion(mesa){
+
+    document.getElementById("btnAgregarProducto").style.display = "";
+
+    document.getElementById("btnEditarPedido").style.display = "";
+
+    document.getElementById("btnCobrar").style.display = "";
+
+    const volver = document.getElementById("btnVolverSalon");
+
+    volver.textContent = "← Volver";
+
+    volver.onclick = cerrarModalMesa;
+
+}
 async function abrirCarta(mesa){
 
     document
