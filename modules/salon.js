@@ -865,18 +865,22 @@ async function cargarCartaSalon(mesa){
 
     btn.onclick = async () => {
 
-        await agregarProductoPedido(
+    console.log("CLICK AGREGAR");
 
-            mesa,
+    await agregarProductoPedido(
 
-            btn.dataset.id,
+        mesa,
 
-            btn.dataset.nombre,
+        btn.dataset.id,
 
-            Number(btn.dataset.precio)
+        btn.dataset.nombre,
 
-        );
-        const referencia = await getDoc(
+        Number(btn.dataset.precio)
+
+    );
+
+
+const referencia = await getDoc(
 
     doc(db,"mesas",String(mesa.numero))
 

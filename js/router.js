@@ -67,6 +67,26 @@ if (opcion === "Salón") {
 
 }
 
+if (opcion === "Pendientes") {
+
+    const modulo = await import("../modules/cocina.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if (opcion === "Entregados") {
+
+    const modulo = await import("../modules/cocinaEntregados.js");
+
+    modulo.default();
+
+    return;
+
+}
+
     document.querySelector("#contenido").innerHTML = `
         <h1>${opcion}</h1>
         <p>Módulo en construcción.</p>

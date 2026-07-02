@@ -1,0 +1,74 @@
+import { db } from "../js/firebase.js";
+
+import {
+
+    collection,
+    getDocs,
+    query,
+    where,
+    orderBy
+
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+export default async function(){
+
+    document.getElementById("contenido").innerHTML = `
+
+        <h1>🍳 Cocina</h1>
+
+        <h2>Entregados</h2>
+
+        <div id="listaEntregados">
+
+            Cargando...
+
+        </div>
+
+    `;
+
+    const consulta = query(
+
+        collection(db,"cocina"),
+
+        where("estado","==","Listo"),
+
+        orderBy("horaLista","desc")
+
+    );
+
+    const snapshot = await getDocs(consulta);
+
+    let html = "";
+
+    snapshot.forEach(documento=>{
+
+        const item = documento.data();
+
+        html += `
+
+        <div class="cardUsuario">
+
+            <strong>${item.nombre}</strong>
+
+            <br>
+
+            🍽 Mesa ${item.mesa}
+
+        </div>
+
+        <br>
+
+        `;
+
+    });
+
+    if(html===""){
+
+        html = "<p>No hay productos entregados.</p>";
+
+    }
+
+    document.getElementById("listaEntregados").innerHTML =
+        html;
+
+}

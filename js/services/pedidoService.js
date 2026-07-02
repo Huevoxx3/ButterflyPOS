@@ -9,7 +9,8 @@ import {
     updateDoc,
     doc,
     deleteDoc,
-    increment
+    increment,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 import { registrarActividad } from "./actividadService.js";
@@ -20,6 +21,7 @@ export async function agregarProductoPedido(
     nombre,
     precio
 ){
+    console.log("ENTRO A agregarProductoPedido");
 
     const itemsRef = collection(
         db,
@@ -37,7 +39,7 @@ export async function agregarProductoPedido(
 
     if(resultado.empty){
 
-        await addDoc(itemsRef,{
+        const nuevoItem = await addDoc(itemsRef,{
 
             productoId,
 
@@ -72,7 +74,40 @@ export async function agregarProductoPedido(
         );
 
     }
+    
+// ==========================
+// ENVIAR A COCINA
+// ==========================
+console.log("ANTES DE COCINA");
+await addDoc(
 
+    collection(db,"cocina"),
+
+    {
+
+        pedidoId: mesa.pedidoId,
+
+        mesa: mesa.numero,
+
+        nombre: nombre,
+
+        observacion: "",
+
+        estado: "Pendiente",
+
+        horaPedido: serverTimestamp(),
+
+        horaLista: null,
+
+        horaEntrega: null,
+
+        requiereConfirmacion: false,
+
+        ultimaModificacion: null
+
+    }
+
+);
     await updateDoc(
 
         doc(db,"pedidos",mesa.pedidoId),
@@ -254,6 +289,41 @@ export async function guardarEdicionPedido(
             }
 
         );
+        const cocina = await getDocs(
+
+    query(
+
+        collection(db,"cocina"),
+
+        where("pedidoId","==",mesa.pedidoId),
+
+        where("nombre","==",item.nombre),
+
+        where("estado","==","Pendiente")
+
+    )
+
+);
+
+for(const producto of cocina.docs){
+
+    await updateDoc(
+
+        producto.ref,
+
+        {
+
+            observacion: item.observacion || "",
+
+            requiereConfirmacion: true,
+
+            ultimaModificacion: serverTimestamp()
+
+        }
+
+    );
+
+}
 
     }
 
