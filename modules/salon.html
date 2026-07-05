@@ -48,7 +48,7 @@
 
         <h3>Pedido</h3>
 
-<div id="vistaMesa">
+<div id="vistaMesa" class="vistaMesa">
 
     <div id="productosMesa">
 
@@ -110,34 +110,30 @@
 
 <div id="modalCarta" class="modal oculto">
 
-    <div class="modal-contenido" style="width:900px;max-height:80vh;overflow:auto;">
+    <div class="modal-contenido">
 
-        <h2>
+        <div class="cabeceraModal">
 
-            Agregar Producto
+            <h2>Agregar Producto</h2>
 
-        </h2>
+            <button
+                id="cerrarCartaSalon"
+                class="btnCerrarModal">
 
-        <br>
+                ✕
+
+            </button>
+
+        </div>
 
         <input
             type="text"
             id="buscarCartaSalon"
-            placeholder="Buscar producto...">
-
-        <br><br>
+            placeholder="🔎 Buscar producto...">
 
         <div id="listaCartaSalon">
 
         </div>
-
-        <br>
-
-        <button id="cerrarCartaSalon">
-
-            Cerrar
-
-        </button>
 
     </div>
 

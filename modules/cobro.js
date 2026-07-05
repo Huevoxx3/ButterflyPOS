@@ -28,185 +28,168 @@ export async function abrirCobro(
 
     actualizarSalon = callbackActualizarSalon;
 
-    const items = await obtenerItemsPedido(
+const items = await obtenerItemsPedido(
+    mesa.pedidoId
+);
 
-        mesa.pedidoId
+let html = `
 
-    );
+<div class="contenedorTablaCobro">
 
-    let html = `
+<table class="tablaCobro">
 
-
-    <table
-        border="1"
-        cellpadding="8"
-        style="width:100%;border-collapse:collapse;">
-
-<tr>
+<tr class="cabeceraCobro">
 
     <th>Producto</th>
-
     <th>Cant.</th>
-
     <th>Precio</th>
-
     <th>Total</th>
-
     <th>No cobrar</th>
-
     <th>Desc %</th>
 
 </tr>
 
+`;
+
+items.forEach(item => {
+
+    html += `
+
+    <tr class="filaCobro">
+
+        <td>${item.nombre}</td>
+
+        <td>${item.cantidad}</td>
+
+        <td>$ ${item.precio.toLocaleString()}</td>
+
+        <td class="totalProducto">
+
+            $ ${(item.precio * item.cantidad).toLocaleString()}
+
+        </td>
+
+        <td class="celdaCentro">
+
+            <input
+                type="checkbox"
+                class="chkNoCobrar">
+
+        </td>
+
+        <td>
+
+            <input
+                type="number"
+                class="txtDescuento"
+                value="0"
+                min="0"
+                max="100">
+
+        </td>
+
+    </tr>
+
     `;
 
-    items.forEach(item=>{
-
-        html += `
-
-<tr>
-
-    <td>${item.nombre}</td>
-
-    <td>${item.cantidad}</td>
-
-    <td>$ ${item.precio}</td>
-
-    <td class="totalProducto">
-
-        $ ${item.precio * item.cantidad}
-
-    </td>
-
-    <td style="text-align:center">
-
-        <input
-            type="checkbox"
-            class="chkNoCobrar">
-
-    </td>
-
-    <td>
-
-        <input
-
-            type="number"
-
-            class="txtDescuento"
-
-            value="0"
-
-            min="0"
-
-            max="100"
-
-            style="width:60px;">
-
-    </td>
-
-</tr>
-
-<br>
-
-
-
-        `;
-
-    });
+});
 
 html += `
 
 </table>
 
-<br>
+</div>
 
-<hr>
+<div class="configuracionCobro">
 
-<h3>
+    <div class="grupoCobro">
 
-Descuento General %
+        <label>
 
-</h3>
+            💸 Descuento General
 
-<input
+        </label>
 
-    type="number"
+        <input
+            type="number"
+            id="descuentoGeneral"
+            value="0"
+            min="0"
+            max="100">
 
-    id="descuentoGeneral"
+    </div>
 
-    value="0"
+    <div id="bloqueMotivo" style="display:none;">
 
-    min="0"
+        <div class="grupoCobro">
 
-    max="100"
+            <label>
 
-    style="width:80px;">
+                📝 Motivo del descuento
 
-<br><br>
+            </label>
 
-<div id="bloqueMotivo" style="display:none;">
+            <textarea
+                id="motivoDescuento"
+                rows="3">
 
-<h3>
+            </textarea>
 
-Motivo del descuento
+        </div>
 
-</h3>
+    </div>
 
-<textarea
+    <div class="grupoCobro">
 
-    id="motivoDescuento"
+        <label>
 
-    rows="3"
+            💳 Medio de Pago
 
-    style="width:100%;">
+        </label>
 
-</textarea>
+        <select id="medioPago">
+
+            <option value="Efectivo">💵 Efectivo</option>
+            <option value="Débito">💳 Débito</option>
+            <option value="Crédito">💳 Crédito</option>
+            <option value="Transferencia">🏦 Transferencia</option>
+            <option value="Cuenta Corriente">📒 Cuenta Corriente</option>
+            <option value="Otro">📝 Otro</option>
+            <option value="Pendiente">⏳ Registrar después</option>
+
+        </select>
+
+    </div>
 
 </div>
 
-<h3>
+<div class="pieCobro">
 
-Medio de pago
+    <div class="totalCobro">
 
-</h3>
+        <h1 id="totalCuenta">
 
-<select id="medioPago">
+            $ ${mesa.total.toLocaleString()}
 
-    <option value="Efectivo">💵 Efectivo</option>
+        </h1>
 
-    <option value="Débito">💳 Débito</option>
+    </div>
 
-    <option value="Crédito">💳 Crédito</option>
+<div class="accionesCobro">
 
-    <option value="Transferencia">🏦 Transferencia</option>
 
-    <option value="Cuenta Corriente">📒 Cuenta Corriente</option>
 
-    <option value="Otro">📝 Otro</option>
+    <button
+        id="btnConfirmarCobro"
+        class="btnVerdeGrande">
 
-    <option value="Pendiente">⏳ Registrar después</option>
+        💳 Cobrar
 
-</select>
+    </button>
 
-<br><br>
+</div>
 
-<hr>
-
-<h2
-    id="totalCuenta"
-    style="text-align:right;">
-
-    Total: $ ${mesa.total.toLocaleString()}
-
-</h2>
-
-<br>
-
-<button id="btnConfirmarCobro">
-
-    Cobrar
-
-</button>
+</div>
 
 `;
 
@@ -215,6 +198,8 @@ document.getElementById("vistaMesa").classList.add("oculto");
 document.getElementById("vistaCobro").classList.remove("oculto");
 
 document.getElementById("vistaCobro").innerHTML = html;
+
+console.log(document.getElementById("btnConfirmarCobro"));
 
 document.getElementById("btnAgregarProducto").style.display = "none";
 
@@ -294,10 +279,12 @@ document.getElementById("btnConfirmarCobro").onclick = async () => {
 
     medioPago: document.getElementById("medioPago").value,
 
-totalCobrado: parseFloat(
+totalCobrado: Number(
     document.getElementById("totalCuenta")
         .textContent
-        .replace("Total: $", "")
+        .replace("$", "")
+        .replace(/\./g, "")
+        .replace(",", ".")
         .trim()
 ),
 
@@ -438,11 +425,13 @@ function calcularTotal(){
 
         if(columnas.length===0) return;
 
-        const subtotalTexto = columnas[3].textContent
-            .replace("$","")
-            .trim();
+const subtotalTexto = columnas[3].textContent
+    .replace("$", "")
+    .replace(/\./g, "")   // elimina los puntos de miles
+    .replace(",", ".")    // por si alguna vez hay decimales
+    .trim();
 
-        const subtotal = Number(subtotalTexto);
+const subtotal = Number(subtotalTexto);
 
         const noCobrar = columnas[4]
             .querySelector("input").checked;
@@ -480,8 +469,7 @@ document.getElementById("bloqueMotivo").style.display =
 
         : "none";
 
-    document.getElementById("totalCuenta").textContent =
-
-        "Total: $ " + total.toFixed(2);
+document.getElementById("totalCuenta").textContent =
+    "$ " + total.toLocaleString("es-AR");
 
 }

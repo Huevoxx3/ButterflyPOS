@@ -505,10 +505,7 @@ function activarModoEdicion(mesa){
 
 async function mostrarPedidoEdicion(mesa){  
 
-    document.getElementById("btnAgregarProducto").style.display = "";
-
-    document.getElementById("btnAgregarProducto").textContent =
-    "➕ Agregar Producto";
+    document.getElementById("btnAgregarProducto").style.display = "none";
 
     document.getElementById("btnEditarPedido").style.display = "none";
 
@@ -577,70 +574,64 @@ pedidoTemporal.forEach(item => {
 
     html += `
 
-    <div class="cardUsuario">
+   <div class="filaEdicion">
 
-        <div style="flex:1;">
+    <div class="filaEdicionSuperior">
 
-            <strong>${item.nombre}</strong>
+        <div class="nombreProductoEdicion">
 
-            <br><br>
-
-            <div class="editorCantidad">
-
-                <button
-                    class="btnMenos"
-                    data-id="${item.id}">
-
-                    −
-
-                </button>
-
-                <span>
-
-                    ${item.cantidad}
-
-                </span>
-
-                <button
-                    class="btnMas"
-                    data-id="${item.id}">
-
-                    +
-
-                </button>
-
-            </div>
-
-            <br>
-
-            <textarea
-                class="txtObservacion"
-                data-id="${item.id}"
-                placeholder="Observaciones...">${item.observacion || ""}</textarea>
-
-            <br><br>
-
-            <button
-                class="btnEliminarProducto"
-                data-id="${item.id}">
-
-                🗑 Eliminar producto
-
-            </button>
+            ${item.nombre}
 
         </div>
 
-        <div>
+        <div class="precioProductoEdicion">
 
-            <strong>
-
-                $ ${(item.precio * item.cantidad).toLocaleString()}
-
-            </strong>
+            $ ${(item.precio * item.cantidad).toLocaleString()}
 
         </div>
 
     </div>
+
+    <div class="editorCantidad">
+
+        <button
+            class="btnMenos"
+            data-id="${item.id}">
+
+            −
+
+        </button>
+
+        <span>
+
+            ${item.cantidad}
+
+        </span>
+
+        <button
+            class="btnMas"
+            data-id="${item.id}">
+
+            +
+
+        </button>
+
+    </div>
+
+    <textarea
+        class="txtObservacion"
+        data-id="${item.id}"
+        placeholder="Observaciones...">${item.observacion || ""}</textarea>
+
+    <button
+        class="btnEliminarProducto"
+        data-id="${item.id}">
+
+        🗑 Eliminar producto
+
+    </button>
+
+</div>
 
     `;
 
@@ -859,45 +850,47 @@ async function cargarCartaSalon(mesa){
 
         lista.innerHTML += `
 
-            <h3 style="margin-top:20px;">
+<div class="tituloCategoria">
 
-                ${categoria}
+    ${categoria}
 
-            </h3>
+</div>
 
         `;
 
         categorias[categoria].forEach(producto=>{
 
-            lista.innerHTML += `
+    lista.innerHTML += `
 
-            <div class="cardUsuario">
+    <div class="filaProducto">
 
-                <div>
+        <div class="filaNombre">
 
-                    <strong>${producto.nombre}</strong>
+            ${producto.nombre}
 
-                    <br>
+        </div>
 
-                    $ ${producto.precio.toLocaleString()}
+        <div class="filaPrecio">
 
-                </div>
+            $ ${producto.precio.toLocaleString()}
 
-                <button
-    class="btnAgregarCarta"
-    data-id="${producto.id}"
-    data-nombre="${producto.nombre}"
-    data-precio="${producto.precio}">
+        </div>
 
-    Agregar
+        <button
+            class="btnAgregarCarta"
+            data-id="${producto.id}"
+            data-nombre="${producto.nombre}"
+            data-precio="${producto.precio}">
 
-</button>
+            ➕ Agregar
 
-            </div>
+        </button>
 
-            `;
+    </div>
 
-        });
+    `;
+
+});
 
     });
    document.querySelectorAll(".btnAgregarCarta").forEach(btn => {
@@ -938,52 +931,42 @@ buscador.oninput = () => {
 
     const texto = buscador.value.toLowerCase();
 
-    document
-        .querySelectorAll("#listaCartaSalon .cardUsuario")
-        .forEach(card => {
+document
+    .querySelectorAll("#listaCartaSalon .filaProducto")
+    .forEach(card => {
 
-            const nombre =
-                card.textContent.toLowerCase();
+        const nombre = card.textContent.toLowerCase();
 
-            card.style.display =
-                nombre.includes(texto)
-                    ? "flex"
-                    : "none";
+        card.style.display =
+            nombre.includes(texto)
+                ? "grid"
+                : "none";
 
-        });
+    });
 
-    document
-        .querySelectorAll("#listaCartaSalon h3")
-        .forEach(titulo => {
+document
+    .querySelectorAll("#listaCartaSalon .tituloCategoria")
+    .forEach(titulo => {
 
-            let mostrar = false;
+        let mostrar = false;
 
-            let siguiente = titulo.nextElementSibling;
+        let siguiente = titulo.nextElementSibling;
 
-            while(
-                siguiente &&
-                siguiente.tagName !== "H3"
-            ){
+        while (
+            siguiente &&
+            !siguiente.classList.contains("tituloCategoria")
+        ) {
 
-                if(
-                    siguiente.style.display !== "none"
-                ){
-
-                    mostrar = true;
-
-                }
-
-                siguiente =
-                    siguiente.nextElementSibling;
-
+            if (siguiente.style.display !== "none") {
+                mostrar = true;
             }
 
-            titulo.style.display =
-                mostrar
-                    ? "block"
-                    : "none";
+            siguiente = siguiente.nextElementSibling;
+        }
 
-        });
+        titulo.style.display = mostrar ? "block" : "none";
+
+    });
 
 };
 

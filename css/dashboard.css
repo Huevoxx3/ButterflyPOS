@@ -213,6 +213,18 @@ header{
 
 }
 
+#vistaMesa.oculto{
+
+    display:none !important;
+
+}
+
+#vistaCobro.oculto{
+
+    display:none !important;
+
+}
+
 .modal-contenido{
 
     width:500px;
@@ -824,12 +836,15 @@ header{
 
 .mesaModal{
 
-    width:760px;
-    max-width:90vw;
-    background:#ffffff;
-    border-radius:18px;
-    padding:28px;
-    box-shadow:0 20px 60px rgba(0,0,0,.20);
+    width:min(1200px,95vw);
+
+    height:90vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
 
 }
 
@@ -896,11 +911,15 @@ header{
 
 .seccionPedido{
 
-    background:#fafafa;
-    border-radius:14px;
-    padding:20px;
-    margin-bottom:25px;
-    min-height:180px;
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
+    margin-top:18px;
 
 }
 
@@ -908,6 +927,28 @@ header{
 
     margin:0 0 20px 0;
     color:#202938;
+
+}
+
+.vistaMesa{
+
+    flex:1;
+
+    overflow:hidden;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+#productosMesa{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    padding-right:8px;
 
 }
 
@@ -932,6 +973,7 @@ header{
     margin:0;
     font-size:46px;
     color:#1e293b;
+    flex-shrink:0;
 
 }
 
@@ -940,6 +982,7 @@ header{
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:12px;
+    flex-shrink:0;
 
 }
 
@@ -1003,29 +1046,27 @@ header{
 
 #modalCarta .modal-contenido{
 
-    width:900px;
-    max-width:90vw;
-    max-height:85vh;
+    width:min(1400px,95vw);
 
-    overflow-y:auto;
+    height:90vh;
 
-    background:#ffffff;
+    display:flex;
+
+    flex-direction:column;
+
+    padding:20px;
 
     border-radius:18px;
 
-    padding:30px;
+    background:white;
 
-    box-shadow:0 20px 60px rgba(0,0,0,.25);
+    box-shadow:0 20px 60px rgba(0,0,0,.20);
 
 }
 
 #modalCarta h2{
 
-    margin:0;
-
-    font-size:34px;
-
-    color:#1f2937;
+flex-shrink:0;
 
 }
 
@@ -1033,17 +1074,33 @@ header{
 
     width:100%;
 
-    padding:14px 18px;
+    height:52px;
 
-    border:1px solid #dcdcdc;
+    padding:0 18px;
 
-    border-radius:12px;
+    border:1px solid #dbe2ea;
+
+    border-radius:14px;
+
+    background:#ffffff;
 
     font-size:16px;
 
-    margin-top:25px;
+    color:#374151;
 
-    margin-bottom:20px;
+    outline:none;
+
+    transition:.2s;
+
+    margin-bottom:18px;
+
+}
+
+#buscarCartaSalon:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.10);
 
 }
 
@@ -1057,7 +1114,45 @@ header{
 
 }
 
-#listaCartaSalon h3{
+#listaCartaSalon{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    padding-right:8px;
+
+}
+
+.tituloCategoria{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:5;
+
+    background:#f8fafc;
+
+    padding:8px 12px;
+
+    margin:14px 0 6px 0;
+
+    border-left:4px solid #2563eb;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    color:#475569;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+}
+
+/*#listaCartaSalon h3{
 
     margin-top:30px;
 
@@ -1071,21 +1166,25 @@ header{
 
     padding-left:12px;
 
-}
+}*/
 
 #listaCartaSalon .cardUsuario{
 
-    display:flex;
-    justify-content:space-between;
+    display:grid;
+
+    grid-template-columns:1fr 90px 110px;
+
     align-items:center;
 
-    padding:10px 16px;
+    gap:15px;
 
-    margin-bottom:8px;
+    padding:8px 14px;
 
-    min-height:58px;
+    margin-bottom:4px;
 
-    border-radius:10px;
+    min-height:48px;
+
+    border-radius:8px;
 
     background:#fff;
 
@@ -1105,30 +1204,57 @@ header{
 
 #listaCartaSalon strong{
 
-    font-size:17px;
+    font-size:16px;
+
     color:#202938;
+
     font-weight:600;
 
 }
 
 #listaCartaSalon .cardUsuario div{
 
-    font-size:14px;
+    font-size:13px;
+
     color:#666;
-    line-height:1.3;
+
+    line-height:1.2;
+
+}
+
+#listaCartaSalon::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+#listaCartaSalon::-webkit-scrollbar-thumb{
+
+    background:#cbd5e1;
+
+    border-radius:10px;
+
+}
+
+#listaCartaSalon::-webkit-scrollbar-thumb:hover{
+
+    background:#94a3b8;
 
 }
 
 .btnAgregarCarta{
 
     background:#2563eb;
-    color:white;
+
+    color:#fff;
 
     border:none;
 
-    border-radius:8px;
+    border-radius:10px;
 
-    padding:8px 14px;
+    height:36px;
+
+    width:105px;
 
     font-size:13px;
 
@@ -1136,15 +1262,15 @@ header{
 
     cursor:pointer;
 
-    min-width:82px;
-
-    transition:.2s;
+    transition:.15s;
 
 }
 
 .btnAgregarCarta:hover{
 
     background:#1d4ed8;
+
+    transform:scale(1.03);
 
 }
 
@@ -1192,5 +1318,661 @@ header{
     background:#fff3b0;
 
     border:2px solid orange;
+
+}
+
+/*=========================================
+    CARTA - NUEVO DISEÑO
+=========================================*/
+
+.productoCarta{
+
+    display:grid !important;
+
+    grid-template-columns: 1fr 140px 150px;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.productoNombre{
+
+    font-size:17px;
+
+    font-weight:600;
+
+    color:#202938;
+
+}
+
+.productoPrecio{
+
+    text-align:right;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:#198754;
+
+}
+
+.productoAccion{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+.btnAgregarCarta{
+
+    width:120px;
+
+    height:40px;
+
+}
+
+/*==================================
+    FILAS DE LA CARTA
+===================================*/
+
+.filaProducto{
+
+    display:grid;
+
+    grid-template-columns: 1fr 110px 120px;
+
+    align-items:center;
+
+    gap:12px;
+
+    min-height:54px;
+
+    padding:6px 14px;
+
+    border-bottom:1px solid #ececec;
+
+    transition:.15s;
+
+}
+
+.filaProducto:hover{
+
+    background:#f8fbff;
+
+    border-radius:10px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+    transform:translateX(4px);
+
+}
+
+.filaNombre{
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:#1e293b;
+
+    letter-spacing:.2px;
+
+}
+
+.filaPrecio{
+
+    text-align:right;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:#16a34a;
+
+    white-space:nowrap;
+
+}
+.filaProducto .btnAgregarCarta{
+
+    justify-self:end;
+
+    width:105px;
+
+    height:34px;
+
+    border-radius:8px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+/*====================================
+        CABECERA MODALES
+=====================================*/
+
+.cabeceraModal{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.cabeceraModal h2{
+
+    margin:0;
+
+  font-size:42px;
+
+font-weight:800;
+
+color:#1e293b;
+
+}
+
+.btnCerrarModal{
+
+    width:42px !important;
+
+    min-width:42px;
+
+    max-width:42px;
+
+    height:42px;
+
+    padding:0;
+
+    margin:0;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:transparent;
+
+    color:#666;
+
+    font-size:26px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    flex-shrink:0;
+
+}
+
+.btnCerrarModal:hover{
+
+    background:#ececec;
+
+    color:#000;
+
+}
+
+/*=========================================
+        EDITAR PEDIDO
+=========================================*/
+
+.filaEdicion{
+
+    padding:16px 8px;
+
+    margin-bottom:6px;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+.filaEdicionSuperior{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:10px;
+
+}
+
+.nombreProductoEdicion{
+
+    font-size:16px;
+
+    font-weight:700;
+
+    color:#1f2937;
+
+}
+
+.precioProductoEdicion{
+
+    font-size:16px;
+
+    font-weight:700;
+
+    color:#16a34a;
+
+}
+
+.editorCantidad{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin:12px 0;
+
+}
+
+.txtObservacion{
+
+    width:100%;
+
+    min-height:55px;
+
+    resize:vertical;
+
+    border:1px solid #dbe2ea;
+
+    border-radius:10px;
+
+    padding:10px;
+
+    font-size:14px;
+
+    margin:8px 0 12px;
+
+}
+
+.btnEliminarProducto{
+
+    width:auto;
+
+    padding:8px 14px;
+
+    background:#fff5f5;
+
+    color:#dc3545;
+
+    border:1px solid #fecaca;
+
+    border-radius:8px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+.btnEliminarProducto:hover{
+
+    background:#dc3545;
+
+    color:white;
+
+}
+
+.btnMas,
+.btnMenos{
+
+    width:34px;
+
+    height:34px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#edf2f7;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.15s;
+
+}
+
+.btnMas:hover{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.btnMenos:hover{
+
+    background:#dc3545;
+
+    color:white;
+
+}
+
+.editorCantidad span{
+
+    min-width:30px;
+
+    text-align:center;
+
+    font-size:18px;
+
+    font-weight:700;
+
+}
+
+/*======================================
+            COBRO
+======================================*/
+
+.tablaCobro{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:10px;
+
+}
+
+.tablaCobro th{
+
+    background:#f3f4f6;
+
+    color:#374151;
+
+    padding:12px;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    text-align:left;
+
+    border-bottom:2px solid #dbe2ea;
+
+}
+
+.tablaCobro td{
+
+    padding:12px;
+
+    border-bottom:1px solid #ececec;
+
+    vertical-align:middle;
+
+}
+
+.filaCobro:hover{
+
+    background:#f8fbff;
+
+}
+
+.celdaCentro{
+
+    text-align:center;
+
+}
+
+.txtDescuento{
+
+    width:65px;
+
+    text-align:center;
+
+    border:1px solid #dbe2ea;
+
+    border-radius:8px;
+
+    padding:6px;
+
+}
+
+/*====================================
+        FORMULARIO COBRO
+=====================================*/
+
+.grupoCobro{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.grupoCobro label{
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#475569;
+
+    margin-bottom:4px;
+
+}
+
+.grupoCobro input,
+
+.grupoCobro select,
+
+.grupoCobro textarea{
+
+    border:1px solid #dbe2ea;
+
+    border-radius:10px;
+
+    padding:10px 12px;
+
+    font-size:15px;
+
+}
+
+#descuentoGeneral{
+
+    width:100%;
+
+    height:42px;
+
+    border:1px solid #dbe2ea;
+
+    border-radius:10px;
+
+    padding:0 12px;
+
+    font-size:16px;
+
+    text-align:center;
+
+}
+
+#medioPago{
+
+    width:100%;
+
+    height:42px;
+
+    border:1px solid #dbe2ea;
+
+    border-radius:10px;
+
+    padding:0 12px;
+
+    font-size:15px;
+
+    background:white;
+
+}
+
+/*======================================
+            PIE COBRO
+======================================*/
+
+.pieCobro{
+
+    border-top:1px solid #e5e7eb;
+
+    padding-top:25px;
+
+    display:grid;
+
+    grid-template-columns:1fr auto;
+
+    align-items:center;
+
+    gap:30px;
+
+}
+
+.totalCobro{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+
+.totalCobro h1{
+
+    margin:0;
+
+    font-size:52px;
+
+    color:#1e293b;
+
+    font-weight:800;
+
+}
+
+.btnVerdeGrande{
+
+    width:240px;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#16a34a;
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.btnVerdeGrande:hover{
+
+    background:#15803d;
+
+    transform:translateY(-2px);
+
+}
+
+.contenedorTablaCobro{
+
+    max-height:320px;
+
+    overflow-y:auto;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:10px;
+
+}
+
+.configuracionCobro{
+
+    display:grid;
+
+    grid-template-columns:220px 320px;
+
+    gap:24px;
+
+    align-items:end;
+
+    margin:25px 0;
+
+}
+
+.grupoCobro{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.grupoCobro label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    height:20px;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#334155;
+
+}
+
+.grupoCobro:first-child{
+
+    width:160px;
+
+}
+
+.grupoCobro:last-child{
+
+    width:300px;
+
+}
+
+.accionesCobro{
+
+    display:flex;
+
+    gap:15px;
 
 }
