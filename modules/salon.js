@@ -6,7 +6,7 @@ import {
 import { registrarActividad } from "../js/services/actividadService.js";
 
 import { db } from "../js/firebase.js";
-
+import { abrirCobro } from "./cobro.js";
 import {
     collection,
     query,
@@ -264,9 +264,7 @@ document.getElementById("btnCobrar").style.display = "";
 
 const volver = document.getElementById("btnVolverSalon");
 
-volver.textContent = "← Volver";
-
-volver.onclick = cerrarModalMesa;    
+configurarBotonVolver();   
 
     document.getElementById("datosMesa").innerHTML = `
 
@@ -440,6 +438,37 @@ document.getElementById("productosMesa").innerHTML = html;
     activarModoEdicion(mesa);
 
 };
+document.getElementById("btnCobrar").onclick = () => {
+
+    abrirCobro(
+
+        mesa,
+
+        async () => {
+
+            const referencia = await getDoc(
+
+                doc(db,"mesas",String(mesa.numero))
+
+            );
+
+            await mostrarModalMesa(
+
+                referencia.data()
+
+            );
+
+        },
+
+        async () => {
+
+            await dibujarMesas();
+
+        }
+
+    );
+
+};
 
 }
 
@@ -451,11 +480,21 @@ function cerrarModalMesa(){
 
     document.getElementById("btnCobrar").style.display = "";
 
-    document.getElementById("btnVolverSalon").textContent = "← Volver";
+    configurarBotonVolver();
 
     document
         .getElementById("modalMesa")
         .classList.add("oculto");
+
+}
+
+function configurarBotonVolver(){
+
+    const boton = document.getElementById("btnVolverSalon");
+
+    boton.textContent = "← Volver";
+
+    boton.onclick = cerrarModalMesa;
 
 }
 function activarModoEdicion(mesa){
@@ -468,7 +507,7 @@ async function mostrarPedidoEdicion(mesa){
 
     document.getElementById("btnAgregarProducto").style.display = "";
 
-document.getElementById("btnAgregarProducto").textContent =
+    document.getElementById("btnAgregarProducto").textContent =
     "➕ Agregar Producto";
 
     document.getElementById("btnEditarPedido").style.display = "none";

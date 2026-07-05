@@ -37,6 +37,7 @@ opciones[datos.perfil].forEach(opcion => {
 
 boton.onclick = async () => {
 
+
 if (opcion === "Usuarios") {
 
     const modulo = await import("../modules/usuarios.js");
@@ -70,6 +71,16 @@ if (opcion === "Salón") {
 if (opcion === "Pendientes") {
 
     const modulo = await import("../modules/cocina.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if (opcion === "Mesas Cerradas") {
+
+    const modulo = await import("../modules/mesasCerradas.js");
 
     modulo.default();
 
