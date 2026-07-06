@@ -19,7 +19,15 @@ serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-export default async function mostrarMesasCerradas(){
+let modoSoloLectura = false;
+
+export default async function mostrarMesasCerradas(admin = null){
+
+    if(admin !== null){
+
+        modoSoloLectura = admin;
+
+    }
 
     const contenido = document.getElementById("contenido");
 
@@ -245,6 +253,16 @@ Observaciones
 `;
 
     contenido.innerHTML = html;
+
+    if (modoSoloLectura) {
+
+    document.getElementById("medioPagoEditar").disabled = true;
+
+    document.getElementById("observacionesVenta").disabled = true;
+
+    document.getElementById("btnGuardarVenta").style.display = "none";
+
+}
 
     document.getElementById("medioPagoEditar").value =
     venta.medioPago;

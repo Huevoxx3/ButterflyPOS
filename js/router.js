@@ -5,13 +5,26 @@ const menu = document.getElementById("menu");
 const opciones = {
 
     admin: [
-        "Inicio",
-        "Usuarios",
-        "Carta",
-        "Actividad",
-        "Historial",
-        "Cierre de Caja"
-    ],
+    "Inicio",
+
+    "Salón",
+
+    "Mesas Cerradas",
+
+    "Pendientes",
+
+    "Entregados",
+
+    "Usuarios",
+
+    "Carta",
+
+    "Actividad",
+
+    "Historial",
+
+    "Cierre de Caja"
+],
 
     salon: [
         "Inicio",
@@ -38,6 +51,17 @@ opciones[datos.perfil].forEach(opcion => {
 boton.onclick = async () => {
 
 
+if (opcion === "Inicio") {
+
+    const modulo = await import("../modules/inicio.js");
+
+    modulo.default();
+
+    return;
+
+}    
+
+
 if (opcion === "Usuarios") {
 
     const modulo = await import("../modules/usuarios.js");
@@ -62,7 +86,7 @@ if (opcion === "Salón") {
 
     const modulo = await import("../modules/salon.js");
 
-    modulo.default();
+    modulo.default(datos.perfil === "admin");
 
     return;
 
@@ -72,7 +96,7 @@ if (opcion === "Pendientes") {
 
     const modulo = await import("../modules/cocina.js");
 
-    modulo.default();
+    modulo.default(datos.perfil === "admin");
 
     return;
 
@@ -82,7 +106,7 @@ if (opcion === "Mesas Cerradas") {
 
     const modulo = await import("../modules/mesasCerradas.js");
 
-    modulo.default();
+    modulo.default(datos.perfil === "admin");
 
     return;
 
@@ -91,6 +115,26 @@ if (opcion === "Mesas Cerradas") {
 if (opcion === "Entregados") {
 
     const modulo = await import("../modules/cocinaEntregados.js");
+
+    modulo.default(datos.perfil === "admin");
+
+    return;
+
+}
+
+if (opcion === "Cierre de Caja") {
+
+    const modulo = await import("../modules/cierreCaja.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if (opcion === "Historial") {
+
+    const modulo = await import("../modules/historialCaja.js");
 
     modulo.default();
 
@@ -106,5 +150,13 @@ if (opcion === "Entregados") {
 };
 
     menu.appendChild(boton);
+
+
+
+});
+
+import("../modules/inicio.js").then(modulo => {
+
+    modulo.default();
 
 });

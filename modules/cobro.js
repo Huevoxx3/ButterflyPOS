@@ -1,3 +1,5 @@
+import { obtenerJornadaActual } from "../js/services/cajaService.js";
+
 import { obtenerItemsPedido } from "../js/services/pedidoService.js";
 
 import { db } from "../js/firebase.js";
@@ -5,6 +7,7 @@ import { db } from "../js/firebase.js";
 import {
     collection,
     addDoc,
+    getDoc,
     serverTimestamp,
     doc,
     updateDoc
@@ -255,6 +258,8 @@ document.getElementById("btnConfirmarCobro").onclick = async () => {
 
     );
 
+const jornada = await obtenerJornadaActual();
+
     await addDoc(
 
         collection(db,"ventas"),
@@ -266,6 +271,8 @@ document.getElementById("btnConfirmarCobro").onclick = async () => {
     mesa: mesa.numero,
 
     mozo: mesa.mozo,
+
+    jornada: jornada,
 
     fecha: serverTimestamp(),
 
@@ -378,12 +385,26 @@ await addDoc(
 
 );
 
+
+document.getElementById("productosMesa").innerHTML = "";
+
+document.getElementById("datosMesa").innerHTML = "";
+
+document.getElementById("totalMesa").textContent = "$0";
+
 document.getElementById("modalMesa").classList.add("oculto");
+
 if(actualizarSalon){
 
     await actualizarSalon();
 
 }
+
+document.getElementById("vistaCobro").innerHTML = "";
+
+document.getElementById("vistaCobro").classList.add("oculto");
+
+document.getElementById("vistaMesa").classList.remove("oculto");
 
 // AQUÍ VAMOS A RECARGAR EL SALÓN
 

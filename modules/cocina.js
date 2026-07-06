@@ -13,7 +13,9 @@ serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-export default async function(){
+export default async function(admin = false){
+        
+    modoSoloLectura = admin;
 
     const respuesta = await fetch("../modules/cocina.html");
 
@@ -23,6 +25,8 @@ export default async function(){
     await cargarPendientes();
 
 }
+
+let modoSoloLectura = false;
 
 async function cargarPendientes(){
 
@@ -93,17 +97,14 @@ ${item.nombre}
     📝 ${item.observacion || "Sin observaciones"}
 
     ${
+    modoSoloLectura
+    ?
+    ""
+    :
+    (
         item.requiereConfirmacion
         ?
         `
-        <br><br>
-
-        <strong style="color:red">
-
-            🚨 PEDIDO MODIFICADO
-
-        </strong>
-
         <br><br>
 
         <button
@@ -126,7 +127,8 @@ ${item.nombre}
 
         </button>
         `
-    }
+    )
+}
 
 </div>
 

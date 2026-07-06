@@ -30,7 +30,11 @@ let itemsEliminados = [];
 
 let totalTemporal = 0;
 
-export default async function () {
+let modoSoloLectura = false;
+
+export default async function(admin = false){
+
+    modoSoloLectura = admin;
 
     const respuesta = await fetch("../modules/salon.html");
 
@@ -78,16 +82,23 @@ async function dibujarMesas() {
 
     });
 
-    document.querySelectorAll(".mesaCard").forEach(mesa => {
+document.querySelectorAll(".mesaCard").forEach(mesa => {
 
-        mesa.addEventListener("click", () => {
+    mesa.addEventListener("click", () => {
 
-            abrirMesa(mesa.dataset.mesa);
+        if (modoSoloLectura) {
 
-        });
+            alert("Modo solo lectura.");
+
+            return;
+
+        }
+
+        abrirMesa(mesa.dataset.mesa);
 
     });
 
+});
 }
 
 function obtenerClase(estado){
@@ -228,7 +239,13 @@ async function abrirMesa(numero){
 
     }
 
-    await mostrarModalMesa(mesa);
+  const mesaActualizada = await getDoc(referencia);
+
+await mostrarModalMesa(
+
+    mesaActualizada.data()
+
+);
 
 }
 
@@ -304,6 +321,11 @@ configurarBotonVolver();
 
     document.getElementById("totalMesa").textContent =
         "Total: $" + mesa.total.toLocaleString();
+
+        console.log("================================");
+console.log("Mesa:", mesa.numero);
+console.log("PedidoId:", mesa.pedidoId);
+console.log("Estado:", mesa.estado);
 
     const items = await obtenerItemsPedido(mesa.pedidoId);
 
@@ -460,11 +482,11 @@ document.getElementById("btnCobrar").onclick = () => {
 
         },
 
-        async () => {
+async () => {
 
-            await dibujarMesas();
+    await dibujarVistaSalon();
 
-        }
+}
 
     );
 
@@ -758,12 +780,17 @@ async function abrirCartaEdicion(mesa){
 
 async function guardarPedidoTemporal(mesa){
 
-    await guardarEdicionPedido(
-    mesa,
-    pedidoTemporal,
-    itemsEliminados
-);
+await guardarEdicionPedido(
 
+    mesa,
+
+    pedidoOriginal,
+
+    pedidoTemporal,
+
+    itemsEliminados
+
+);
 // Limpiar memoria
 pedidoTemporal = [];
 pedidoOriginal = [];
@@ -976,7 +1003,7 @@ async function reiniciarSistema(){
 
     const confirmar = confirm(
 
-        "¿Desea reiniciar el sistema?\n\nSe eliminará toda la actividad."
+        "¿Desea reiniciar el sistema?\n\nSe eliminarán todos los pedidos, ventas, actividad y cierres de caja."
 
     );
 
@@ -987,9 +1014,7 @@ async function reiniciarSistema(){
     // ==========================
 
     const actividad = await getDocs(
-
         collection(db,"actividad")
-
     );
 
     for(const documento of actividad.docs){
@@ -998,89 +1023,137 @@ async function reiniciarSistema(){
 
     }
 
-
     // ==========================
-// BORRAR PEDIDOS
-// ==========================
+    // BORRAR PEDIDOS
+    // ==========================
 
-const pedidos = await getDocs(
-
-    collection(db,"pedidos")
-
-);
-
-for(const pedido of pedidos.docs){
-
-    const items = await getDocs(
-
-        collection(
-            db,
-            "pedidos",
-            pedido.id,
-            "items"
-        )
-
+    const pedidos = await getDocs(
+        collection(db,"pedidos")
     );
 
-    for(const item of items.docs){
+    for(const pedido of pedidos.docs){
 
-        await deleteDoc(item.ref);
+        const items = await getDocs(
+
+            collection(
+                db,
+                "pedidos",
+                pedido.id,
+                "items"
+            )
+
+        );
+
+        for(const item of items.docs){
+
+            await deleteDoc(item.ref);
+
+        }
+
+        await deleteDoc(pedido.ref);
 
     }
 
-    await deleteDoc(pedido.ref);
+    // ==========================
+    // BORRAR COCINA
+    // ==========================
 
-}
+    const cocina = await getDocs(
+        collection(db,"cocina")
+    );
 
-// ==========================
-// BORRAR COCINA
-// ==========================
+    for(const producto of cocina.docs){
 
-const cocina = await getDocs(
+        await deleteDoc(producto.ref);
 
-    collection(db,"cocina")
+    }
 
-);
+    // ==========================
+    // BORRAR VENTAS
+    // ==========================
 
-for(const producto of cocina.docs){
+    const ventas = await getDocs(
+        collection(db,"ventas")
+    );
 
-    await deleteDoc(producto.ref);
+    for(const venta of ventas.docs){
 
-}
+        await deleteDoc(venta.ref);
 
-// ==========================
-// REINICIAR MESAS
-// ==========================
+    }
 
-const mesas = await getDocs(
+    // ==========================
+    // BORRAR CIERRES DE CAJA
+    // ==========================
 
-    collection(db,"mesas")
+    const cierres = await getDocs(
+        collection(db,"cierresCaja")
+    );
 
-);
+    for(const cierre of cierres.docs){
 
-for(const mesa of mesas.docs){
+        await deleteDoc(cierre.ref);
+
+    }
+
+    // ==========================
+    // REINICIAR MESAS
+    // ==========================
+
+    const mesas = await getDocs(
+        collection(db,"mesas")
+    );
+
+    for(const mesa of mesas.docs){
+
+        await updateDoc(
+
+            mesa.ref,
+
+            {
+
+                estado: "Libre",
+
+                personas: 0,
+
+                mozo: "",
+
+                pedidoId: "",
+
+                total: 0
+
+            }
+
+        );
+
+    }
+
+    // ==========================
+    // REINICIAR CAJA
+    // ==========================
 
     await updateDoc(
 
-        mesa.ref,
+        doc(db,"caja","actual"),
 
         {
 
-            estado: "Libre",
+            abierta: true,
 
-            personas: 0,
+            fechaJornada: "2026-07-06",
 
-            mozo: "",
+            apertura: serverTimestamp(),
 
-            pedidoId: "",
+            cierre: null,
 
-            total: 0
+            usuario: ""
 
         }
 
     );
 
-}
-    alert("Sistema reiniciado correctamente.");
+    await dibujarMesas();
+
+    alert("✅ Sistema reiniciado correctamente.");
 
 }

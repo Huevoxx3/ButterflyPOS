@@ -5,6 +5,7 @@ import {
     query,
     where,
     getDocs,
+    getDoc,
     addDoc,
     updateDoc,
     doc,
@@ -75,39 +76,61 @@ export async function agregarProductoPedido(
 
     }
     
+const producto = await getDoc(
+
+    doc(db,"carta",productoId)
+
+);
+
+const categoria = producto.data().categoria;
+
+const categoriasExcluidas = [
+
+    "Cerveza Artesanal",
+
+    "Con Alcohol",
+
+    "Sin Alcohol"
+
+];
+
 // ==========================
 // ENVIAR A COCINA
 // ==========================
 console.log("ANTES DE COCINA");
-await addDoc(
+if(!categoriasExcluidas.includes(categoria)){
 
-    collection(db,"cocina"),
+    await addDoc(
 
-    {
+        collection(db,"cocina"),
 
-        pedidoId: mesa.pedidoId,
+        {
 
-        mesa: mesa.numero,
+            pedidoId: mesa.pedidoId,
 
-        nombre: nombre,
+            mesa: mesa.numero,
 
-        observacion: "",
+            nombre: nombre,
 
-        estado: "Pendiente",
+            observacion: "",
 
-        horaPedido: serverTimestamp(),
+            estado: "Pendiente",
 
-        horaLista: null,
+            horaPedido: serverTimestamp(),
 
-        horaEntrega: null,
+            horaLista: null,
 
-        requiereConfirmacion: false,
+            horaEntrega: null,
 
-        ultimaModificacion: null
+            requiereConfirmacion: false,
 
-    }
+            ultimaModificacion: null
 
-);
+        }
+
+    );
+
+}
     await updateDoc(
 
         doc(db,"pedidos",mesa.pedidoId),
@@ -259,11 +282,16 @@ export async function eliminarItem(item, mesa){
 }
 
 export async function guardarEdicionPedido(
-    mesa,
-    pedidoTemporal,
-    itemsEliminados
-){
 
+    mesa,
+
+    pedidoOriginal,
+
+    pedidoTemporal,
+
+    itemsEliminados
+
+){
     // ===========================
     // ACTUALIZAR ITEMS
     // ===========================
@@ -289,6 +317,20 @@ export async function guardarEdicionPedido(
             }
 
         );
+
+const original = pedidoOriginal.find(
+
+    p => p.id === item.id
+
+);
+
+const cambioObservacion =
+
+    (original?.observacion || "") !==
+    (item.observacion || "");
+    const cantidadOriginal = original?.cantidad || 0;
+    const cantidadNueva = item.cantidad;
+
         const cocina = await getDocs(
 
     query(
@@ -305,23 +347,107 @@ export async function guardarEdicionPedido(
 
 );
 
-for(const producto of cocina.docs){
+if(cambioObservacion){
 
-    await updateDoc(
+    for(const producto of cocina.docs){
 
-        producto.ref,
+        await updateDoc(
 
-        {
+            producto.ref,
 
-            observacion: item.observacion || "",
+            {
 
-            requiereConfirmacion: true,
+                observacion: item.observacion || "",
 
-            ultimaModificacion: serverTimestamp()
+                requiereConfirmacion: true,
 
-        }
+                ultimaModificacion: serverTimestamp()
+
+            }
+
+        );
+
+    }
+
+}
+
+if(cantidadNueva > cantidadOriginal){
+
+    for(
+
+        let i = cantidadOriginal;
+
+        i < cantidadNueva;
+
+        i++
+
+    ){
+
+        await addDoc(
+
+            collection(db,"cocina"),
+
+            {
+
+                pedidoId: mesa.pedidoId,
+
+                mesa: mesa.numero,
+
+                nombre: item.nombre,
+
+                observacion: item.observacion || "",
+
+                estado: "Pendiente",
+
+                horaPedido: serverTimestamp(),
+
+                horaLista: null,
+
+                horaEntrega: null,
+
+                requiereConfirmacion: false,
+
+                ultimaModificacion: null
+
+            }
+
+        );
+
+    }
+
+}
+
+if(cantidadNueva < cantidadOriginal){
+
+    const diferencia = cantidadOriginal - cantidadNueva;
+
+    const cocina = await getDocs(
+
+        query(
+
+            collection(db,"cocina"),
+
+            where("pedidoId","==",mesa.pedidoId),
+
+            where("nombre","==",item.nombre),
+
+            where("estado","==","Pendiente")
+
+        )
 
     );
+
+    let eliminados = 0;
+
+    for(const producto of cocina.docs){
+
+        if(eliminados >= diferencia) break;
+
+        await deleteDoc(producto.ref);
+
+        eliminados++;
+
+    }
 
 }
 
@@ -344,6 +470,28 @@ for(const producto of cocina.docs){
             )
 
         );
+
+        const cocina = await getDocs(
+
+    query(
+
+        collection(db,"cocina"),
+
+        where("pedidoId","==",mesa.pedidoId),
+
+        where("nombre","==",item.nombre),
+
+        where("estado","==","Pendiente")
+
+    )
+
+);
+
+for(const producto of cocina.docs){
+
+    await deleteDoc(producto.ref);
+
+}
 
     }
 
