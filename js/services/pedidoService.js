@@ -159,13 +159,17 @@ if(!categoriasExcluidas.includes(categoria)){
         sessionStorage.getItem("usuario")
     );
 
-    await registrarActividad(
+await registrarActividad(
 
-        usuario.nombre,
+    usuario.nombre,
 
-        `Agregó ${nombre} a Mesa ${mesa.numero}`
+    "Pedido",
 
-    );
+    "Agregar Producto",
+
+    `${nombre} - Mesa ${mesa.numero}`
+
+);
 
 }
 
@@ -261,6 +265,8 @@ export async function restarCantidad(item, mesa){
 
 export async function eliminarItem(item, mesa){
 
+    console.log("ENTRÓ A eliminarItem");
+
     await deleteDoc(
         doc(db,"pedidos",mesa.pedidoId,"items",item.id)
     );
@@ -277,6 +283,26 @@ export async function eliminarItem(item, mesa){
         {
             total: increment(-(item.precio * item.cantidad))
         }
+    );
+
+    console.log("Mesa:", mesa);
+console.log("Item:", item);
+console.log("Mozo:", mesa.mozo);
+console.log("Nombre:", item.nombre);
+    // ==========================
+    // REGISTRAR ACTIVIDAD
+    // ==========================
+
+    await registrarActividad(
+
+        mesa.mozo,
+
+        "Pedido",
+
+        "Eliminar Producto",
+
+        `${item.nombre} - Mesa ${mesa.numero}`
+
     );
 
 }
@@ -451,6 +477,22 @@ if(cantidadNueva < cantidadOriginal){
 
 }
 
+if(cantidadOriginal !== cantidadNueva){
+
+    await registrarActividad(
+
+        mesa.mozo,
+
+        "Pedido",
+
+        "Modificar Cantidad",
+
+        `${item.nombre} - Mesa ${mesa.numero} (${cantidadOriginal} → ${cantidadNueva})`
+
+    );
+
+}
+
     }
 
     // ===========================
@@ -492,6 +534,18 @@ for(const producto of cocina.docs){
     await deleteDoc(producto.ref);
 
 }
+
+await registrarActividad(
+
+    mesa.mozo,
+
+    "Pedido",
+
+    "Eliminar Producto",
+
+    `${item.nombre} - Mesa ${mesa.numero}`
+
+);
 
     }
 

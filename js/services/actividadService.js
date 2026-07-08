@@ -6,19 +6,33 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-export async function registrarActividad(usuario, accion) {
+export async function registrarActividad(
+
+    usuario,
+    modulo,
+    accion,
+    descripcion = "",
+    extra = {}
+
+){
 
     await addDoc(
 
-        collection(db, "actividad"),
+        collection(db,"actividad"),
 
         {
 
             usuario,
 
+            modulo,
+
             accion,
 
-            fecha: serverTimestamp()
+            descripcion,
+
+            fecha: serverTimestamp(),
+            
+            ...extra
 
         }
 

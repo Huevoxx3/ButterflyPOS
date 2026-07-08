@@ -2,6 +2,8 @@ import { obtenerJornadaActual } from "../js/services/cajaService.js";
 
 import { obtenerItemsPedido } from "../js/services/pedidoService.js";
 
+import { registrarActividad } from "../js/services/actividadService.js";
+
 import { db } from "../js/firebase.js";
 
 import {
@@ -17,6 +19,10 @@ let volverAMesa = null;
 
 let actualizarSalon = null;
 
+let motivosNoCobrar = {};
+
+let motivosDescuento = {};
+
 export async function abrirCobro(
 
     mesa,
@@ -30,6 +36,10 @@ export async function abrirCobro(
     volverAMesa = callbackVolver;
 
     actualizarSalon = callbackActualizarSalon;
+
+    motivosNoCobrar = {};
+
+    motivosDescuento = {};
 
 const items = await obtenerItemsPedido(
     mesa.pedidoId
@@ -54,46 +64,48 @@ let html = `
 
 `;
 
-items.forEach(item => {
+items.forEach((item,index) => {
 
     html += `
 
-    <tr class="filaCobro">
+<tr class="filaCobro">
 
-        <td>${item.nombre}</td>
+    <td>${item.nombre}</td>
 
-        <td>${item.cantidad}</td>
+    <td>${item.cantidad}</td>
 
-        <td>$ ${item.precio.toLocaleString()}</td>
+    <td>$ ${item.precio.toLocaleString()}</td>
 
-        <td class="totalProducto">
+    <td class="totalProducto">
 
-            $ ${(item.precio * item.cantidad).toLocaleString()}
+        $ ${(item.precio * item.cantidad).toLocaleString()}
 
-        </td>
+    </td>
 
-        <td class="celdaCentro">
+    <td class="celdaCentro">
 
-            <input
-                type="checkbox"
-                class="chkNoCobrar">
+        <input
+            type="checkbox"
+            class="chkNoCobrar"
+            data-index="${index}">
 
-        </td>
+    </td>
 
-        <td>
+    <td>
 
-            <input
-                type="number"
-                class="txtDescuento"
-                value="0"
-                min="0"
-                max="100">
+        <input
+            type="number"
+            class="txtDescuento"
+            value="0"
+            min="0"
+            max="100"
+            data-index="${index}">
 
-        </td>
+    </td>
 
-    </tr>
+</tr>
 
-    `;
+`;
 
 });
 
@@ -182,13 +194,21 @@ html += `
 
 
 
-    <button
-        id="btnConfirmarCobro"
-        class="btnVerdeGrande">
+<button
+    id="btnConfirmarCobro"
+    class="btnVerdeGrande">
 
-        💳 Cobrar
+    💳 Cobrar
 
-    </button>
+</button>
+
+<p
+id="mensajeValidacion"
+style="display:none;color:red;font-weight:bold;margin-top:10px;">
+
+⚠ Complete todos los motivos requeridos.
+
+</p>
 
 </div>
 
@@ -309,13 +329,21 @@ totalCobrado: Number(
 
         ) || 0,
 
+        motivoDescuento:
+
+    motivosDescuento[items.indexOf(item)] || "",
+
         invitado:
 
             document.querySelectorAll(".chkNoCobrar")[
 
                 items.indexOf(item)
 
-            ].checked
+            ].checked,
+
+motivoNoCobrar:
+
+    motivosNoCobrar[items.indexOf(item)] || ""
 
     }))
 
@@ -361,25 +389,21 @@ await updateDoc(
 
 );
 
-await addDoc(
+await registrarActividad(
 
-    collection(db,"actividad"),
+    mesa.mozo,
+
+    "Cobro",
+
+    "Cerrar Mesa",
+
+    `Mesa ${mesa.numero} - Total: ${document.getElementById("totalCuenta").textContent} - ${document.getElementById("medioPago").value}`,
 
     {
 
-        fecha: serverTimestamp(),
+        pedidoId: mesa.pedidoId,
 
-        usuario: mesa.mozo,
-
-        accion: "Cobro",
-
-        descripcion:
-            `Mesa ${mesa.numero} cerrada - Total: $${parseFloat(
-                document.getElementById("totalCuenta")
-                    .textContent
-                    .replace("Total: $","")
-                    .trim()
-            )}`
+        jornada: jornada
 
     }
 
@@ -412,26 +436,170 @@ document.getElementById("vistaMesa").classList.remove("oculto");
 
     calcularTotal();
 
-document.querySelectorAll(".chkNoCobrar").forEach(control=>{
+calcularTotal();
 
-    control.onchange = calcularTotal;
+// ==========================
+// EVENTOS DE NO COBRAR
+// ==========================
+
+document.querySelectorAll(".chkNoCobrar").forEach((control,index)=>{
+
+    control.onchange = () => {
+
+        if(control.checked){
+
+            const motivo = prompt("Ingrese el motivo por el cual NO se cobrará este producto:");
+
+            if(!motivo || motivo.trim() === ""){
+
+                alert("Debe ingresar un motivo.");
+
+                control.checked = false;
+
+                delete motivosNoCobrar[index];
+
+            }else{
+
+                motivosNoCobrar[index] = motivo.trim();
+
+            }
+
+        }else{
+
+            delete motivosNoCobrar[index];
+
+        }
+
+        calcularTotal();
+
+        validarCobro();
+
+    };
 
 });
 
-document.querySelectorAll(".txtDescuento").forEach(control=>{
+// ==========================
+// EVENTOS DESCUENTO ITEM
+// ==========================
 
-    control.oninput = calcularTotal;
+document.querySelectorAll(".txtDescuento").forEach((control,index)=>{
+
+    control.onchange = () => {
+
+        const descuento = Number(control.value) || 0;
+
+        if(descuento > 0){
+
+            const motivo = prompt("Ingrese el motivo del descuento:");
+
+            if(!motivo || motivo.trim() === ""){
+
+                alert("Debe ingresar un motivo.");
+
+                control.value = 0;
+
+                delete motivosDescuento[index];
+
+            }else{
+
+                motivosDescuento[index] = motivo.trim();
+
+            }
+
+        }else{
+
+            delete motivosDescuento[index];
+
+        }
+
+        calcularTotal();
+
+        validarCobro();
+
+    };
 
 });
+// ==========================
+// EVENTO DESCUENTO GENERAL
+// ==========================
 
 document.getElementById("descuentoGeneral").oninput = () => {
 
     calcularTotal();
 
+    validarCobro();
+
 };
+
+document.getElementById("motivoDescuento").oninput = validarCobro;
+// ==========================
+// MOSTRAR / OCULTAR MOTIVOS
+// ==========================
+
 
 }
 
+function validarCobro(){
+
+    let valido = true;
+
+    // ==========================
+    // DESCUENTO GENERAL
+    // ==========================
+
+    const descuentoGeneral = Number(
+        document.getElementById("descuentoGeneral").value
+    ) || 0;
+
+    if(
+        descuentoGeneral > 0 &&
+        document.getElementById("motivoDescuento").value.trim() === ""
+    ){
+        valido = false;
+    }
+
+    // ==========================
+    // NO COBRAR
+    // ==========================
+
+    document.querySelectorAll(".chkNoCobrar").forEach((check,index)=>{
+
+        if(check.checked && !motivosNoCobrar[index]){
+
+            valido = false;
+
+        }
+
+    });
+
+    // ==========================
+    // DESCUENTO POR PRODUCTO
+    // ==========================
+
+    document.querySelectorAll(".txtDescuento").forEach((txt,index)=>{
+
+        if(
+            Number(txt.value) > 0 &&
+            !motivosDescuento[index]
+        ){
+
+            valido = false;
+
+        }
+
+    });
+
+    // ==========================
+    // BOTÓN
+    // ==========================
+    console.log("VALIDO =", valido);
+
+    document.getElementById("btnConfirmarCobro").disabled = !valido;
+
+    document.getElementById("mensajeValidacion").style.display =
+        valido ? "none" : "block";
+
+}
 function calcularTotal(){
 
     let total = 0;

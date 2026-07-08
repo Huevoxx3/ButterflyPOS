@@ -142,6 +142,18 @@ if (opcion === "Historial") {
 
 }
 
+if (opcion === "Actividad") {
+
+    const modulo = await import("../modules/actividad.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+
+
     document.querySelector("#contenido").innerHTML = `
         <h1>${opcion}</h1>
         <p>Módulo en construcción.</p>

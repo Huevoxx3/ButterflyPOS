@@ -2167,3 +2167,359 @@ cursor:pointer;
 font-weight:bold;
 
 }
+
+/* ===========================================
+   HISTORIAL DE CAJA
+=========================================== */
+
+.tablaHistorial{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:25px;
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.10);
+
+}
+
+.tablaHistorial th{
+
+    background:#f5f5f5;
+
+    padding:14px;
+
+    text-align:center;
+
+    font-weight:bold;
+
+    border-bottom:2px solid #ddd;
+
+}
+
+.tablaHistorial td{
+
+    padding:14px;
+
+    text-align:center;
+
+    border-bottom:1px solid #eee;
+
+}
+
+.tablaHistorial tbody tr:hover{
+
+    background:#f8faff;
+
+}
+
+.estadoCerrada{
+
+    background:#d32f2f;
+
+    color:white;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+    letter-spacing:.5px;
+
+}
+
+/* ===========================
+   HISTORIAL
+=========================== */
+
+.contenedorHistorial{
+
+display:grid;
+
+grid-template-columns:2fr 1fr;
+
+gap:25px;
+
+align-items:start;
+
+}
+
+.panelHistorial{
+
+width:100%;
+
+}
+
+.panelDetalle{
+
+background:white;
+
+padding:20px;
+
+border-radius:12px;
+
+box-shadow:0 4px 12px rgba(0,0,0,.10);
+
+position:sticky;
+
+top:20px;
+
+min-height:300px;
+
+}
+
+.filaDetalle{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:10px 0;
+
+    border-bottom:1px solid #ececec;
+
+}
+
+.filaDetalle:last-child{
+
+    border-bottom:none;
+
+}
+
+.panelDetalle h2{
+
+    margin-top:0;
+
+}
+
+.panelDetalle h3{
+
+    margin-top:20px;
+
+}
+
+/* ==========================================
+   MOTIVOS EN COBRO
+========================================== */
+
+.filaMotivos td{
+
+    background:#fafafa;
+
+    padding:15px;
+
+}
+
+.motivosContainer{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+.motivosContainer label{
+
+    display:block;
+
+    font-weight:bold;
+
+    margin-bottom:5px;
+
+}
+
+.motivosContainer textarea{
+
+    width:100%;
+
+    min-height:60px;
+
+    resize:vertical;
+
+    padding:8px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    font-family:inherit;
+
+    font-size:14px;
+
+    box-sizing:border-box;
+
+}
+
+/* ==========================
+   ACTIVIDAD
+========================== */
+
+.barraActividad{
+
+    margin:20px 0;
+
+}
+
+#buscarActividad{
+
+    width:350px;
+
+    max-width:100%;
+
+    padding:10px 15px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    font-size:15px;
+
+}
+
+.panelActividad{
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:auto;
+
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+}
+
+.tablaActividad{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    min-width:1000px;
+
+}
+
+.tablaActividad thead{
+
+    background:#222;
+
+    color:white;
+
+}
+
+.tablaActividad th{
+
+    padding:14px;
+
+    text-align:left;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1;
+
+}
+
+.tablaActividad td{
+
+    padding:12px;
+
+    border-bottom:1px solid #ececec;
+
+}
+
+.tablaActividad tbody tr:hover{
+
+    background:#f7f7f7;
+
+}
+
+.colFecha{
+
+    width:90px;
+
+}
+
+.colHora{
+
+    width:70px;
+
+}
+
+.colUsuario{
+
+    width:120px;
+
+}
+
+.colModulo{
+
+    width:110px;
+
+    text-align:center;
+
+    font-weight:600;
+
+}
+
+.colAccion{
+
+    width:170px;
+
+    font-weight:bold;
+
+}
+
+#modalDetalleVenta{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+#modalDetalleVenta.oculto{
+
+    display:none;
+
+}
+
+#modalDetalleVenta .modalContenido{
+
+    background:white;
+
+    width:min(700px,95vw);
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    border-radius:12px;
+
+    padding:25px;
+
+}

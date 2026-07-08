@@ -186,13 +186,17 @@ async function abrirMesa(numero){
 
         });
 
-        await registrarActividad(
+await registrarActividad(
 
-            usuario.nombre,
+    usuario.nombre,
 
-            "Abrió Mesa " + numero
+    "Salón",
 
-        );
+    "Abrir Mesa",
+
+    `Mesa ${numero} - ${personas} personas`
+
+);
 
         await dibujarVistaSalon();
 
