@@ -1,3 +1,5 @@
+import { obtenerJornadaActual } from "../js/services/cajaService.js";
+
 import { db } from "../js/firebase.js";
 
 import {
@@ -30,15 +32,19 @@ let modoSoloLectura = false;
 
 async function cargarPendientes(){
 
+    const jornada = await obtenerJornadaActual();
+
     const consulta = query(
 
-        collection(db,"cocina"),
+    collection(db,"cocina"),
 
-        where("estado","==","Pendiente"),
+    where("jornada","==",jornada),
 
-        orderBy("horaPedido")
+    where("estado","==","Pendiente"),
 
-    );
+    orderBy("horaPedido")
+
+);
 
     const snapshot = await getDocs(consulta);
 

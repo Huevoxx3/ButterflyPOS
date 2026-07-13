@@ -2523,3 +2523,81 @@ min-height:300px;
     padding:25px;
 
 }
+
+.modalContenido{
+
+    background:#fff;
+
+    width:650px;
+
+    max-width:95%;
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    padding:25px;
+
+    border-radius:12px;
+
+}
+
+.detalleVenta{
+
+    max-width:850px;
+
+    margin:30px auto;
+
+    background:#fff;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+
+}
+
+.cardResumenVenta{
+
+    background:#f8f9fb;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    margin-bottom:25px;
+
+}
+
+.cardProducto{
+
+    background:#ffffff;
+
+    border:1px solid #e6e6e6;
+
+    border-radius:10px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+}
+
+.totalVenta{
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    color:#16a34a;
+
+    margin-top:15px;
+
+}
+
+.tituloSeccion{
+
+    margin:30px 0 15px;
+
+}

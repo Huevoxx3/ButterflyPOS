@@ -1,3 +1,5 @@
+import { generarExcelCierre } from "../js/services/excelService.js";
+
 import { db } from "../js/firebase.js";
 
 import {
@@ -320,6 +322,46 @@ Jornada: <strong>${jornada}</strong>
 
     if(!confirmar) return;
 
+    // ==========================
+// VERIFICAR MESAS ABIERTAS
+// ==========================
+
+const mesasAbiertas = await getDocs(
+
+    query(
+
+        collection(db,"mesas"),
+
+        where("estado","==","Ocupada")
+
+    )
+
+);
+
+if(!mesasAbiertas.empty){
+
+    let mensaje =
+
+        "⚠️ No es posible cerrar la caja.\n\n";
+
+    mensaje +=
+
+        "Existen mesas abiertas:\n\n";
+
+    mesasAbiertas.forEach(doc=>{
+
+        mensaje +=
+
+            `• Mesa ${doc.data().numero}\n`;
+
+    });
+
+    alert(mensaje);
+
+    return;
+
+}
+
     const boton = document.getElementById("btnCerrarCaja");
 
 boton.disabled = true;
@@ -396,6 +438,8 @@ if(!cierreExistente.empty){
         }
 
     );
+
+    await generarExcelCierre(jornada);
 
     await updateDoc(
 

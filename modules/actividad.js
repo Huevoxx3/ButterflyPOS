@@ -1,3 +1,7 @@
+import { obtenerVentaPorPedido } from "../js/services/ventasService.js";
+
+import { obtenerJornadaActual } from "../js/services/cajaService.js";
+
 import { db } from "../js/firebase.js";
 
 import {
@@ -5,6 +9,7 @@ import {
     collection,
     getDocs,
     query,
+    where,
     orderBy
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
@@ -13,17 +18,21 @@ export default async function(){
 
     const contenido = document.getElementById("contenido");
 
+    const jornada = await obtenerJornadaActual();
+
     const snapshot = await getDocs(
 
-        query(
+    query(
 
-            collection(db,"actividad"),
+        collection(db,"actividad"),
 
-            orderBy("fecha","desc")
+        where("jornada","==",jornada),
 
-        )
+        orderBy("fecha","desc")
 
-    );
+    )
+
+);
 
 let html = `
 
@@ -165,6 +174,45 @@ ${
 
     contenido.innerHTML = html;
 
+    // ==========================
+// MODAL DETALLE DE VENTA
+// ==========================
+
+if(!document.getElementById("modalDetalleVenta")){
+
+    document.body.insertAdjacentHTML("beforeend",`
+
+<div id="modalDetalleVenta" class="modal oculto">
+
+    <div class="modal-contenido">
+
+        <div id="contenidoDetalleVenta"></div>
+
+        <br>
+
+        <button
+            id="btnCerrarDetalleVenta"
+            class="btnRojo">
+
+            Cerrar
+
+        </button>
+
+    </div>
+
+</div>
+
+`);
+
+}
+document.getElementById("btnCerrarDetalleVenta").onclick = ()=>{
+
+    document
+        .getElementById("modalDetalleVenta")
+        .classList.add("oculto");
+
+};
+
     const buscador = document.getElementById("buscarActividad");
 
 buscador.oninput = () => {
@@ -188,4 +236,159 @@ buscador.oninput = () => {
 
 };
 
+document.querySelectorAll(".btnDetalleVenta").forEach(boton=>{
+
+    boton.onclick = async()=>{
+
+        const pedidoId = boton.dataset.id;
+
+        const venta = await obtenerVentaPorPedido(pedidoId);
+
+const modal = document.getElementById("modalDetalleVenta");
+
+const contenido = document.getElementById("contenidoDetalleVenta");
+
+contenido.innerHTML = `
+
+<h2>🧾 Detalle de Venta</h2>
+
+<hr>
+
+<p><strong>Mesa:</strong> ${venta.mesa}</p>
+
+<p><strong>Mozo:</strong> ${venta.mozo}</p>
+
+<p><strong>Medio de Pago:</strong> ${venta.medioPago}</p>
+
+<p><strong>Total Cobrado:</strong> $${venta.totalCobrado.toLocaleString()}</p>
+
+`;
+
+contenido.innerHTML += `
+
+<hr>
+
+<h3>Productos</h3>
+
+`;
+
+venta.productos.forEach(producto=>{
+
+    contenido.innerHTML += `
+
+    <div class="detalleProducto">
+
+        <h4>${producto.nombre}</h4>
+
+        <p>
+
+            Cantidad: <strong>${producto.cantidad}</strong>
+
+        </p>
+
+        <p>
+
+            Precio: <strong>$${producto.precio.toLocaleString()}</strong>
+
+        </p>
+
+        ${
+            producto.descuento > 0
+
+            ?
+
+            `
+
+            <p style="color:#d97706;">
+
+                <strong>🟠 DESCUENTO ${producto.descuento}%</strong>
+
+            </p>
+
+            <p>
+
+                Motivo:
+
+                ${producto.motivoDescuento}
+
+            </p>
+
+            `
+
+            : ""
+
+        }
+
+        ${
+            producto.invitado
+
+            ?
+
+            `
+
+            <p style="color:#dc2626;">
+
+                <strong>🔴 NO COBRADO</strong>
+
+            </p>
+
+            <p>
+
+                Motivo:
+
+                ${producto.motivoNoCobrar}
+
+            </p>
+
+            `
+
+            : ""
+
+        }
+
+    </div>
+
+    <hr>
+
+    `;
+
+});
+
+if(venta.descuentoGeneral>0){
+
+    contenido.innerHTML += `
+
+    <h3>
+
+        🟢 Descuento General
+
+    </h3>
+
+    <p>
+
+        ${venta.descuentoGeneral} %
+
+    </p>
+
+    <p>
+
+        Motivo:
+
+        ${venta.motivo}
+
+    </p>
+
+    <hr>
+
+    `;
+
 }
+
+modal.classList.remove("oculto");
+
+    };
+
+});
+
+}
+

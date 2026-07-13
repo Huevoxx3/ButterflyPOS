@@ -1,3 +1,5 @@
+import { obtenerJornadaActual } from "../js/services/cajaService.js";
+
 import { db } from "../js/firebase.js";
 
 import {
@@ -11,6 +13,8 @@ import {
     doc,
 
     query,
+
+    where,
 
     orderBy,
 
@@ -29,21 +33,25 @@ export default async function mostrarMesasCerradas(admin = null){
 
     }
 
+    const jornada = await obtenerJornadaActual();
+    
     const contenido = document.getElementById("contenido");
 
     contenido.innerHTML = "<h1>Mesas Cerradas</h1>";
 
     const snapshot = await getDocs(
 
-        query(
+    query(
 
-            collection(db,"ventas"),
+        collection(db,"ventas"),
 
-            orderBy("fecha","desc")
+        where("jornada","==",jornada),
 
-        )
+        orderBy("fecha","desc")
 
-    );
+    )
+
+);
 
     snapshot.forEach(documento=>{
 
@@ -111,7 +119,9 @@ async function abrirVenta(id){
 
     const contenido = document.getElementById("contenido");
 
-    let html = `
+let html = `
+
+<div class="detalleVenta">
 
 <button id="btnVolverVentas" class="btnGris">
 
@@ -121,75 +131,150 @@ async function abrirVenta(id){
 
 <h1>
 
-Mesa ${venta.mesa}
+🧾 Detalle de Venta
 
 </h1>
 
-<p>
+<div class="cardResumenVenta">
 
-<b>Mozo:</b> ${venta.mozo}
+    <h2>
 
-</p>
+        Mesa ${venta.mesa}
 
-<p>
+    </h2>
 
-<b>Medio de pago:</b>
+    <p>
 
-${venta.medioPago}
+        👤 <strong>Mozo:</strong>
 
-</p>
+        ${venta.mozo}
 
-<p>
+    </p>
 
-<b>Subtotal:</b>
+    <p>
 
-$ ${venta.subtotal}
+        💳 <strong>Medio de Pago:</strong>
 
-</p>
+        ${venta.medioPago}
 
-<p>
+    </p>
 
-<b>Total:</b>
+    <p>
 
-$ ${venta.totalCobrado}
+        💲 <strong>Subtotal:</strong>
 
-</p>
+        $ ${Number(venta.subtotal).toLocaleString()}
 
-<hr>
+    </p>
 
-<h3>
+    <p class="totalVenta">
+
+        Total Cobrado
+
+        $ ${Number(venta.totalCobrado).toLocaleString()}
+
+    </p>
+
+</div>
+
+<h2 class="tituloSeccion">
 
 Productos
 
-</h3>
-
+</h2>
 `;
 
-    venta.productos.forEach(producto=>{
+venta.productos.forEach(producto=>{
 
-        html += `
+    html += `
 
-<div class="cardUsuario">
+<div class="cardProducto">
 
-    <div>
+    <div style="width:100%;">
 
-        <strong>
+        <h3 style="margin-bottom:10px;">
 
             ${producto.nombre}
 
-        </strong>
+        </h3>
 
-        <br>
+        <p>
 
-        Cantidad:
+            <strong>Cantidad:</strong>
 
-        ${producto.cantidad}
+            ${producto.cantidad}
 
-    </div>
+        </p>
 
-    <div>
+        <p>
 
-        $ ${producto.precio}
+            <strong>Precio:</strong>
+
+            $ ${Number(producto.precio).toLocaleString()}
+
+        </p>
+
+        ${
+            producto.descuento > 0
+
+            ?
+
+            `
+
+            <p style="color:#d97706;">
+
+                <strong>
+
+                    🟠 Descuento: ${producto.descuento}%
+
+                </strong>
+
+            </p>
+
+            <p>
+
+                <strong>Motivo:</strong>
+
+                ${producto.motivoDescuento}
+
+            </p>
+
+            `
+
+            : ""
+
+        }
+
+        ${
+            producto.invitado
+
+            ?
+
+            `
+
+            <p style="color:#dc2626;">
+
+                <strong>
+
+                    🔴 NO COBRADO
+
+                </strong>
+
+            </p>
+
+            <p>
+
+                <strong>Motivo:</strong>
+
+                ${producto.motivoNoCobrar}
+
+            </p>
+
+            `
+
+            : ""
+
+        }
 
     </div>
 
@@ -197,7 +282,39 @@ Productos
 
 `;
 
-    });
+});
+
+if(venta.descuentoGeneral > 0){
+
+    html += `
+
+<hr>
+
+<h3>
+
+🟢 Descuento General
+
+</h3>
+
+<p>
+
+<strong>Descuento:</strong>
+
+${venta.descuentoGeneral} %
+
+</p>
+
+<p>
+
+<strong>Motivo:</strong>
+
+${venta.motivo}
+
+</p>
+
+`;
+
+}
 
     html += `
 
@@ -249,6 +366,8 @@ Observaciones
 💾 Guardar Cambios
 
 </button>
+
+</div>
 
 `;
 

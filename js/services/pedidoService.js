@@ -1,3 +1,5 @@
+import { obtenerJornadaActual } from "./cajaService.js";
+
 import { db } from "../firebase.js";
 
 import {
@@ -97,6 +99,8 @@ const categoriasExcluidas = [
 // ==========================
 // ENVIAR A COCINA
 // ==========================
+const jornada = await obtenerJornadaActual();
+
 console.log("ANTES DE COCINA");
 if(!categoriasExcluidas.includes(categoria)){
 
@@ -124,7 +128,9 @@ if(!categoriasExcluidas.includes(categoria)){
 
             requiereConfirmacion: false,
 
-            ultimaModificacion: null
+            ultimaModificacion: null,
+
+            jornada
 
         }
 

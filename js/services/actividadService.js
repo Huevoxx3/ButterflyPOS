@@ -1,3 +1,5 @@
+import { obtenerJornadaActual } from "./cajaService.js";
+
 import { db } from "../firebase.js";
 
 import {
@@ -16,6 +18,8 @@ export async function registrarActividad(
 
 ){
 
+    const jornada = await obtenerJornadaActual();
+
     await addDoc(
 
         collection(db,"actividad"),
@@ -31,6 +35,8 @@ export async function registrarActividad(
             descripcion,
 
             fecha: serverTimestamp(),
+
+            jornada,
             
             ...extra
 

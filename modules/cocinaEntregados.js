@@ -1,3 +1,5 @@
+import { obtenerJornadaActual } from "../js/services/cajaService.js";
+
 import { db } from "../js/firebase.js";
 
 import {
@@ -26,15 +28,19 @@ export default async function(){
 
     `;
 
-    const consulta = query(
+    const jornada = await obtenerJornadaActual();
 
-        collection(db,"cocina"),
+   const consulta = query(
 
-        where("estado","==","Listo"),
+    collection(db,"cocina"),
 
-        orderBy("horaLista","desc")
+    where("jornada","==",jornada),
 
-    );
+    where("estado","==","Listo"),
+
+    orderBy("horaLista","desc")
+
+);
 
     const snapshot = await getDocs(consulta);
 
