@@ -310,6 +310,14 @@ Jornada: <strong>${jornada}</strong>
 
 </button>
 
+<button
+    id="btnExcelTest"
+    class="btnSecundario">
+
+🧪 Generar Excel (TEST)
+
+</button>
+
 `;
 
     document.getElementById("btnCerrarCaja").onclick = async () => {
@@ -458,6 +466,12 @@ if(!cierreExistente.empty){
 console.log("Caja cerrada correctamente");
 
     alert("✅ Caja cerrada correctamente.");
+
+};
+
+document.getElementById("btnExcelTest").onclick = async () => {
+
+    await generarExcelCierre(jornada);
 
 };
 
