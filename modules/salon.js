@@ -1,3 +1,7 @@
+
+import {
+    abrirCaja
+} from "../js/services/cajaService.js";
 import {
     agregarProductoPedido,
     obtenerItemsPedido,
@@ -32,6 +36,43 @@ let totalTemporal = 0;
 
 let modoSoloLectura = false;
 
+async function actualizarEstadoCaja(){
+
+    const documento = await getDoc(
+
+        doc(db,"caja","actual")
+
+    );
+
+    const caja = documento.data();
+
+    console.log("Estado de caja:", caja);
+console.log("abierta =", caja.abierta);
+
+    const estado = document.getElementById("estadoCaja");
+
+    const boton = document.getElementById("btnAbrirCaja");
+
+    if(caja.abierta){
+
+        estado.innerHTML = `🟢 Caja Abierta`;
+
+        estado.style.color = "#2ecc71";
+
+        boton.style.display = "none";
+
+    }else{
+
+        estado.innerHTML = `🔴 Caja Cerrada`;
+
+        estado.style.color = "#e74c3c";
+
+        boton.style.display = "";
+
+    }
+
+}
+
 export default async function(admin = false){
 
     modoSoloLectura = admin;
@@ -43,8 +84,24 @@ export default async function(admin = false){
 
     await dibujarMesas();
 
-    document.getElementById("btnReiniciarSistema").onclick =
-    reiniciarSistema;
+    await actualizarEstadoCaja();  
+    
+    document.getElementById("btnAbrirCaja").onclick = async () => {
+
+    const usuario = JSON.parse(
+        sessionStorage.getItem("usuario")
+    );
+
+    const abierta = await abrirCaja(usuario.nombre);
+
+if(!abierta) return;
+
+await actualizarEstadoCaja();
+
+};
+
+document.getElementById("btnReiniciarSistema").onclick =
+reiniciarSistema;
 
 }
 
@@ -261,6 +318,8 @@ async function dibujarVistaSalon(){
         await respuesta.text();
 
     await dibujarMesas();
+
+    await actualizarEstadoCaja();
 
 }
 

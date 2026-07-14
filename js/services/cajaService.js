@@ -5,6 +5,10 @@ import {
     doc,
     getDoc,
     updateDoc,
+    collection,
+    getDocs,
+    query,
+    where,
     serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
@@ -28,40 +32,73 @@ export async function obtenerJornadaActual(){
 
     }
 
-// ==========================
-// CREAR NUEVA JORNADA
-// ==========================
+console.log("No hay caja abierta.");
 
-const fechaAnterior = new Date(caja.fechaJornada + "T00:00:00");
+return null;
 
-fechaAnterior.setDate(fechaAnterior.getDate() + 1);
+}
 
-const nuevaJornada =
-`${fechaAnterior.getFullYear()}-${
-String(fechaAnterior.getMonth()+1).padStart(2,"0")
+export async function abrirCaja(usuario){
+
+    const referencia = doc(db,"caja","actual");
+
+    const hoy = new Date();
+
+    const jornada =
+`${hoy.getFullYear()}-${
+String(hoy.getMonth()+1).padStart(2,"0")
 }-${
-String(fechaAnterior.getDate()).padStart(2,"0")
+String(hoy.getDate()).padStart(2,"0")
 }`;
+// ==========================
+// VERIFICAR SI YA EXISTE
+// UN CIERRE PARA HOY
+// ==========================
 
-console.log("Abriendo nueva jornada:", nuevaJornada);
+const cierre = await getDocs(
 
-await updateDoc(
+    query(
 
-    referencia,
+        collection(db,"cierresCaja"),
 
-    {
+        where("jornada","==",jornada)
 
-        abierta: true,
-
-        fechaJornada: nuevaJornada,
-
-        apertura: serverTimestamp(),
-
-        cierre: null
-
-    }
+    )
 
 );
 
-return nuevaJornada;
+if(!cierre.empty){
+
+    alert(
+
+        "⚠ La jornada de hoy ya fue cerrada.\n\nNo es posible volver a abrir la caja."
+
+    );
+
+    return false;
+
+}
+
+    await updateDoc(
+
+        referencia,
+
+        {
+
+            abierta: true,
+
+            fechaJornada: jornada,
+
+            apertura: serverTimestamp(),
+
+            cierre: null,
+
+            usuario
+
+        }
+
+    );
+
+    return true;
+
 }
