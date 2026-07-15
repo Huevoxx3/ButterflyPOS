@@ -417,7 +417,9 @@ if(document.getElementById("medioPago").value === "Cuenta Corriente"){
 
             fecha: serverTimestamp(),
 
-            estado: "Pendiente"
+            estado: "Pendiente",
+
+            tipo: "Consumo"
 
         }
 

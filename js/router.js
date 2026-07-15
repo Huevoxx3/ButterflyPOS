@@ -17,6 +17,8 @@ const opciones = {
 
     "Usuarios",
 
+    "Cuenta Corriente",
+
     "Carta",
 
     "Actividad",
@@ -157,6 +159,20 @@ if (opcion === "Actividad") {
 if (opcion === "Configuración") {
 
     const modulo = await import("../modules/configuracion.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if(opcion==="Cuenta Corriente"){
+
+    const modulo = await import(
+
+        "../modules/cuentaCorriente.js"
+
+    );
 
     modulo.default();
 

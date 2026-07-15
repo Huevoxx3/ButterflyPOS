@@ -2952,3 +2952,269 @@ min-height:300px;
     color:#dc3545;
 
 }
+
+.cardCuentaCorriente{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#fff;
+
+    border-radius:14px;
+
+    padding:18px 22px;
+
+    margin-bottom:15px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+
+    transition:.2s;
+
+}
+
+.cardCuentaCorriente:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+
+}
+
+.saldoCuenta{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:#27ae60;
+
+    margin-top:8px;
+
+}
+
+.btnDetalleCuenta{
+
+    background:#273043;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px 20px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:.2s;
+
+}
+
+.btnDetalleCuenta:hover{
+
+    background:#1b2330;
+
+}
+
+.resumenCuenta{
+
+    background:#f8fafc;
+
+    border:2px solid #e5e7eb;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    text-align:center;
+
+    margin-top:20px;
+
+    margin-bottom:20px;
+
+}
+
+.resumenCuenta span{
+
+    color:#777;
+
+    font-size:14px;
+
+}
+
+.resumenCuenta h1{
+
+    margin-top:8px;
+
+    color:#16a34a;
+
+    font-size:34px;
+
+}
+
+.pagoCuenta{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    margin-top:20px;
+
+}
+
+.pagoCuenta input{
+
+    padding:12px;
+
+    border-radius:8px;
+
+    border:1px solid #d1d5db;
+
+    font-size:16px;
+
+}
+
+.pagoCuenta button{
+
+    background:#273043;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:12px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+}
+
+#cerrarCuentaCorriente{
+
+    margin-top:15px;
+
+    width:100%;
+
+}
+
+.movimientoCuenta{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px 0;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+.movIzquierda{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:4px;
+
+}
+
+.fechaMovimiento{
+
+    font-size:13px;
+
+    color:#6b7280;
+
+}
+
+.descripcionMovimiento{
+
+    font-size:16px;
+
+    font-weight:600;
+
+}
+
+.estadoMovimiento{
+
+    font-size:13px;
+
+    color:#888;
+
+}
+
+.importeMovimiento{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+.btnSecundario{
+
+    width:100%;
+
+    margin-top:12px;
+
+    padding:12px;
+
+    background:#6b7280;
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.btnSecundario:hover{
+
+    background:#4b5563;
+
+}
+
+.accionesCuenta{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-top:20px;
+
+}
+
+#btnRegistrarPago{
+
+    flex:1;
+
+}
+
+#cerrarCuentaCorriente{
+
+    width:160px;
+
+}
