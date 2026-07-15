@@ -403,7 +403,33 @@ if(cambioObservacion){
 
 }
 
-if(cantidadNueva > cantidadOriginal){
+const producto = await getDoc(
+
+    doc(db,"carta",item.productoId)
+
+);
+
+const categoria = producto.data().categoria;
+
+const categoriasExcluidas = [
+
+    "Cerveza Artesanal",
+
+    "Con Alcohol",
+
+    "Sin Alcohol"
+
+];
+
+const jornada = await obtenerJornadaActual();
+
+if(
+
+    cantidadNueva > cantidadOriginal &&
+
+    !categoriasExcluidas.includes(categoria)
+
+){
 
     for(
 
@@ -439,7 +465,9 @@ if(cantidadNueva > cantidadOriginal){
 
                 requiereConfirmacion: false,
 
-                ultimaModificacion: null
+                ultimaModificacion: null,
+
+                jornada
 
             }
 

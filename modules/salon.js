@@ -32,6 +32,8 @@ let pedidoOriginal = [];
 
 let itemsEliminados = [];
 
+let carritoCarta = [];
+
 let totalTemporal = 0;
 
 let modoSoloLectura = false;
@@ -905,6 +907,54 @@ function cerrarCartaSalon(){
 
 }
 
+async function aceptarPedidoCarta(mesa){
+
+    if(carritoCarta.length === 0){
+
+        alert("No agregó ningún producto.");
+
+        return;
+
+    }
+
+    for(const item of carritoCarta){
+
+        for(let i=0;i<item.cantidad;i++){
+
+            await agregarProductoPedido(
+
+                mesa,
+
+                item.id,
+
+                item.nombre,
+
+                item.precio
+
+            );
+
+        }
+
+    }
+
+    carritoCarta = [];
+
+    cerrarCartaSalon();
+
+    const referencia = await getDoc(
+
+        doc(db,"mesas",String(mesa.numero))
+
+    );
+
+    await mostrarModalMesa(
+
+        referencia.data()
+
+    );
+
+}
+
 async function cargarCartaSalon(mesa){
 
     const lista =
@@ -966,15 +1016,35 @@ async function cargarCartaSalon(mesa){
 
         </div>
 
-        <button
-            class="btnAgregarCarta"
-            data-id="${producto.id}"
-            data-nombre="${producto.nombre}"
-            data-precio="${producto.precio}">
+        <div class="selectorCantidad">
 
-            ➕ Agregar
+    <button
+        class="btnMenosCarta"
+        data-id="${producto.id}">
 
-        </button>
+        −
+
+    </button>
+
+    <span
+        class="cantidadCarta"
+        id="cant-${producto.id}">
+
+        0
+
+    </span>
+
+    <button
+        class="btnMasCarta"
+        data-id="${producto.id}"
+        data-nombre="${producto.nombre}"
+        data-precio="${producto.precio}">
+
+        +
+
+    </button>
+
+</div>
 
     </div>
 
@@ -983,7 +1053,115 @@ async function cargarCartaSalon(mesa){
 });
 
     });
-   document.querySelectorAll(".btnAgregarCarta").forEach(btn => {
+
+    document.querySelectorAll(".btnMasCarta").forEach(btn=>{
+
+    btn.onclick=()=>{
+
+        const existente=carritoCarta.find(
+
+            item=>item.id===btn.dataset.id
+
+        );
+
+        if(existente){
+
+            existente.cantidad++;
+
+        }
+        else{
+
+            carritoCarta.push({
+
+                id:btn.dataset.id,
+
+                nombre:btn.dataset.nombre,
+
+                precio:Number(btn.dataset.precio),
+
+                cantidad:1
+
+            });
+
+        }
+
+        actualizarCantidadesCarta();
+
+    };
+
+});
+
+document.querySelectorAll(".btnMenosCarta").forEach(btn=>{
+
+    btn.onclick=()=>{
+
+        const existente = carritoCarta.find(
+
+            item => item.id === btn.dataset.id
+
+        );
+
+        if(!existente) return;
+
+        existente.cantidad--;
+
+        if(existente.cantidad<=0){
+
+            carritoCarta = carritoCarta.filter(
+
+                item => item.id !== btn.dataset.id
+
+            );
+
+        }
+
+        actualizarCantidadesCarta();
+
+    };
+
+});
+    
+/*   document.querySelectorAll(".btnAgregarCarta").forEach(btn => {
+
+    btn.onclick = () => {
+
+        const existente = carritoCarta.find(
+
+    item => item.id === btn.dataset.id
+
+);
+
+if(existente){
+
+    existente.cantidad++;
+
+}
+else{
+
+    carritoCarta.push({
+
+        id: btn.dataset.id,
+
+        nombre: btn.dataset.nombre,
+
+        precio: Number(btn.dataset.precio),
+
+        cantidad:1
+
+    });
+
+}
+
+        console.clear();
+
+        console.table(carritoCarta);
+
+    };
+
+}); 
+
+
+ /*    document.querySelectorAll(".btnAgregarCarta").forEach(btn => {
 
     btn.onclick = async () => {
 
@@ -1016,7 +1194,7 @@ mostrarModalMesa(
 
     };
 
-});
+});*/
 buscador.oninput = () => {
 
     const texto = buscador.value.toLowerCase();
@@ -1059,6 +1237,40 @@ document
     });
 
 };
+
+document.getElementById("btnAceptarPedido").onclick = async () => {
+
+    await aceptarPedidoCarta(mesa);
+
+};
+
+}
+
+function actualizarCantidadesCarta(){
+
+    document
+        .querySelectorAll(".cantidadCarta")
+        .forEach(span=>{
+
+            span.textContent="0";
+
+        });
+
+    carritoCarta.forEach(item=>{
+
+        const cantidad=document.getElementById(
+
+            "cant-"+item.id
+
+        );
+
+        if(cantidad){
+
+            cantidad.textContent=item.cantidad;
+
+        }
+
+    });
 
 }
 
