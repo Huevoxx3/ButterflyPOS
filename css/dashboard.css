@@ -2872,3 +2872,83 @@ min-height:300px;
     font-size:17px;
 
 }
+
+.selectorCantidad{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:1px solid #dcdcdc;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    width:140px;
+
+    height:42px;
+
+    background:#fff;
+
+    box-shadow:0 2px 6px rgba(0,0,0,.08);
+
+}
+
+.selectorCantidad button{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    background:#f5f5f5;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.selectorCantidad button:hover{
+
+    background:#273043;
+
+    color:white;
+
+}
+
+.cantidadCarta{
+
+    flex:1;
+
+    text-align:center;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#273043;
+
+    user-select:none;
+
+}
+
+.btnMasCarta{
+
+    color:#28a745;
+
+}
+
+.btnMenosCarta{
+
+    color:#dc3545;
+
+}
