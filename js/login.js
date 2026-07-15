@@ -24,15 +24,44 @@ async function iniciarSesion() {
         btnEntrar.disabled = true;
         btnEntrar.textContent = "Ingresando...";
 
-        const datosUsuario = await Auth.login(usuario, password);
+    const datosUsuario = await Auth.login(usuario, password);
 
-        console.log("LOGIN CORRECTO");
+console.log("LOGIN CORRECTO");
 
-        console.log(datosUsuario);
+console.log(datosUsuario);
 
-        sessionStorage.setItem(
+// ==========================
+// PRIMER INGRESO
+// ==========================
+
+if(datosUsuario.primerIngreso){
+
+    sessionStorage.setItem(
+
+        "primerIngreso",
+
+        "true"
+
+    );
+
+}
+
+sessionStorage.setItem(
+
     "usuario",
+
     JSON.stringify(datosUsuario)
+
+);
+
+window.location.href = "templates/dashboard.html";
+
+sessionStorage.setItem(
+
+    "usuario",
+
+    JSON.stringify(datosUsuario)
+
 );
 
 window.location.href = "templates/dashboard.html";

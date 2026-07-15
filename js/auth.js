@@ -42,18 +42,23 @@ class Auth {
 
         }
 
-        // Login en Firebase Authentication
-        await signInWithEmailAndPassword(
-            auth,
-            datos.email,
-            password
-        );
+    // Validar contraseña
 
-        // Obtener nuevamente el documento usando el UID
-        const usuarioDoc = await getDoc(doc(db, "usuarios", auth.currentUser.uid));
+if(datos.password !== password){
 
-        return usuarioDoc.data();
+    throw new Error("Contraseña incorrecta.");
 
+}
+
+// Devolver directamente el usuario
+
+return {
+
+    id: documento.id,
+
+    ...datos
+
+};
     }
 
     async logout() {

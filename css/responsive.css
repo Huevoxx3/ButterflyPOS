@@ -1,0 +1,57 @@
+/* ==========================================
+   TABLET
+========================================== */
+
+/*@media (max-width: 1024px){
+
+    #contenido{
+
+        padding:20px;
+
+    }
+
+}
+
+/* ==========================================
+   CELULAR
+========================================== */
+
+/*@media (max-width: 768px){
+
+    #contenido{
+
+        padding:15px;
+
+    }
+
+    .cardUsuario{
+
+        width:100%;
+
+    }
+
+    .accionesCarta{
+
+        align-items:flex-start;
+
+    }
+
+    .accionesProducto{
+
+        width:100%;
+
+    }
+
+    .btnEditar,
+    .btnEstado,
+    .btnPrincipal,
+    .btnSecundario,
+    .btnVerde,
+    .btnRojo,
+    .btnGris{
+
+        width:100%;
+
+    }
+
+}

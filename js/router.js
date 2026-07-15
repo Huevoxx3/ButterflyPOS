@@ -23,7 +23,9 @@ const opciones = {
 
     "Historial",
 
-    "Cierre de Caja"
+    "Cierre de Caja",
+
+    "Configuración"
 ],
 
     salon: [
@@ -152,6 +154,16 @@ if (opcion === "Actividad") {
 
 }
 
+if (opcion === "Configuración") {
+
+    const modulo = await import("../modules/configuracion.js");
+
+    modulo.default();
+
+    return;
+
+}
+
 
 
     document.querySelector("#contenido").innerHTML = `
@@ -167,8 +179,25 @@ if (opcion === "Actividad") {
 
 });
 
-import("../modules/inicio.js").then(modulo => {
+if(sessionStorage.getItem("primerIngreso") === "true"){
 
-    modulo.default();
+    document.querySelector(".sidebar").style.display = "none";
 
-});
+    document.querySelector("header").style.display = "none";
+
+    import("../modules/completarPerfil.js").then(modulo=>{
+
+        modulo.default();
+
+    });
+
+}
+else{
+
+    import("../modules/inicio.js").then(modulo=>{
+
+        modulo.default();
+
+    });
+
+}

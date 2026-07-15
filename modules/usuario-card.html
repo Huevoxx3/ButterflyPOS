@@ -7,24 +7,44 @@
         </div>
 
         <div class="detalleUsuario">
-            Perfil: <strong>{{PERFIL}}</strong>
+            🪪 DNI: <strong>{{USUARIO}}</strong>
         </div>
 
         <div class="detalleUsuario">
-            Usuario: {{USUARIO}}
+            💼 Perfil: <strong>{{PERFIL}}</strong>
         </div>
 
-        <div class="detalleUsuario">
-            Email: {{EMAIL}}
+        <div class="detalleUsuario estadoUsuario">
+            {{ESTADO}}
         </div>
 
     </div>
 
     <div class="accionesUsuario">
 
-        <div class="estadoUsuario">
-            {{ESTADO}}
-        </div>
+        <button
+    class="btnEditarUsuario"
+    data-id="{{ID}}">
+
+    ✏ Editar
+
+</button>
+
+  <button
+    class="btnResetPassword"
+    data-id="{{ID}}">
+
+    🔑 Reset Pass
+
+</button>
+
+<button
+    class="btnDesactivarUsuario"
+    data-id="{{ID}}">
+
+    {{BOTON}}
+
+</button>
 
     </div>
 

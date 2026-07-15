@@ -86,22 +86,29 @@ const actuales = {};
 
 <div class="cardUsuario ${item.requiereConfirmacion ? "pedidoModificado" : ""}">
 
+<div class="datosCocina">
+
     <strong>
 
-${item.nombre}
+        ${item.nombre}
 
-(${actuales[item.nombre]} de ${totales[item.nombre]})
+        (${actuales[item.nombre]} de ${totales[item.nombre]})
 
-</strong>
+    </strong>
 
-    <br>
+    <span>
 
-    🍽 Mesa ${item.mesa}
+        🍽 Mesa ${item.mesa}
 
-    <br>
+    </span>
 
-    📝 ${item.observacion || "Sin observaciones"}
+    <span>
 
+        📝 ${item.observacion || "Sin observaciones"}
+
+    </span>
+
+</div>
     ${
     modoSoloLectura
     ?
@@ -111,27 +118,30 @@ ${item.nombre}
         item.requiereConfirmacion
         ?
         `
-        <br><br>
+        <div class="accionesCocina">
 
         <button
+
             class="btnEntendido"
             data-id="${documento.id}">
 
             ✔ ENTENDIDO
 
         </button>
+        </div>
         `
         :
         `
-        <br><br>
+        <div class="accionesCocina">
 
         <button
             class="btnListo"
             data-id="${documento.id}">
 
-            ✅ LISTO
+            ✔ LISTO
 
         </button>
+        </div>
         `
     )
 }

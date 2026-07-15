@@ -63,23 +63,27 @@ export default async function mostrarMesasCerradas(admin = null){
     class="cardUsuario cardVenta"
     data-id="${documento.id}">
 
-    <div style="flex:1;">
+<div class="datosVenta">
 
-        <strong>
+    <strong>
 
-            Mesa ${venta.mesa}
+        🍽 Mesa ${venta.mesa}
 
-        </strong>
+    </strong>
 
-        <br>
+    <span>
 
-        ${venta.mozo}
+        👤 ${venta.mozo}
 
-        <br>
+    </span>
 
-        ${venta.medioPago}
+    <span>
 
-    </div>
+        💳 ${venta.medioPago}
+
+    </span>
+
+</div>
 
     <div>
 

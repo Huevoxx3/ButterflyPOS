@@ -16,9 +16,9 @@ export default async function(){
 
     document.getElementById("contenido").innerHTML = `
 
-        <h1>🍳 Cocina</h1>
+        <h1>🍳 Cocina - Entregados </h1>
 
-        <h2>Entregados</h2>
+        <br></br>
 
         <div id="listaEntregados">
 

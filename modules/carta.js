@@ -164,15 +164,63 @@ if (!mostrarNoDisponibles && producto.disponible === false) {
 
     });
 
+const iconosCategoria = {
+
+    "Pizza":"🍕",
+
+    "Hamburguesa":"🍔",
+
+    "Sandwiches":"🥪",
+
+    "Milanesa":"🥩",
+
+    "Ensaladas":"🥗",
+
+    "Fritas":"🍟",
+
+    "Tostones":"🥔",
+
+    "Minutas":"🍳",
+
+    "Pastas":"🍝",
+
+    "Salsas":"🥣",
+
+    "Menu Infantil":"🧒",
+
+    "Picadas y Cazuelas":"🧀",
+
+    "Adicional Huevo Frito":"🍳",
+
+    "Dulce":"🍰",
+
+    "Cerveza Artesanal":"🍺",
+
+    "Con Alcohol":"🥃",
+
+    "Sin Alcohol":"🥤"
+
+};
+
     const nombresCategorias = Object.keys(categorias).sort();
 
     nombresCategorias.forEach((categoria) => {
 
-        lista.innerHTML += `
-            <h2 style="margin:25px 0 15px;color:#202938;">
-                ${categoria}
-            </h2>
-        `;
+lista.innerHTML += `
+
+<div class="tituloCategoria">
+
+    <h2>
+
+        ${iconosCategoria[categoria] || "📋"}
+
+        ${categoria}
+
+    </h2>
+
+</div>
+
+`;
 
         categorias[categoria]
             .sort((a, b) => a.nombre.localeCompare(b.nombre))
@@ -192,32 +240,34 @@ if (!mostrarNoDisponibles && producto.disponible === false) {
 
                     </div>
 
-                    <div class="accionesCarta">
+<div class="accionesCarta">
 
-    <strong>
+    <strong class="precioProducto">
 
         $ ${producto.precio.toLocaleString()}
 
     </strong>
 
-    <br><br>
+    <div class="accionesProducto">
 
-    <button
-        class="btnEditar"
-        data-id="${producto.id}">
+        <button
+            class="btnEditar"
+            data-id="${producto.id}">
 
-        Editar
+            ✏ Editar
 
-    </button>
+        </button>
 
-    <button
-    class="btnEstado"
-    data-id="${producto.id}"
-    data-estado="${producto.disponible}">
+        <button
+            class="btnEstado"
+            data-id="${producto.id}"
+            data-estado="${producto.disponible}">
 
-    ${producto.disponible ? "🟢 Disponible" : "🔴 No disponible"}
+            ${producto.disponible ? "🟢 Disponible" : "🔴 No disponible"}
 
-</button>
+        </button>
+
+    </div>
 
 </div>
 

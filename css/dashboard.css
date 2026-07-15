@@ -172,13 +172,11 @@ header{
 
     flex:1;
 
-    display:flex;
+    width:100%;
 
-    justify-content:center;
+    padding:30px;
 
-    align-items:center;
-
-    flex-direction:column;
+    overflow:auto;
 
 }
 
@@ -280,26 +278,6 @@ header{
 
 }
 
-.cardUsuario{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    background:white;
-
-    border-radius:12px;
-
-    padding:15px;
-
-    margin-bottom:12px;
-
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
-
-}
-
 .activo{
 
     color:#18a558;
@@ -378,15 +356,17 @@ header{
 
     align-items:center;
 
-    background:white;
+    background:#fff;
 
-    border-radius:12px;
+    border-radius:14px;
 
-    padding:18px;
+    padding:14px 18px;
 
-    margin-bottom:15px;
+    margin-bottom:8px;
 
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+
+    transition:.2s ease;
 
 }
 /*=============================
@@ -441,11 +421,29 @@ header{
 
     display:flex;
 
-    justify-content:flex-end;
+    flex-direction:column;
 
-    align-items:center;
+    align-items:flex-end;
 
     gap:10px;
+
+}
+
+.precioProducto{
+
+    font-size:18px;
+
+    color:#1f2937;
+
+}
+
+.accionesProducto{
+
+    display:flex;
+
+    gap:8px;
+
+    flex-wrap:wrap;
 
 }
 
@@ -500,49 +498,6 @@ header{
     display:flex;
 
     gap:10px;
-
-}
-
-.btnEditar,
-.btnEstado{
-
-    border:none;
-
-    padding:10px 14px;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    font-size:14px;
-
-}
-
-.btnEditar{
-
-    background:#1e88e5;
-
-    color:white;
-
-}
-
-.btnEstado{
-
-    background:#555;
-
-    color:white;
-
-}
-
-.btnEditar:hover{
-
-    background:#1565c0;
-
-}
-
-.btnEstado:hover{
-
-    background:#333;
 
 }
 
@@ -1004,33 +959,6 @@ header{
 
 }
 
-.btnPrincipal{
-
-    background:#1e293b;
-    color:white;
-
-}
-
-.btnSecundario{
-
-    background:#0d6efd;
-    color:white;
-
-}
-
-.btnVerde{
-
-    background:#198754;
-    color:white;
-
-}
-
-.btnRojo{
-
-    background:#dc3545;
-    color:white;
-
-}
 
 .importeTotal{
 
@@ -1126,6 +1054,30 @@ flex-shrink:0;
 
 .tituloCategoria{
 
+    margin:28px 0 16px;
+
+    padding-bottom:10px;
+
+    border-bottom:2px solid #e5e7eb;
+
+}
+
+.tituloCategoria h2{
+
+    margin:0;
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#1f2937;
+
+    letter-spacing:.3px;
+
+}
+
+/*.tituloCategoria{
+
     position:sticky;
 
     top:0;
@@ -1150,9 +1102,9 @@ flex-shrink:0;
 
     letter-spacing:1px;
 
-}
+} 
 
-/*#listaCartaSalon h3{
+#listaCartaSalon h3{
 
     margin-top:30px;
 
@@ -1191,6 +1143,14 @@ flex-shrink:0;
     border:1px solid #ececec;
 
     transition:.15s;
+
+}
+
+.cardUsuario:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 6px 18px rgba(0,0,0,.10);
 
 }
 
@@ -1297,19 +1257,6 @@ flex-shrink:0;
 #cerrarCartaSalon:hover{
 
     background:#d6d8dc;
-
-}
-
-.btnGris{
-
-    background:#6c757d;
-    color:white;
-
-}
-
-.btnGris:hover{
-
-    background:#5c636a;
 
 }
 
@@ -2599,5 +2546,329 @@ min-height:300px;
 .tituloSeccion{
 
     margin:30px 0 15px;
+
+}
+
+.datosVenta{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    flex-wrap:wrap;
+
+}
+
+.datosVenta strong{
+
+    font-size:17px;
+
+    color:#1e293b;
+
+}
+
+.datosVenta span{
+
+    color:#666;
+
+    font-size:14px;
+
+}
+
+.datosCocina{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+}
+
+.datosCocina strong{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#1f2937;
+
+}
+
+.datosCocina span{
+
+    font-size:15px;
+
+}
+
+.datosCocina span:first-of-type{
+
+    font-weight:600;
+
+    color:#374151;
+
+}
+
+.datosCocina span:last-of-type{
+
+    color:#6b7280;
+
+}
+
+.accionesCocina{
+
+    margin-left:auto;
+
+    display:flex;
+
+    align-items:center;
+
+}
+
+.btnPrincipal,
+.btnSecundario,
+.btnVerde,
+.btnRojo,
+.btnGris,
+.btnEditar,
+.btnEstado,
+.btnListo,
+.btnEntendido{
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:10px 18px;
+
+    min-height:42px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:all .20s ease;
+
+}
+.btnPrincipal{
+
+    background:#1e293b;
+
+    color:white;
+
+}
+
+.btnSecundario{
+
+    background:#0d6efd;
+
+    color:white;
+
+}
+
+.btnVerde{
+
+    background:#198754;
+
+    color:white;
+
+}
+
+.btnListo{
+
+    background:#21cf2f;
+
+    color:white;
+
+}
+
+.btnRojo{
+
+    background:#dc3545;
+
+    color:white;
+
+}
+
+.btnEntendido{
+
+    background:#ced118;
+
+    color:white;
+
+}
+
+.btnGris{
+
+    background:#6c757d;
+
+    color:white;
+
+}
+
+.btnEditar{
+
+    background:#1e88e5;
+
+    color:white;
+
+}
+
+.btnEstado{
+
+    background:#555;
+
+    color:white;
+
+}
+
+.btnPrincipal:hover,
+.btnSecundario:hover,
+.btnVerde:hover,
+.btnRojo:hover,
+.btnGris:hover,
+.btnEditar:hover,
+.btnEstado:hover,
+.btnListo:hover,
+.btnEntendido:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 6px 14px rgba(0,0,0,.12);
+
+}
+
+.accionesUsuario{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    min-width:170px;
+
+}
+
+.btnEditarUsuario,
+.btnResetPassword,
+.btnDesactivarUsuario{
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:10px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+.btnEditarUsuario{
+
+    background:#0d6efd;
+
+    color:white;
+
+}
+
+.btnResetPassword{
+
+    background:#ffc107;
+
+    color:#222;
+
+}
+
+.btnDesactivarUsuario{
+
+    background:#dc3545;
+
+    color:white;
+
+}
+
+.btnEditarUsuario:hover,
+.btnResetPassword:hover,
+.btnDesactivarUsuario:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/*=====================================
+        PRIMER INGRESO
+======================================*/
+
+.cardPrimerIngreso{
+
+    width:100%;
+    max-width:650px;
+
+    margin:40px auto;
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:45px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.10);
+
+}
+
+.logoPrimerIngreso{
+
+    display:block;
+
+    width:120px;
+
+    margin:0 auto 20px;
+
+}
+
+.cardPrimerIngreso h1{
+
+    text-align:center;
+
+    color:#202938;
+
+    margin-bottom:10px;
+
+    font-size:34px;
+
+}
+
+.textoPrimerIngreso{
+
+    text-align:center;
+
+    color:#666;
+
+    line-height:1.6;
+
+    margin-bottom:35px;
+
+}
+
+.btnGuardarPerfil{
+
+    width:100%;
+
+    margin-top:20px;
+
+    height:52px;
+
+    font-size:17px;
 
 }
