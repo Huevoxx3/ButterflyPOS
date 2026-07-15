@@ -10,10 +10,12 @@ import {
     collection,
     addDoc,
     getDoc,
+    getDocs,
     serverTimestamp,
     doc,
     updateDoc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 let volverAMesa = null;
 
@@ -174,6 +176,25 @@ html += `
 
         </select>
 
+            <div
+    id="grupoCuentaCorriente"
+    class="grupoCobro"
+    style="display:none;">
+
+    <label>
+
+        👤 Empleado
+
+    </label>
+
+    <select id="empleadoCuenta">
+
+        <option value="">Seleccione un empleado</option>
+
+    </select>
+
+</div>
+
     </div>
 
 </div>
@@ -221,6 +242,20 @@ document.getElementById("vistaMesa").classList.add("oculto");
 document.getElementById("vistaCobro").classList.remove("oculto");
 
 document.getElementById("vistaCobro").innerHTML = html;
+
+await cargarEmpleados();
+
+document.getElementById("medioPago").onchange = ()=>{
+
+    document.getElementById("grupoCuentaCorriente").style.display =
+
+        document.getElementById("medioPago").value === "Cuenta Corriente"
+
+            ? ""
+
+            : "none";
+
+};
 
 console.log(document.getElementById("btnConfirmarCobro"));
 
@@ -280,76 +315,115 @@ document.getElementById("btnConfirmarCobro").onclick = async () => {
 
 const jornada = await obtenerJornadaActual();
 
+const ventaRef = await addDoc(
+
+    collection(db,"ventas"),
+
+    {
+
+        pedidoId: mesa.pedidoId,
+
+        mesa: mesa.numero,
+
+        mozo: mesa.mozo,
+
+        jornada: jornada,
+
+        fecha: serverTimestamp(),
+
+        subtotal: mesa.total,
+
+        descuentoGeneral: Number(
+            document.getElementById("descuentoGeneral").value
+        ) || 0,
+
+        motivo: document.getElementById("motivoDescuento").value,
+
+        medioPago: document.getElementById("medioPago").value,
+
+        totalCobrado: Number(
+            document.getElementById("totalCuenta")
+                .textContent
+                .replace("$", "")
+                .replace(/\./g, "")
+                .replace(",", ".")
+                .trim()
+        ),
+
+        productos: items.map(item => ({
+
+            ...item,
+
+            descuento: Number(
+
+                document.querySelectorAll(".txtDescuento")[
+
+                    items.indexOf(item)
+
+                ].value
+
+            ) || 0,
+
+            motivoDescuento:
+
+                motivosDescuento[items.indexOf(item)] || "",
+
+            invitado:
+
+                document.querySelectorAll(".chkNoCobrar")[
+
+                    items.indexOf(item)
+
+                ].checked,
+
+            motivoNoCobrar:
+
+                motivosNoCobrar[items.indexOf(item)] || ""
+
+        }))
+
+    }
+
+);
+
+if(document.getElementById("medioPago").value === "Cuenta Corriente"){
+
+    const selector = document.getElementById("empleadoCuenta");
+
     await addDoc(
 
-        collection(db,"ventas"),
+        collection(db,"cuentasCorrientes"),
 
         {
 
-    pedidoId: mesa.pedidoId,
+            empleadoId: selector.value,
 
-    mesa: mesa.numero,
+            empleado: selector.selectedOptions[0].textContent,
 
-    mozo: mesa.mozo,
+            ventaId: ventaRef.id,
 
-    jornada: jornada,
+            pedidoId: mesa.pedidoId,
 
-    fecha: serverTimestamp(),
+            mesa: mesa.numero,
 
-    subtotal: mesa.total,
+            importe: Number(
+                document.getElementById("totalCuenta")
+                    .textContent
+                    .replace("$","")
+                    .replace(/\./g,"")
+                    .replace(",",".")
+                    .trim()
+            ),
 
-    descuentoGeneral: Number(
-        document.getElementById("descuentoGeneral").value
-    ) || 0,
+            fecha: serverTimestamp(),
 
-    motivo: document.getElementById("motivoDescuento").value,
+            estado: "Pendiente"
 
-    medioPago: document.getElementById("medioPago").value,
-
-totalCobrado: Number(
-    document.getElementById("totalCuenta")
-        .textContent
-        .replace("$", "")
-        .replace(/\./g, "")
-        .replace(",", ".")
-        .trim()
-),
-
-    productos: items.map(item => ({
-
-        ...item,
-
-        descuento: Number(
-
-            document.querySelectorAll(".txtDescuento")[
-
-                items.indexOf(item)
-
-            ].value
-
-        ) || 0,
-
-        motivoDescuento:
-
-    motivosDescuento[items.indexOf(item)] || "",
-
-        invitado:
-
-            document.querySelectorAll(".chkNoCobrar")[
-
-                items.indexOf(item)
-
-            ].checked,
-
-motivoNoCobrar:
-
-    motivosNoCobrar[items.indexOf(item)] || ""
-
-    }))
-
-}
+        }
 
     );
+
+}
 
     console.log("Pedido ID:", mesa.pedidoId);
 console.log("Mesa:", mesa);
@@ -660,5 +734,39 @@ document.getElementById("bloqueMotivo").style.display =
 
 document.getElementById("totalCuenta").textContent =
     "$ " + total.toLocaleString("es-AR");
+
+}
+
+async function cargarEmpleados(){
+
+    const selector = document.getElementById("empleadoCuenta");
+
+    const snapshot = await getDocs(
+
+        collection(db,"usuarios")
+
+    );
+
+    snapshot.forEach(documento=>{
+
+        const usuario = documento.data();
+
+        if(!usuario.activo) return;
+
+        const option = document.createElement("option");
+
+        option.value = documento.id;
+
+        option.textContent =
+
+            usuario.nombre +
+
+            " " +
+
+            usuario.apellido;
+
+        selector.appendChild(option);
+
+    });
 
 }

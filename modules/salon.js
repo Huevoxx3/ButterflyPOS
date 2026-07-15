@@ -52,8 +52,13 @@ async function actualizarEstadoCaja(){
 console.log("abierta =", caja.abierta);
 
     const estado = document.getElementById("estadoCaja");
+const boton = document.getElementById("btnAbrirCaja");
 
-    const boton = document.getElementById("btnAbrirCaja");
+if(!estado || !boton){
+
+    return;
+
+}
 
     if(caja.abierta){
 
