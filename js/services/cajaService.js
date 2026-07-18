@@ -13,29 +13,33 @@ import {
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-export async function obtenerJornadaActual(){
+let jornadaCache = null;
+
+export async function obtenerJornadaActual() {
+
+    // Si ya la tenemos en memoria, la devolvemos
+    if (jornadaCache) {
+        return jornadaCache;
+    }
 
     console.log("ENTRÓ A obtenerJornadaActual");
 
-    const referencia = doc(db,"caja","actual");
-
+    const referencia = doc(db, "caja", "actual");
     const documento = await getDoc(referencia);
-
     const caja = documento.data();
 
-    // Si la jornada sigue abierta
-    if(caja.abierta){
+    if (caja.abierta) {
 
         console.log("Caja abierta");
 
-        return caja.fechaJornada;
+        jornadaCache = caja.fechaJornada;
 
+        return jornadaCache;
     }
 
-console.log("No hay caja abierta.");
+    console.log("No hay caja abierta.");
 
-return null;
-
+    return null;
 }
 
 export async function abrirCaja(usuario){
@@ -98,6 +102,8 @@ if(!cierre.empty){
         }
 
     );
+
+    jornadaCache = jornada;
 
     return true;
 
