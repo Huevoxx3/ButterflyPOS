@@ -39,8 +39,6 @@ let totalTemporal = 0;
 
 let modoSoloLectura = false;
 
-let cartaCache = null;
-
 async function actualizarEstadoCaja(){
 
     const documento = await getDoc(
