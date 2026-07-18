@@ -18,12 +18,21 @@ import {
 
 import { registrarActividad } from "./actividadService.js";
 
+    const usuario = JSON.parse(
+        sessionStorage.getItem("usuario")
+    );
+
+import { obtenerCategoria } from "./cartaService.js";
+
 export async function agregarProductoPedido(
+    
     mesa,
     productoId,
     nombre,
     precio
 ){
+
+    console.time("Agregar Producto");
     console.log("ENTRO A agregarProductoPedido");
 
     const itemsRef = collection(
@@ -38,7 +47,9 @@ export async function agregarProductoPedido(
         where("productoId","==",productoId)
     );
 
+    console.time("Buscar Item");
     const resultado = await getDocs(consulta);
+    console.timeEnd("Buscar Item");
 
     if(resultado.empty){
 
@@ -78,13 +89,7 @@ export async function agregarProductoPedido(
 
     }
     
-const producto = await getDoc(
-
-    doc(db,"carta",productoId)
-
-);
-
-const categoria = producto.data().categoria;
+const categoria = await obtenerCategoria(productoId);
 
 const categoriasExcluidas = [
 
@@ -99,72 +104,58 @@ const categoriasExcluidas = [
 // ==========================
 // ENVIAR A COCINA
 // ==========================
+
+console.time("Enviar Cocina");
+
 const jornada = await obtenerJornadaActual();
 
 console.log("ANTES DE COCINA");
-if(!categoriasExcluidas.includes(categoria)){
+
+if (!categoriasExcluidas.includes(categoria)) {
 
     await addDoc(
-
-        collection(db,"cocina"),
-
+        collection(db, "cocina"),
         {
-
             pedidoId: mesa.pedidoId,
-
             mesa: mesa.numero,
-
-            nombre: nombre,
-
+            nombre,
             observacion: "",
-
             estado: "Pendiente",
-
             horaPedido: serverTimestamp(),
-
             horaLista: null,
-
             horaEntrega: null,
-
             requiereConfirmacion: false,
-
             ultimaModificacion: null,
-
             jornada
-
         }
-
     );
 
 }
-    await updateDoc(
 
+console.timeEnd("Enviar Cocina");
+console.time("Actualizar Totales");
+
+await Promise.all([
+
+    updateDoc(
         doc(db,"pedidos",mesa.pedidoId),
-
         {
-
-            total:increment(precio)
-
+            total: increment(precio)
         }
+    ),
 
-    );
-
-    await updateDoc(
-
+    updateDoc(
         doc(db,"mesas",String(mesa.numero)),
-
         {
-
-            total:increment(precio)
-
+            total: increment(precio)
         }
+    )
 
-    );
+]);
 
-    const usuario = JSON.parse(
-        sessionStorage.getItem("usuario")
-    );
+console.timeEnd("Actualizar Totales");
 
+    console.time("Registrar Actividad");
 await registrarActividad(
 
     usuario.nombre,
@@ -176,6 +167,9 @@ await registrarActividad(
     `${nombre} - Mesa ${mesa.numero}`
 
 );
+console.timeEnd("Registrar Actividad");
+
+console.timeEnd("Agregar Producto");
 
 }
 
@@ -403,13 +397,7 @@ if(cambioObservacion){
 
 }
 
-const producto = await getDoc(
-
-    doc(db,"carta",item.productoId)
-
-);
-
-const categoria = producto.data().categoria;
+const categoria = await obtenerCategoria(item.productoId);
 
 const categoriasExcluidas = [
 

@@ -1,4 +1,5 @@
 
+import { obtenerCarta } from "../js/services/cartaService.js";
 import {
     abrirCaja
 } from "../js/services/cajaService.js";
@@ -37,6 +38,8 @@ let carritoCarta = [];
 let totalTemporal = 0;
 
 let modoSoloLectura = false;
+
+let cartaCache = null;
 
 async function actualizarEstadoCaja(){
 
@@ -969,15 +972,11 @@ async function cargarCartaSalon(mesa){
     document.getElementById("buscarCartaSalon");
         lista.innerHTML = "";
 
-    const productos = await getDocs(collection(db,"carta"));
+const productos = await obtenerCarta();
 
     const categorias = {};
 
-    productos.forEach(documento=>{
-
-        const producto = documento.data();
-
-        producto.id = documento.id;
+   productos.forEach(producto => {
 
         if(!producto.disponible) return;
 
