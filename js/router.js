@@ -50,9 +50,19 @@ opciones[datos.perfil].forEach(opcion => {
 
     const boton = document.createElement("button");
 
+    boton.classList.add("menu-btn");
+
     boton.textContent = opcion;
 
 boton.onclick = async () => {
+
+    document.querySelectorAll("#menu button").forEach(b=>{
+
+    b.classList.remove("activo");
+
+});
+
+boton.classList.add("activo");
 
 
 if (opcion === "Inicio") {
@@ -194,6 +204,14 @@ if(opcion==="Cuenta Corriente"){
 
 
 });
+
+const primerBoton = document.querySelector("#menu button");
+
+if(primerBoton){
+
+    primerBoton.classList.add("activo");
+
+}
 
 if(sessionStorage.getItem("primerIngreso") === "true"){
 

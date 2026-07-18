@@ -1,0 +1,114 @@
+/* ==========================================================
+   BUTTERFLYPOS THEME
+   Versión 1.0
+   ========================================================== */
+
+:root{
+
+    /* ======================================================
+       COLORES
+    ====================================================== */
+
+    --color-primary: #202938;
+    --color-primary-hover: #2c3950;
+
+    --color-success: #198754;
+    --color-success-hover: #157347;
+
+    --color-danger: #dc3545;
+    --color-danger-hover: #bb2d3b;
+
+    --color-warning: #f39c12;
+    --color-warning-hover: #d68910;
+
+    --color-info: #0d6efd;
+
+    --color-white: #ffffff;
+
+    --color-background: #f5f6fa;
+    --color-surface: #ffffff;
+
+    --color-border: #dfe4ea;
+
+    --color-text: #1f2937;
+    --color-text-light: #6b7280;
+
+    --color-sidebar: #202938;
+    --color-sidebar-hover: #2f4058;
+    --color-sidebar-active: #30405a;
+
+
+    /* ======================================================
+       BORDES
+    ====================================================== */
+
+    --radius-xs:6px;
+    --radius-sm:8px;
+    --radius-md:12px;
+    --radius-lg:18px;
+    --radius-xl:24px;
+    --radius-pill:999px;
+
+
+    /* ======================================================
+       SOMBRAS
+    ====================================================== */
+
+    --shadow-sm:0 2px 8px rgba(0,0,0,.06);
+
+    --shadow-md:0 6px 18px rgba(0,0,0,.10);
+
+    --shadow-lg:0 12px 30px rgba(0,0,0,.16);
+
+
+    /* ======================================================
+       ESPACIADO
+    ====================================================== */
+
+    --space-xs:4px;
+    --space-sm:8px;
+    --space-md:16px;
+    --space-lg:24px;
+    --space-xl:32px;
+    --space-xxl:48px;
+
+
+    /* ======================================================
+       TIPOGRAFÍA
+    ====================================================== */
+
+    --font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+
+    --font-xs:12px;
+    --font-sm:14px;
+    --font-md:16px;
+    --font-lg:18px;
+    --font-xl:22px;
+    --font-xxl:28px;
+
+    --font-weight-normal:400;
+    --font-weight-medium:500;
+    --font-weight-semibold:600;
+    --font-weight-bold:700;
+
+
+    /* ======================================================
+       TRANSICIONES
+    ====================================================== */
+
+    --transition-fast:.15s ease;
+
+    --transition:.25s ease;
+
+    --transition-slow:.35s ease;
+
+
+    /* ======================================================
+       LAYOUT
+    ====================================================== */
+
+    --sidebar-width:260px;
+
+    --header-height:70px;
+
+}

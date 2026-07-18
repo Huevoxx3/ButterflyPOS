@@ -1,0 +1,398 @@
+/* ==========================
+   MODAL CARTA
+========================== */
+
+#modalCarta .modal-contenido{
+
+    width:min(1400px,95vw);
+
+    height:90vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:20px;
+
+    border-radius:18px;
+
+    background:white;
+
+    box-shadow:0 20px 60px rgba(0,0,0,.20);
+
+}
+
+#modalCarta h2{
+
+flex-shrink:0;
+
+}
+
+#buscarCartaSalon{
+
+    width:100%;
+
+    height:52px;
+
+    padding:0 18px;
+
+    border:1px solid #dbe2ea;
+
+    border-radius:14px;
+
+    background:#ffffff;
+
+    font-size:16px;
+
+    color:#374151;
+
+    outline:none;
+
+    transition:.2s;
+
+    margin-bottom:18px;
+
+}
+
+#buscarCartaSalon:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.10);
+
+}
+
+
+#listaCartaSalon{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    padding-right:8px;
+
+}
+
+.tituloCategoria{
+
+    margin:28px 0 16px;
+
+    padding-bottom:10px;
+
+    border-bottom:2px solid #e5e7eb;
+
+}
+
+.tituloCategoria h2{
+
+    margin:0;
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#1f2937;
+
+    letter-spacing:.3px;
+
+}
+
+/*.tituloCategoria{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:5;
+
+    background:#f8fafc;
+
+    padding:8px 12px;
+
+    margin:14px 0 6px 0;
+
+    border-left:4px solid #2563eb;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    color:#475569;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+} 
+
+#listaCartaSalon h3{
+
+    margin-top:30px;
+
+    margin-bottom:15px;
+
+    font-size:26px;
+
+    color:#1f2937;
+
+    border-left:6px solid #2563eb;
+
+    padding-left:12px;
+
+}*/
+
+#listaCartaSalon .cardUsuario{
+
+    display:grid;
+
+    grid-template-columns:1fr 90px 110px;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:8px 14px;
+
+    margin-bottom:4px;
+
+    min-height:48px;
+
+    border-radius:8px;
+
+    background:#fff;
+
+    border:1px solid #ececec;
+
+    transition:.15s;
+
+}
+
+.cardUsuario:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 6px 18px rgba(0,0,0,.10);
+
+}
+
+#listaCartaSalon .cardUsuario:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+#listaCartaSalon strong{
+
+    font-size:16px;
+
+    color:#202938;
+
+    font-weight:600;
+
+}
+
+#listaCartaSalon .cardUsuario div{
+
+    font-size:13px;
+
+    color:#666;
+
+    line-height:1.2;
+
+}
+
+#listaCartaSalon::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+#listaCartaSalon::-webkit-scrollbar-thumb{
+
+    background:#cbd5e1;
+
+    border-radius:10px;
+
+}
+
+#listaCartaSalon::-webkit-scrollbar-thumb:hover{
+
+    background:#94a3b8;
+
+}
+
+.btnAgregarCarta{
+
+    background:#2563eb;
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:10px;
+
+    height:36px;
+
+    width:105px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.15s;
+
+}
+
+.btnAgregarCarta:hover{
+
+    background:#1d4ed8;
+
+    transform:scale(1.03);
+
+}
+
+#cerrarCartaSalon{
+
+    width:100%;
+
+    margin-top:25px;
+
+    background:#e5e7eb;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:14px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+#cerrarCartaSalon:hover{
+
+    background:#d6d8dc;
+
+}
+
+.pedidoModificado{
+
+    background:#fff3b0;
+
+    border:2px solid orange;
+
+}
+
+/*=========================================
+    CARTA - NUEVO DISEÑO
+=========================================*/
+
+.productoCarta{
+
+    display:grid !important;
+
+    grid-template-columns: 1fr 140px 150px;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.productoNombre{
+
+    font-size:17px;
+
+    font-weight:600;
+
+    color:#202938;
+
+}
+
+.productoPrecio{
+
+    text-align:right;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:#198754;
+
+}
+
+.productoAccion{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+/*==================================
+    FILAS DE LA CARTA
+===================================*/
+
+.filaProducto{
+
+    display:grid;
+
+    grid-template-columns: 1fr 110px 120px;
+
+    align-items:center;
+
+    gap:12px;
+
+    min-height:54px;
+
+    padding:6px 14px;
+
+    border-bottom:1px solid #ececec;
+
+    transition:.15s;
+
+}
+
+.filaProducto:hover{
+
+    background:#f8fbff;
+
+    border-radius:10px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+    transform:translateX(4px);
+
+}
+
+.filaNombre{
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:#1e293b;
+
+    letter-spacing:.2px;
+
+}
+
+.filaPrecio{
+
+    text-align:right;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    color:#16a34a;
+
+    white-space:nowrap;
+
+}

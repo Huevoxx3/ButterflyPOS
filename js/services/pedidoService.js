@@ -23,6 +23,7 @@ import { registrarActividad } from "./actividadService.js";
     );
 
 import { obtenerCategoria } from "./cartaService.js";
+import { obtenerPendientesCocina } from "./cocinaService.js";
 
 export async function agregarProductoPedido(
     
@@ -357,20 +358,9 @@ const cambioObservacion =
     const cantidadOriginal = original?.cantidad || 0;
     const cantidadNueva = item.cantidad;
 
-        const cocina = await getDocs(
-
-    query(
-
-        collection(db,"cocina"),
-
-        where("pedidoId","==",mesa.pedidoId),
-
-        where("nombre","==",item.nombre),
-
-        where("estado","==","Pendiente")
-
-    )
-
+const cocina = await obtenerPendientesCocina(
+    mesa.pedidoId,
+    item.nombre
 );
 
 if(cambioObservacion){
@@ -469,21 +459,10 @@ if(cantidadNueva < cantidadOriginal){
 
     const diferencia = cantidadOriginal - cantidadNueva;
 
-    const cocina = await getDocs(
-
-        query(
-
-            collection(db,"cocina"),
-
-            where("pedidoId","==",mesa.pedidoId),
-
-            where("nombre","==",item.nombre),
-
-            where("estado","==","Pendiente")
-
-        )
-
-    );
+const cocina = await obtenerPendientesCocina(
+    mesa.pedidoId,
+    item.nombre
+);
 
     let eliminados = 0;
 
@@ -535,20 +514,9 @@ if(cantidadOriginal !== cantidadNueva){
 
         );
 
-        const cocina = await getDocs(
-
-    query(
-
-        collection(db,"cocina"),
-
-        where("pedidoId","==",mesa.pedidoId),
-
-        where("nombre","==",item.nombre),
-
-        where("estado","==","Pendiente")
-
-    )
-
+const cocina = await obtenerPendientesCocina(
+    mesa.pedidoId,
+    item.nombre
 );
 
 for(const producto of cocina.docs){

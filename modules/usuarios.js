@@ -90,6 +90,7 @@ const textoBoton = usuario.activo
 html = html.replaceAll("{{ESTADO}}", estado);
 html = html.replaceAll("{{ID}}", id);
 html = html.replaceAll("{{BOTON}}", textoBoton);
+html = html.replaceAll("{{DNI}}", usuario.dni || "-");
 
         lista.innerHTML+=html;
 

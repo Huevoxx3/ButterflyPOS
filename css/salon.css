@@ -1,4 +1,4 @@
-.salon-container{
+/*.salon-container{
 
     width:100%;
 
@@ -129,5 +129,275 @@
     justify-content:center;
 
     align-items:center;
+
+}*/
+
+.salon{
+
+    width:100%;
+
+    padding:30px;
+
+}
+
+.salonTitulo{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.salonTitulo button{
+
+    background:#202938;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 20px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.planoSalon{
+
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    gap:25px;
+
+}
+
+.mesaCard{
+
+    background:white;
+
+    border-radius:18px;
+
+    height:150px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.12);
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.mesaCard:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.mesaNumero{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:50%;
+
+    background:#202938;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    margin-bottom:15px;
+
+}
+
+.mesaEstado{
+
+    color:white;
+
+    padding:8px 20px;
+
+    border-radius:30px;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+}
+
+.libre{
+
+    background:#27ae60;
+
+}
+
+.ocupada{
+
+    background:#3498db;
+
+}
+
+.cocina{
+
+    background:#f39c12;
+
+}
+
+.cuenta{
+
+    background:#c0392b;
+
+}
+
+/* ===========================
+   PEDIDO DE LA MESA
+=========================== */
+
+.pedidoItem{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+    padding:18px;
+
+    margin-bottom:12px;
+
+    border:1px solid #e7e7e7;
+
+    border-radius:12px;
+
+    background:#fff;
+
+}
+
+.pedidoInfo{
+
+    flex:1;
+
+}
+
+.pedidoNombre{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#202938;
+
+}
+
+.pedidoObs{
+
+    margin-top:6px;
+
+    color:#777;
+
+    font-size:14px;
+
+}
+
+.pedidoAcciones{
+
+    text-align:right;
+
+    min-width:180px;
+
+}
+
+.cantidadPedido{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:12px;
+
+}
+
+.btnCantidad{
+
+    width:34px;
+
+    height:34px;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    background:#202938;
+
+    color:white;
+
+}
+
+.btnCantidad:hover{
+
+    opacity:.9;
+
+}
+
+.btnObservacion{
+
+    width:100%;
+
+    margin-bottom:10px;
+
+    padding:8px;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    background:#ececec;
+
+}
+
+.precioPedido{
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    color:#202938;
 
 }

@@ -1415,9 +1415,9 @@ async function reiniciarSistema(){
 
         {
 
-            abierta: true,
+            abierta: false,
 
-            fechaJornada: "2026-07-06",
+            fechaJornada: "",
 
             apertura: serverTimestamp(),
 

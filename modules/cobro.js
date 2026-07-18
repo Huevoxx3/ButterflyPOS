@@ -146,11 +146,11 @@ html += `
 
             </label>
 
-            <textarea
-                id="motivoDescuento"
-                rows="3">
-
-            </textarea>
+            <input
+    type="text"
+    id="motivoDescuento"
+    maxlength="80"
+    placeholder="Ingrese el motivo del descuento">
 
         </div>
 
@@ -213,15 +213,23 @@ html += `
 
 <div class="accionesCobro">
 
+    <button
+        id="btnVolverCobro"
+        class="btnGris">
 
+        ← Volver
 
-<button
-    id="btnConfirmarCobro"
-    class="btnVerdeGrande">
+    </button>
 
-    💳 Cobrar
+    <button
+        id="btnConfirmarCobro"
+        class="btnVerdeGrande">
 
-</button>
+        💳 Cobrar
+
+    </button>
+
+</div>
 
 <p
 id="mensajeValidacion"
@@ -265,13 +273,17 @@ document.getElementById("btnEditarPedido").style.display = "none";
 
 document.getElementById("btnCobrar").style.display = "none";
 
+document.querySelector(".accionesMesa").style.display = "none";
+
+document.getElementById("btnVolverSalon").style.display = "";
+
 document.getElementById("datosMesa").style.display = "none";
 
 document.querySelector(".totalMesa").style.display = "none";
 
 document.getElementById("btnVolverSalon").textContent = "← Volver";
 
-document.getElementById("btnVolverSalon").onclick = async () => {
+async function volverDesdeCobro(){
 
     document.getElementById("vistaCobro").innerHTML = "";
 
@@ -283,19 +295,25 @@ document.getElementById("btnVolverSalon").onclick = async () => {
 
     document.querySelector(".totalMesa").style.display = "";
 
+    document.querySelector(".accionesMesa").style.display = "grid";
+
     document.getElementById("btnAgregarProducto").style.display = "";
 
     document.getElementById("btnEditarPedido").style.display = "";
 
     document.getElementById("btnCobrar").style.display = "";
 
-    if (volverAMesa) {
+    if(volverAMesa){
 
         await volverAMesa();
 
     }
 
-};
+}
+
+document.getElementById("btnVolverSalon").onclick = volverDesdeCobro;
+
+document.getElementById("btnVolverCobro").onclick = volverDesdeCobro;
 
 document.getElementById("btnConfirmarCobro").onclick = async () => {
 

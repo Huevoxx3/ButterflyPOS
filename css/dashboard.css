@@ -1,19 +1,28 @@
-/* ===========================================================
-   BUTTERFLY POS
-   DASHBOARD.CSS
+/* ==========================================================
+   BUTTERFLYPOS - DASHBOARD.CSS
+   ==========================================================
 
-   1. VARIABLES
-   2. RESET
-   3. LAYOUT
-   4. BOTONES
-   5. INPUTS
-   6. TARJETAS
-   7. MODALES
-   8. TABLAS
-   9. SALÓN
-   10. CARTA
-   11. ADMIN
-=========================================================== */
+   ÍNDICE
+
+   01 - Variables
+   02 - Layout General
+   03 - Sidebar
+   04 - Header
+   05 - Dashboard
+   06 - Mesas
+   07 - Salón
+   08 - Carta
+   09 - Formularios
+   10 - Botones
+   11 - Tablas
+   12 - Modales
+   13 - Actividad
+   14 - Historial
+   15 - Caja
+   16 - Utilidades
+   17 - Responsive
+
+========================================================== */
 
 *{
     margin:0;
@@ -29,81 +38,73 @@ body{
 }
 
 .contenedor{
-
     display:flex;
-
     height:100vh;
-
+    overflow:hidden;
 }
 
 .sidebar{
-
     width:250px;
-
     background:#202938;
-
     color:white;
-
     display:flex;
-
     flex-direction:column;
-
+    flex-shrink:0;
+    overflow:hidden;
 }
 
 .logo{
-
+    padding:28px 20px 22px;
     text-align:center;
-
-    padding:25px;
-
+    border-bottom:1px solid rgba(255,255,255,.08);
 }
 
 .logo img{
-
-    width:90px;
-
-    margin-bottom:10px;
-
+    width:72px;
+    margin-bottom:14px;
 }
 
 .logo h2{
-
-    font-size:22px;
-
+    font-size:1.8rem;
+    font-weight:700;
+    color:#fff;
 }
 
 nav{
-
     display:flex;
-
     flex-direction:column;
-
-    margin-top:20px;
-
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:18px 10px;
+    gap:6px;
 }
 
 nav button{
-
-    background:none;
-
+    display:flex;
+    align-items:center;
+    width:100%;
+    padding:14px 18px;
     border:none;
-
-    color:white;
-
-    padding:18px;
-
-    text-align:left;
-
-    cursor:pointer;
-
+    border-radius:10px;
+    background:transparent;
+    color:#d7dde8;
     font-size:15px;
-
+    font-weight:500;
+    cursor:pointer;
+    transition:all .2s ease;
 }
 
 nav button:hover{
+    background:#2f3d55;
+    color:#fff;
+    transform:translateX(4px);
+}
 
-    background:#30405a;
-
+nav button.activo{
+    background:var(--color-primary);
+    color:#fff;
+    box-shadow:0 6px 18px rgba(0,0,0,.18);
 }
 
 .principal{
@@ -117,40 +118,34 @@ nav button:hover{
 }
 
 header{
-
-    height:80px;
-
-    background:white;
-
+    height:72px;
+    background:var(--color-surface);
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
-
-    padding:25px;
-
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
-
+    padding:0 32px;
+    border-bottom:1px solid #e5e7eb;
+    box-shadow:none;
 }
 
 .usuario{
-
     display:flex;
-
     align-items:center;
-
-    gap:15px;
-
-}
+    gap:12px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:8px 12px;
+}   
 
 .usuario img{
-
-    width:50px;
-
+    width:42px;
+    height:42px;
     border-radius:50%;
-
+    object-fit:cover;
 }
+
+
 
 .usuario button{
 
@@ -169,16 +164,32 @@ header{
 }
 
 #contenido{
-
     flex:1;
-
-    width:100%;
-
-    padding:30px;
-
+    padding:32px;
     overflow:auto;
-
+    background:#f5f7fb;
 }
+
+.panel{
+    background:#fff;
+    border-radius:16px;
+    padding:28px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 4px 18px rgba(15,23,42,.05);
+}
+
+.panel h1{
+    font-size:28px;
+    color:#1f2937;
+    margin-bottom:8px;
+}
+
+.panel p{
+    color:#6b7280;
+    line-height:1.6;
+}
+
+
 
 .logoCentral{
 
@@ -223,13 +234,31 @@ header{
 
 }
 
+#vistaCobro{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    min-height:0;
+
+}
+
 .modal-contenido{
 
-    width:500px;
+    width:650px;
+
+    max-width:95%;
+
+    max-height:90vh;
+
+    overflow-y:auto;
 
     background:white;
 
-    border-radius:10px;
+    border-radius:12px;
 
     padding:25px;
 
@@ -295,512 +324,25 @@ header{
 }
 
 .titulo{
-
-    font-size:24px;
-
+    font-size:2rem;
     font-weight:700;
-
-    color:#202938;
-
+    color:var(--color-text);
+    letter-spacing:-0.5px;
 }
 
-.usuarios{
 
-    width:100%;
-
-    max-width:950px;
-
-}
-
-.usuarios-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
-}
-
-.usuarios-header button{
-
-    background:#202938;
-
-    color:white;
-
-    border:none;
-
-    padding:12px 20px;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    font-size:15px;
-
-}
-
-.usuarios-header button:hover{
-
-    background:#30405a;
-
-}
-
-.cardUsuario{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    background:#fff;
-
-    border-radius:14px;
-
-    padding:14px 18px;
-
-    margin-bottom:8px;
-
-    box-shadow:0 2px 10px rgba(0,0,0,.06);
-
-    transition:.2s ease;
-
-}
-/*=============================
-    PRODUCTOS ADMIN
-==============================*/
-
-.productoCard{
-
-    display:grid;
-
-    grid-template-columns:1fr 120px 180px;
-
-    align-items:center;
-
-    gap:20px;
-
-    padding:12px 18px;
-
-    margin-bottom:6px;
-
-}
-
-.datosProducto{
-
-    display:flex;
-
-    flex-direction:column;
-
-}
-
-.categoriaProducto{
-
-    margin-top:3px;
-
-    color:#777;
-
-    font-size:13px;
-
-}
-
-.precioProducto{
-
-    font-size:18px;
-
-    font-weight:700;
-
-    text-align:center;
-
-}
-
-.accionesCarta{
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:flex-end;
-
-    gap:10px;
-
-}
-
-.precioProducto{
-
-    font-size:18px;
-
-    color:#1f2937;
-
-}
-
-.accionesProducto{
-
-    display:flex;
-
-    gap:8px;
-
-    flex-wrap:wrap;
-
-}
-
-.datosUsuario{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:5px;
-
-}
-
-.estadoUsuario{
-
-    font-weight:bold;
-
-}
-
-.nombreUsuario{
-
-    font-size:18px;
-
-    font-weight:700;
-
-    margin-bottom:8px;
-
-}
-
-.detalleUsuario{
-
-    color:#555;
-
-    margin-bottom:5px;
-
-}
-
-.accionesUsuario{
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:flex-end;
-
-    gap:15px;
-
-}
-
-.botonesUsuario{
-
-    display:flex;
-
-    gap:10px;
-
-}
-
-#buscarUsuario{
-
-    width:250px;
-
-    padding:10px;
-
-    border-radius:8px;
-
-    border:1px solid #ccc;
-
-    margin-right:10px;
-
-}
-
-.salon{
-
-    width:100%;
-
-    padding:30px;
-
-}
-
-.salonTitulo{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:30px;
-
-}
-
-.salonTitulo button{
-
-    background:#202938;
-
-    color:white;
-
-    border:none;
-
-    padding:12px 20px;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-}
-
-.planoSalon{
-
-    display:grid;
-
-    grid-template-columns:repeat(5,1fr);
-
-    gap:25px;
-
-}
-
-.mesaCard{
-
-    background:white;
-
-    border-radius:18px;
-
-    height:150px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
-
-    box-shadow:0 5px 15px rgba(0,0,0,.12);
-
-    cursor:pointer;
-
-    transition:.25s;
-
-}
-
-.mesaCard:hover{
-
-    transform:translateY(-4px);
-
-}
-
-.mesaNumero{
-
-    width:70px;
-
-    height:70px;
-
-    border-radius:50%;
-
-    background:#202938;
-
-    color:white;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:30px;
-
-    font-weight:bold;
-
-    margin-bottom:15px;
-
-}
-
-.mesaEstado{
-
-    color:white;
-
-    padding:8px 20px;
-
-    border-radius:30px;
-
-    font-size:14px;
-
-    font-weight:bold;
-
-}
-
-.libre{
-
-    background:#27ae60;
-
-}
-
-.ocupada{
-
-    background:#3498db;
-
-}
-
-.cocina{
-
-    background:#f39c12;
-
-}
-
-.cuenta{
-
-    background:#c0392b;
-
-}
-
-/* ===========================
-   PEDIDO DE LA MESA
-=========================== */
-
-.pedidoItem{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    gap:20px;
-
-    padding:18px;
-
-    margin-bottom:12px;
-
-    border:1px solid #e7e7e7;
-
-    border-radius:12px;
-
-    background:#fff;
-
-}
-
-.pedidoInfo{
-
-    flex:1;
-
-}
-
-.pedidoNombre{
-
-    font-size:18px;
-
-    font-weight:700;
-
-    color:#202938;
-
-}
-
-.pedidoObs{
-
-    margin-top:6px;
-
-    color:#777;
-
-    font-size:14px;
-
-}
-
-.pedidoAcciones{
-
-    text-align:right;
-
-    min-width:180px;
-
-}
-
-.cantidadPedido{
-
-    display:flex;
-
-    justify-content:flex-end;
-
-    align-items:center;
-
-    gap:12px;
-
-    margin-bottom:12px;
-
-}
-
-.btnCantidad{
-
-    width:34px;
-
-    height:34px;
-
-    border:none;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    font-size:18px;
-
-    font-weight:bold;
-
-    background:#202938;
-
-    color:white;
-
-}
-
-.btnCantidad:hover{
-
-    opacity:.9;
-
-}
-
-.btnObservacion{
-
-    width:100%;
-
-    margin-bottom:10px;
-
-    padding:8px;
-
-    border:none;
-
-    border-radius:8px;
-
-    cursor:pointer;
-
-    background:#ececec;
-
-}
-
-.precioPedido{
-
-    font-size:18px;
-
-    font-weight:bold;
-
-    color:#202938;
-
-}
 
 /* =========================
    MODAL MESA
 ========================= */
 
 .mesaModal{
-
     width:min(1200px,95vw);
-
-    height:90vh;
+    height:min(92vh,900px);
 
     display:flex;
-
     flex-direction:column;
-
     overflow:hidden;
-
 }
 
 .mesaHeader{
@@ -808,14 +350,14 @@ header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:25px;
+    margin-bottom:12px;
 
 }
 
 .mesaHeader h2{
 
     margin:0;
-    font-size:38px;
+    font-size:30px;
     color:#1e293b;
 
 }
@@ -872,15 +414,15 @@ header{
 
     flex-direction:column;
 
-    overflow:hidden;
+    margin-top:8px;
 
-    margin-top:18px;
+    min-height:0;
 
 }
 
 .seccionPedido h3{
 
-    margin:0 0 20px 0;
+    margin:0 0 12px 0;
     color:#202938;
 
 }
@@ -889,11 +431,11 @@ header{
 
     flex:1;
 
-    overflow:hidden;
-
     display:flex;
 
     flex-direction:column;
+
+    min-height:0;
 
 }
 
@@ -968,436 +510,7 @@ header{
 
 }
 
-/* ==========================
-   MODAL CARTA
-========================== */
 
-#modalCarta .modal-contenido{
-
-    width:min(1400px,95vw);
-
-    height:90vh;
-
-    display:flex;
-
-    flex-direction:column;
-
-    padding:20px;
-
-    border-radius:18px;
-
-    background:white;
-
-    box-shadow:0 20px 60px rgba(0,0,0,.20);
-
-}
-
-#modalCarta h2{
-
-flex-shrink:0;
-
-}
-
-#buscarCartaSalon{
-
-    width:100%;
-
-    height:52px;
-
-    padding:0 18px;
-
-    border:1px solid #dbe2ea;
-
-    border-radius:14px;
-
-    background:#ffffff;
-
-    font-size:16px;
-
-    color:#374151;
-
-    outline:none;
-
-    transition:.2s;
-
-    margin-bottom:18px;
-
-}
-
-#buscarCartaSalon:focus{
-
-    border-color:#2563eb;
-
-    box-shadow:0 0 0 4px rgba(37,99,235,.10);
-
-}
-
-#buscarCartaSalon:focus{
-
-    outline:none;
-
-    border-color:#2563eb;
-
-    box-shadow:0 0 0 3px rgba(37,99,235,.15);
-
-}
-
-#listaCartaSalon{
-
-    flex:1;
-
-    overflow-y:auto;
-
-    padding-right:8px;
-
-}
-
-.tituloCategoria{
-
-    margin:28px 0 16px;
-
-    padding-bottom:10px;
-
-    border-bottom:2px solid #e5e7eb;
-
-}
-
-.tituloCategoria h2{
-
-    margin:0;
-
-    font-size:24px;
-
-    font-weight:700;
-
-    color:#1f2937;
-
-    letter-spacing:.3px;
-
-}
-
-/*.tituloCategoria{
-
-    position:sticky;
-
-    top:0;
-
-    z-index:5;
-
-    background:#f8fafc;
-
-    padding:8px 12px;
-
-    margin:14px 0 6px 0;
-
-    border-left:4px solid #2563eb;
-
-    font-size:12px;
-
-    font-weight:700;
-
-    color:#475569;
-
-    text-transform:uppercase;
-
-    letter-spacing:1px;
-
-} 
-
-#listaCartaSalon h3{
-
-    margin-top:30px;
-
-    margin-bottom:15px;
-
-    font-size:26px;
-
-    color:#1f2937;
-
-    border-left:6px solid #2563eb;
-
-    padding-left:12px;
-
-}*/
-
-#listaCartaSalon .cardUsuario{
-
-    display:grid;
-
-    grid-template-columns:1fr 90px 110px;
-
-    align-items:center;
-
-    gap:15px;
-
-    padding:8px 14px;
-
-    margin-bottom:4px;
-
-    min-height:48px;
-
-    border-radius:8px;
-
-    background:#fff;
-
-    border:1px solid #ececec;
-
-    transition:.15s;
-
-}
-
-.cardUsuario:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:0 6px 18px rgba(0,0,0,.10);
-
-}
-
-#listaCartaSalon .cardUsuario:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
-
-}
-
-#listaCartaSalon strong{
-
-    font-size:16px;
-
-    color:#202938;
-
-    font-weight:600;
-
-}
-
-#listaCartaSalon .cardUsuario div{
-
-    font-size:13px;
-
-    color:#666;
-
-    line-height:1.2;
-
-}
-
-#listaCartaSalon::-webkit-scrollbar{
-
-    width:8px;
-
-}
-
-#listaCartaSalon::-webkit-scrollbar-thumb{
-
-    background:#cbd5e1;
-
-    border-radius:10px;
-
-}
-
-#listaCartaSalon::-webkit-scrollbar-thumb:hover{
-
-    background:#94a3b8;
-
-}
-
-.btnAgregarCarta{
-
-    background:#2563eb;
-
-    color:#fff;
-
-    border:none;
-
-    border-radius:10px;
-
-    height:36px;
-
-    width:105px;
-
-    font-size:13px;
-
-    font-weight:600;
-
-    cursor:pointer;
-
-    transition:.15s;
-
-}
-
-.btnAgregarCarta:hover{
-
-    background:#1d4ed8;
-
-    transform:scale(1.03);
-
-}
-
-#cerrarCartaSalon{
-
-    width:100%;
-
-    margin-top:25px;
-
-    background:#e5e7eb;
-
-    border:none;
-
-    border-radius:12px;
-
-    padding:14px;
-
-    font-size:16px;
-
-    cursor:pointer;
-
-}
-
-#cerrarCartaSalon:hover{
-
-    background:#d6d8dc;
-
-}
-
-.pedidoModificado{
-
-    background:#fff3b0;
-
-    border:2px solid orange;
-
-}
-
-/*=========================================
-    CARTA - NUEVO DISEÑO
-=========================================*/
-
-.productoCarta{
-
-    display:grid !important;
-
-    grid-template-columns: 1fr 140px 150px;
-
-    align-items:center;
-
-    gap:20px;
-
-}
-
-.productoNombre{
-
-    font-size:17px;
-
-    font-weight:600;
-
-    color:#202938;
-
-}
-
-.productoPrecio{
-
-    text-align:right;
-
-    font-size:17px;
-
-    font-weight:700;
-
-    color:#198754;
-
-}
-
-.productoAccion{
-
-    display:flex;
-
-    justify-content:flex-end;
-
-}
-
-.btnAgregarCarta{
-
-    width:120px;
-
-    height:40px;
-
-}
-
-/*==================================
-    FILAS DE LA CARTA
-===================================*/
-
-.filaProducto{
-
-    display:grid;
-
-    grid-template-columns: 1fr 110px 120px;
-
-    align-items:center;
-
-    gap:12px;
-
-    min-height:54px;
-
-    padding:6px 14px;
-
-    border-bottom:1px solid #ececec;
-
-    transition:.15s;
-
-}
-
-.filaProducto:hover{
-
-    background:#f8fbff;
-
-    border-radius:10px;
-
-    box-shadow:0 4px 12px rgba(0,0,0,.05);
-
-    transform:translateX(4px);
-
-}
-
-.filaNombre{
-
-    font-size:17px;
-
-    font-weight:700;
-
-    color:#1e293b;
-
-    letter-spacing:.2px;
-
-}
-
-.filaPrecio{
-
-    text-align:right;
-
-    font-size:17px;
-
-    font-weight:700;
-
-    color:#16a34a;
-
-    white-space:nowrap;
-
-}
-.filaProducto .btnAgregarCarta{
-
-    justify-self:end;
-
-    width:105px;
-
-    height:34px;
-
-    border-radius:8px;
-
-    font-size:13px;
-
-    font-weight:600;
-
-}
 
 /*====================================
         CABECERA MODALES
@@ -1742,19 +855,17 @@ color:#1e293b;
 
 #descuentoGeneral{
 
-    width:100%;
+    width:110px;
 
-    height:42px;
-
-    border:1px solid #dbe2ea;
-
-    border-radius:10px;
-
-    padding:0 12px;
-
-    font-size:16px;
+    height:52px;
 
     text-align:center;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    border-radius:12px;
 
 }
 
@@ -1781,19 +892,12 @@ color:#1e293b;
 ======================================*/
 
 .pieCobro{
-
     border-top:1px solid #e5e7eb;
-
-    padding-top:25px;
-
+    padding-top:18px;
     display:grid;
-
     grid-template-columns:1fr auto;
-
     align-items:center;
-
-    gap:30px;
-
+    gap:24px;
 }
 
 .totalCobro{
@@ -1807,15 +911,10 @@ color:#1e293b;
 
 
 .totalCobro h1{
-
     margin:0;
-
-    font-size:52px;
-
-    color:#1e293b;
-
+    font-size:42px;
     font-weight:800;
-
+    color:#1e293b;
 }
 
 .btnVerdeGrande{
@@ -1842,6 +941,16 @@ color:#1e293b;
 
 }
 
+#btnVolverCobro{
+
+    min-width:170px;
+
+    background:#6b7280;
+
+    color:white;
+
+}
+
 .btnVerdeGrande:hover{
 
     background:#15803d;
@@ -1851,29 +960,18 @@ color:#1e293b;
 }
 
 .contenedorTablaCobro{
-
-    max-height:320px;
-
+    max-height:260px;
     overflow-y:auto;
-
     border:1px solid #e5e7eb;
-
     border-radius:10px;
-
 }
 
 .configuracionCobro{
-
     display:grid;
-
-    grid-template-columns:220px 320px;
-
-    gap:24px;
-
-    align-items:end;
-
-    margin:25px 0;
-
+    grid-template-columns:220px 320px 1fr;
+    gap:20px;
+    align-items:start;
+    margin:18px 0;
 }
 
 .grupoCobro{
@@ -1925,26 +1023,44 @@ color:#1e293b;
 }
 
 .inicioDashboard{
-
     width:100%;
-
-    height:calc(100vh - 40px);
-
-    border-radius:18px;
-
-    overflow:hidden;
-
-    background:#fff;
-
+    height:100%;
+    display:flex;
+    padding:20px;
 }
 
 .frameButterfly{
+    width:100%;
+    height:100%;
+    border:none;
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 10px 30px rgba(15,23,42,.10);
+}
+
+#motivoDescuento{
 
     width:100%;
 
-    height:100%;
+    height:52px;
 
-    border:none;
+    min-height:52px;
+
+    max-height:52px;
+
+    resize:none;
+
+    padding:12px 14px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:12px;
+
+    font-size:15px;
+
+    line-height:1.4;
+
+    box-sizing:border-box;
 
 }
 /* =======================================================
@@ -2455,19 +1571,15 @@ min-height:300px;
 
 }
 
-#modalDetalleVenta .modalContenido{
+#contenidoDetalleVenta{
 
-    background:white;
+    flex:1;
 
-    width:min(700px,95vw);
+    overflow-y:auto;
 
-    max-height:90vh;
+    min-height:0;
 
-    overflow:auto;
-
-    border-radius:12px;
-
-    padding:25px;
+    padding-right:10px;
 
 }
 
@@ -2481,12 +1593,24 @@ min-height:300px;
 
     max-height:90vh;
 
-    overflow-y:auto;
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
 
     padding:25px;
 
     border-radius:12px;
 
+}
+#contenidoDetalleVenta{
+
+    flex:1;
+
+    overflow-y:auto;
+
+    min-height:0;
 }
 
 .detalleVenta{
@@ -2629,7 +1753,7 @@ min-height:300px;
 
 }
 
-.btnPrincipal,
+/* .btnPrincipal,
 .btnSecundario,
 .btnVerde,
 .btnRojo,
@@ -2713,11 +1837,9 @@ min-height:300px;
 }
 
 .btnEditar{
-
-    background:#1e88e5;
-
-    color:white;
-
+    background:#ffffff;
+    color:#0d6efd;
+    border:2px solid #0d6efd;
 }
 
 .btnEstado{
@@ -2742,69 +1864,7 @@ min-height:300px;
 
     box-shadow:0 6px 14px rgba(0,0,0,.12);
 
-}
-
-.accionesUsuario{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:10px;
-
-    min-width:170px;
-
-}
-
-.btnEditarUsuario,
-.btnResetPassword,
-.btnDesactivarUsuario{
-
-    border:none;
-
-    border-radius:8px;
-
-    padding:10px;
-
-    cursor:pointer;
-
-    font-weight:600;
-
-    transition:.2s;
-
-}
-
-.btnEditarUsuario{
-
-    background:#0d6efd;
-
-    color:white;
-
-}
-
-.btnResetPassword{
-
-    background:#ffc107;
-
-    color:#222;
-
-}
-
-.btnDesactivarUsuario{
-
-    background:#dc3545;
-
-    color:white;
-
-}
-
-.btnEditarUsuario:hover,
-.btnResetPassword:hover,
-.btnDesactivarUsuario:hover{
-
-    transform:translateY(-2px);
-
-}
+} */
 
 /*=====================================
         PRIMER INGRESO
@@ -3165,7 +2225,7 @@ min-height:300px;
 
 }
 
-.btnSecundario{
+.btnFormularioSecundario{
 
     width:100%;
 
@@ -3191,7 +2251,7 @@ min-height:300px;
 
 }
 
-.btnSecundario:hover{
+.btnFormularioSecundario:hover{
 
     background:#4b5563;
 
@@ -3217,4 +2277,17 @@ min-height:300px;
 
     width:160px;
 
+}
+
+
+.modal{
+    border:5px solid red !important;
+}
+
+.modalContenido{
+    border:5px solid blue !important;
+}
+
+#contenidoDetalleVenta{
+    border:5px solid green !important;
 }
