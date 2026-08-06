@@ -44,6 +44,8 @@ export default async function(){
 
     const jornada = caja.data().fechaJornada;
 
+    const montoInicial = caja.data().montoInicial || 0;
+
     // ==========================
     // VENTAS DEL DÍA
     // ==========================
@@ -62,17 +64,15 @@ export default async function(){
 
     let total = 0;
 
+    let esperadoEnCaja = 0;
+
     let efectivo = 0;
 
-    let debito = 0;
+    let mercadoPago = 0;
 
-    let credito = 0;
-
-    let transferencia = 0;
+    let bancoProvincia = 0;
 
     let cuenta = 0;
-
-    let otro = 0;
 
     let pendiente = 0;
 
@@ -96,51 +96,31 @@ export default async function(){
 
         switch(venta.medioPago){
 
-            case "Efectivo":
+    case "Efectivo":
+        efectivo += venta.totalCobrado;
+        break;
 
-                efectivo += venta.totalCobrado;
+    case "MercadoPago":
+        mercadoPago += venta.totalCobrado;
+        break;
 
-                break;
+    case "Banco Provincia":
+        bancoProvincia += venta.totalCobrado;
+        break;
 
-            case "Débito":
+    case "Cuenta Corriente":
+        cuenta += venta.totalCobrado;
+        break;
 
-                debito += venta.totalCobrado;
+    case "Pendiente":
+        pendiente += venta.totalCobrado;
+        break;
 
-                break;
-
-            case "Crédito":
-
-                credito += venta.totalCobrado;
-
-                break;
-
-            case "Transferencia":
-
-                transferencia += venta.totalCobrado;
-
-                break;
-
-            case "Cuenta Corriente":
-
-                cuenta += venta.totalCobrado;
-
-                break;
-
-            case "Otro":
-
-                otro += venta.totalCobrado;
-
-                break;
-
-            case "Pendiente":
-
-                pendiente += venta.totalCobrado;
-
-                break;
-
-        }
+}
 
     });
+
+    esperadoEnCaja = montoInicial + efectivo;
 
     const ticketPromedio =
 
@@ -185,6 +165,40 @@ Jornada: <strong>${jornada}</strong>
         </div>
 
     </div>
+
+    <div class="cardResumen">
+
+    <div class="tituloResumen">
+
+        💵 Caja Inicial
+
+    </div>
+
+    <div class="valorResumen">
+
+        $ ${montoInicial.toLocaleString()}
+
+    </div>
+
+</div>
+
+<div class="cardResumen">
+
+    <div class="tituloResumen">
+
+        🏦 Efectivo Esperado
+
+    </div>
+
+    <div class="valorResumen">
+
+        $ ${esperadoEnCaja.toLocaleString()}
+
+    </div>
+
+</div>
+
+s
 
     <div class="cardResumen">
 
@@ -254,25 +268,17 @@ Jornada: <strong>${jornada}</strong>
 
 <div class="filaCaja">
 
-<span>💳 Débito</span>
+<span>📱 MercadoPago</span>
 
-<strong>$ ${debito.toLocaleString()}</strong>
-
-</div>
-
-<div class="filaCaja">
-
-<span>💳 Crédito</span>
-
-<strong>$ ${credito.toLocaleString()}</strong>
+<strong>$ ${mercadoPago.toLocaleString()}</strong>
 
 </div>
 
 <div class="filaCaja">
 
-<span>🏦 Transferencia</span>
+<span>🏦 Banco Provincia</span>
 
-<strong>$ ${transferencia.toLocaleString()}</strong>
+<strong>$ ${bancoProvincia.toLocaleString()}</strong>
 
 </div>
 
@@ -281,14 +287,6 @@ Jornada: <strong>${jornada}</strong>
 <span>📒 Cuenta Corriente</span>
 
 <strong>$ ${cuenta.toLocaleString()}</strong>
-
-</div>
-
-<div class="filaCaja">
-
-<span>📝 Otro</span>
-
-<strong>$ ${otro.toLocaleString()}</strong>
 
 </div>
 
@@ -423,15 +421,11 @@ if(!cierreExistente.empty){
 
             efectivo,
 
-            debito,
+            mercadoPago,
 
-            credito,
-
-            transferencia,
+            bancoProvincia,
 
             cuenta,
-
-            otro,
 
             pendiente,
 

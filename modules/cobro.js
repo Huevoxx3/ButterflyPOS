@@ -25,6 +25,82 @@ let motivosNoCobrar = {};
 
 let motivosDescuento = {};
 
+let pagos = [];
+
+function crearPagoInicial(total){
+
+    pagos = [
+
+        {
+
+            medio: "Efectivo",
+
+            importe: total
+
+        }
+
+    ];
+
+}
+
+function actualizarResumenPagos(){
+
+    const totalCuenta = Number(
+        document.getElementById("totalCuenta")
+            .textContent
+            .replace("$","")
+            .replace(/\./g,"")
+            .replace(",",".")
+            .trim()
+    );
+
+    const inputPrincipal = document.getElementById("importePagoPrincipal");
+
+    const importePrincipal = inputPrincipal
+        ? Number(inputPrincipal.value) || 0
+        : 0;
+
+    const pagosExtra = document.querySelectorAll(".importePagoExtra");
+
+    if (pagosExtra.length > 0) {
+
+        let sumaExtras = 0;
+
+        pagosExtra.forEach((input, index) => {
+
+            if (index < pagosExtra.length - 1) {
+
+                sumaExtras += Number(input.value) || 0;
+
+            }
+
+        });
+
+        const ultimo = pagosExtra[pagosExtra.length - 1];
+
+        ultimo.value = Math.max(
+            0,
+            totalCuenta - importePrincipal - sumaExtras
+        );
+
+    }
+
+    let totalIngresado = importePrincipal;
+
+    pagosExtra.forEach(input => {
+
+        totalIngresado += Number(input.value) || 0;
+
+    });
+
+    document.getElementById("totalIngresado").textContent =
+        "$ " + totalIngresado.toLocaleString();
+
+    document.getElementById("diferenciaPago").textContent =
+        "$ " + (totalCuenta - totalIngresado).toLocaleString();
+
+}
+
 export async function abrirCobro(
 
     mesa,
@@ -34,6 +110,8 @@ export async function abrirCobro(
     callbackActualizarSalon
 
 ){
+
+    crearPagoInicial(mesa.total);
 
     volverAMesa = callbackVolver;
 
@@ -156,25 +234,35 @@ html += `
 
     </div>
 
-    <div class="grupoCobro">
+<select id="medioPago">
 
-        <label>
+    <option value="Efectivo">💵 Efectivo</option>
+    <option value="MercadoPago">📱 MercadoPago</option>
+    <option value="Banco Provincia">🏦 Banco Provincia</option>
+    <option value="Cuenta Corriente">📒 Cuenta Corriente</option>
+    <option value="Pendiente">⏳ Pendiente</option>
 
-            💳 Medio de Pago
+</select>
 
-        </label>
+<input
+    type="number"
+    id="importePagoPrincipal"
+    value="0"
+    min="0"
+    placeholder="Importe"
+    style="margin-top:8px;width:120px;">
 
-        <select id="medioPago">
+<button
+    id="btnAgregarPago"
+    type="button"
+    class="btnSecundario"
+    style="margin-top:10px;">
 
-            <option value="Efectivo">💵 Efectivo</option>
-            <option value="Débito">💳 Débito</option>
-            <option value="Crédito">💳 Crédito</option>
-            <option value="Transferencia">🏦 Transferencia</option>
-            <option value="Cuenta Corriente">📒 Cuenta Corriente</option>
-            <option value="Otro">📝 Otro</option>
-            <option value="Pendiente">⏳ Registrar después</option>
+    ➕ Agregar otro medio de pago
 
-        </select>
+</button>
+
+<div id="pagosExtra"></div>
 
             <div
     id="grupoCuentaCorriente"
@@ -201,15 +289,45 @@ html += `
 
 <div class="pieCobro">
 
-    <div class="totalCobro">
+<div class="totalCobro">
 
-        <h1 id="totalCuenta">
+    <h1 id="totalCuenta">
 
-            $ ${mesa.total.toLocaleString()}
+        $ ${mesa.total.toLocaleString()}
 
-        </h1>
+    </h1>
+
+    <div
+        id="resumenPagos"
+        style="margin-top:12px;font-size:15px;">
+
+        <div>
+
+            Total ingresado:
+
+            <strong id="totalIngresado">
+
+                $ 0
+
+            </strong>
+
+        </div>
+
+        <div>
+
+            Diferencia:
+
+            <strong id="diferenciaPago">
+
+                $ 0
+
+            </strong>
+
+        </div>
 
     </div>
+
+</div>
 
 <div class="accionesCobro">
 
@@ -251,6 +369,18 @@ document.getElementById("vistaCobro").classList.remove("oculto");
 
 document.getElementById("vistaCobro").innerHTML = html;
 
+const importePrincipal = document.getElementById("importePagoPrincipal");
+
+if (importePrincipal) {
+
+    importePrincipal.value = mesa.total;
+
+    importePrincipal.readOnly = true;
+
+}
+
+actualizarResumenPagos();
+
 await cargarEmpleados();
 
 document.getElementById("medioPago").onchange = ()=>{
@@ -264,6 +394,118 @@ document.getElementById("medioPago").onchange = ()=>{
             : "none";
 
 };
+
+document.getElementById("btnAgregarPago").onclick = () => {
+
+    document.getElementById("pagosExtra").insertAdjacentHTML(
+
+        "beforeend",
+
+        `
+
+        <div class="filaPagoExtra" style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+
+            <select class="medioPagoExtra">
+
+                <option value="Efectivo">💵 Efectivo</option>
+                <option value="MercadoPago">📱 MercadoPago</option>
+                <option value="Banco Provincia">🏦 Banco Provincia</option>
+                <option value="Cuenta Corriente">📒 Cuenta Corriente</option>
+                <option value="Pendiente">⏳ Pendiente</option>
+
+            </select>
+
+            <input
+    type="number"
+    class="importePagoExtra"
+    value="0"
+    placeholder="Importe"
+    min="0"
+    style="width:120px;">
+
+            <button
+                type="button"
+                class="btnEliminarPago">
+
+                🗑
+
+            </button>
+
+        </div>
+
+        `
+
+    );
+
+const filas = document.querySelectorAll(".filaPagoExtra");
+
+const ultimaFila = filas[filas.length - 1];
+
+const inputNuevo = ultimaFila.querySelector(".importePagoExtra");
+
+const totalCuenta = Number(
+    document.getElementById("totalCuenta")
+        .textContent
+        .replace("$","")
+        .replace(/\./g,"")
+        .replace(",",".")
+        .trim()
+);
+
+const importePrincipal = Number(
+    document.getElementById("importePagoPrincipal").value
+) || 0;
+
+inputNuevo.value = totalCuenta - importePrincipal;
+
+actualizarResumenPagos();
+
+document.getElementById("importePagoPrincipal").readOnly = false;
+
+};
+
+document.addEventListener("click", (e) => {
+
+    if (!e.target.classList.contains("btnEliminarPago")) return;
+
+    e.target.closest(".filaPagoExtra").remove();
+
+    const pagosExtra = document.querySelectorAll(".importePagoExtra");
+
+    if (pagosExtra.length === 0) {
+
+        const totalCuenta = Number(
+            document.getElementById("totalCuenta")
+                .textContent
+                .replace("$","")
+                .replace(/\./g,"")
+                .replace(",",".")
+                .trim()
+        );
+
+        document.getElementById("importePagoPrincipal").value = totalCuenta;
+
+        document.getElementById("importePagoPrincipal").readOnly = true;
+
+    }
+
+    actualizarResumenPagos();
+
+});
+
+document.addEventListener("input", (e) => {
+
+    if (!e.target.classList.contains("importePagoExtra")) return;
+
+    actualizarResumenPagos();
+
+});
+
+document.getElementById("importePagoPrincipal").addEventListener("input",()=>{
+
+    actualizarResumenPagos();
+
+});
 
 console.log(document.getElementById("btnConfirmarCobro"));
 
@@ -333,6 +575,36 @@ document.getElementById("btnConfirmarCobro").onclick = async () => {
 
 const jornada = await obtenerJornadaActual();
 
+const mediosPago = [];
+
+// Medio principal
+mediosPago.push({
+
+    medio: document.getElementById("medioPago").value,
+
+    importe: Number(
+        document.getElementById("importePagoPrincipal").value
+    ) || 0
+
+});
+
+// Medios adicionales
+document.querySelectorAll(".filaPagoExtra").forEach(fila => {
+
+    mediosPago.push({
+
+        medio: fila.querySelector(".medioPagoExtra").value,
+
+        importe: Number(
+            fila.querySelector(".importePagoExtra").value
+        ) || 0
+
+    });
+
+});
+
+console.log("Medios de pago:", mediosPago);
+
 const ventaRef = await addDoc(
 
     collection(db,"ventas"),
@@ -358,6 +630,8 @@ const ventaRef = await addDoc(
         motivo: document.getElementById("motivoDescuento").value,
 
         medioPago: document.getElementById("medioPago").value,
+
+        mediosPago,
 
         totalCobrado: Number(
             document.getElementById("totalCuenta")

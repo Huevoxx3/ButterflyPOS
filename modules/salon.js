@@ -94,17 +94,58 @@ export default async function(admin = false){
 
     await actualizarEstadoCaja();  
     
-    document.getElementById("btnAbrirCaja").onclick = async () => {
+document.getElementById("btnAbrirCaja").onclick = async () => {
 
     const usuario = JSON.parse(
         sessionStorage.getItem("usuario")
     );
 
-    const abierta = await abrirCaja(usuario.nombre);
+const esMediodia = confirm(
 
-if(!abierta) return;
+`¿Abrir la caja para el turno MEDIODÍA?
 
-await actualizarEstadoCaja();
+Aceptar = MEDIODÍA
+
+Cancelar = NOCHE`
+
+);
+
+const turno = esMediodia ? "MEDIODIA" : "NOCHE";
+
+    const montoInicial = prompt(
+        "Dinero inicial de la caja:",
+        "0"
+    );
+
+    if(montoInicial === null) return;
+
+const confirmar = confirm(
+
+`Confirme la apertura de la caja
+
+Turno: ${turno}
+
+Monto inicial: $${Number(montoInicial).toLocaleString()}
+
+¿Desea continuar?`
+
+);
+
+if(!confirmar) return;
+
+const abierta = await abrirCaja({
+
+    usuario: usuario.nombre,
+
+    turno,
+
+    montoInicial: Number(montoInicial)
+
+});
+
+    if(!abierta) return;
+
+    await actualizarEstadoCaja();
 
 };
 

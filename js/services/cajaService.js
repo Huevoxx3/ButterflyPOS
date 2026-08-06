@@ -42,7 +42,11 @@ export async function obtenerJornadaActual() {
     return null;
 }
 
-export async function abrirCaja(usuario){
+export async function abrirCaja({
+    usuario,
+    turno,
+    montoInicial
+}){
 
     const referencia = doc(db,"caja","actual");
 
@@ -65,7 +69,7 @@ const cierre = await getDocs(
 
         collection(db,"cierresCaja"),
 
-        where("jornada","==",jornada)
+        where("jornada","==",`${jornada}_${turno}`)
 
     )
 
@@ -88,22 +92,19 @@ if(!cierre.empty){
         referencia,
 
         {
-
-            abierta: true,
-
-            fechaJornada: jornada,
-
-            apertura: serverTimestamp(),
-
-            cierre: null,
-
-            usuario
-
-        }
+    abierta: true,
+    fecha: jornada,
+    turno,
+    fechaJornada: `${jornada}_${turno}`,
+    montoInicial: Number(montoInicial) || 0,
+    apertura: serverTimestamp(),
+    cierre: null,
+    usuario
+}
 
     );
 
-    jornadaCache = jornada;
+    jornadaCache = `${jornada}_${turno}`;
 
     return true;
 
