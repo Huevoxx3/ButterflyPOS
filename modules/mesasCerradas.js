@@ -95,6 +95,14 @@ export default async function mostrarMesasCerradas(admin = null){
 
     </div>
 
+    <button
+    class="btnVerTicket"
+    data-id="${documento.id}">
+
+    🧾 Ver ticket
+
+</button>
+
 </div>
 
 `;
@@ -106,6 +114,26 @@ document.querySelectorAll(".cardVenta").forEach(card=>{
     card.onclick=()=>{
 
         abrirVenta(card.dataset.id);
+
+    };
+
+});
+
+document.querySelectorAll(".btnVerTicket").forEach(boton => {
+
+    boton.onclick = (e) => {
+
+        e.stopPropagation();
+
+        const ventaId = boton.dataset.id;
+
+        window.open(
+
+            `../modules/ticket.html?venta=${ventaId}`,
+
+            "_blank"
+
+        );
 
     };
 
@@ -332,19 +360,15 @@ Medio de Pago
 
 <select id="medioPagoEditar">
 
-    <option value="Efectivo">💵 Efectivo</option>
+<option value="Efectivo">💵 Efectivo</option>
 
-    <option value="Débito">💳 Débito</option>
+<option value="MercadoPago">📱 MercadoPago</option>
 
-    <option value="Crédito">💳 Crédito</option>
+<option value="Banco Provincia">🏦 Banco Provincia</option>
 
-    <option value="Transferencia">🏦 Transferencia</option>
+<option value="Cuenta Corriente">📒 Cuenta Corriente</option>
 
-    <option value="Cuenta Corriente">📒 Cuenta Corriente</option>
-
-    <option value="Otro">📝 Otro</option>
-
-    <option value="Pendiente">🟡 Pendiente</option>
+<option value="Pendiente">⏳ Pendiente</option>
 
 </select>
 

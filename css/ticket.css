@@ -1,0 +1,255 @@
+@page{
+    size: A6 portrait;
+    margin: 6mm;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#ddd;
+}
+
+#ticket{
+
+    width:105mm;
+    min-height:148mm;
+
+    margin:20px auto;
+
+    background:#fff;
+
+    padding:8mm;
+
+    color:#000;
+
+}
+
+.ticketHeader{
+
+    text-align:center;
+
+    border-bottom:2px solid #000;
+
+    padding-bottom:8px;
+
+    margin-bottom:10px;
+
+}
+
+#logoTicket{
+
+    width:75px;
+
+    margin-bottom:5px;
+
+}
+
+.ticketHeader h2{
+
+    font-size:28px;
+
+    letter-spacing:2px;
+
+    margin:3px 0;
+
+}
+
+.ticketHeader p{
+
+    font-size:14px;
+
+    margin:2px 0;
+
+}
+
+#ticketDatos{
+
+    margin:10px 0;
+
+    font-size:13px;
+
+    line-height:1.7;
+
+}
+
+.filaDato{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin:4px 0;
+
+    font-size:13px;
+
+}
+
+.tablaTicket{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:10px;
+
+    margin-bottom:10px;
+
+    font-size:13px;
+
+}
+
+.tablaTicket thead{
+
+    border-top:1px solid #000;
+
+    border-bottom:1px solid #000;
+
+}
+
+.tablaTicket th{
+
+    padding:5px;
+
+}
+
+.tablaTicket td{
+
+    padding:4px;
+
+}
+
+.tablaTicket th:last-child,
+.tablaTicket td:last-child{
+
+    text-align:right;
+
+}
+
+.lineaTotal{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:3px 0;
+
+    font-size:14px;
+
+}
+
+.totalFinal{
+
+    border-top:2px solid #000;
+
+    margin-top:8px;
+
+    padding-top:8px;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+.medioPago{
+
+    border-top:1px dashed #999;
+
+    margin-top:15px;
+
+    padding-top:10px;
+
+    text-align:center;
+
+    font-size:15px;
+
+}
+
+.ticketFooter{
+
+    border-top:1px solid #000;
+
+    margin-top:20px;
+
+    padding-top:15px;
+
+    text-align:center;
+
+}
+
+.ticketFooter p{
+
+    font-weight:bold;
+
+    margin-bottom:8px;
+
+}
+
+.ticketFooter small{
+
+    font-size:11px;
+
+}
+
+.accionesTicket{
+
+    width:105mm;
+
+    margin:20px auto 10px;
+
+    text-align:center;
+
+}
+
+#btnImprimirTicket{
+
+    padding:10px 20px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#222;
+
+    color:white;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+}
+
+#btnImprimirTicket:hover{
+
+    opacity:.85;
+
+}
+
+@media print{
+
+    body{
+
+        background:white;
+
+    }
+
+    .accionesTicket{
+
+        display:none;
+
+    }
+
+    #ticket{
+
+        margin:0;
+
+    }
+
+}
