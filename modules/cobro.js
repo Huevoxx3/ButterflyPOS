@@ -2,6 +2,8 @@ import { obtenerJornadaActual } from "../js/services/cajaService.js";
 
 import { obtenerItemsPedido } from "../js/services/pedidoService.js";
 
+import { obtenerCategoria } from "../js/services/cartaService.js";
+
 import { registrarActividad } from "../js/services/actividadService.js";
 
 import { db } from "../js/firebase.js";
@@ -26,6 +28,10 @@ let motivosNoCobrar = {};
 let motivosDescuento = {};
 
 let pagos = [];
+
+let descuentoComidasCC = 25;
+
+let descuentoBebidasCC = 20;
 
 function crearPagoInicial(total){
 
@@ -121,9 +127,31 @@ export async function abrirCobro(
 
     motivosDescuento = {};
 
+const configuracion = await getDoc(
+
+    doc(db,"configuracion","general")
+
+);
+
+if(configuracion.exists()){
+
+    descuentoComidasCC =
+        configuracion.data().descuentoComidasCC;
+
+    descuentoBebidasCC =
+        configuracion.data().descuentoBebidasCC;
+
+}
+
 const items = await obtenerItemsPedido(
     mesa.pedidoId
 );
+
+for (const item of items) {
+
+    item.categoria = await obtenerCategoria(item.productoId);
+
+}
 
 let html = `
 
@@ -507,8 +535,6 @@ document.getElementById("importePagoPrincipal").addEventListener("input",()=>{
 
 });
 
-console.log(document.getElementById("btnConfirmarCobro"));
-
 document.getElementById("btnAgregarProducto").style.display = "none";
 
 document.getElementById("btnEditarPedido").style.display = "none";
@@ -557,6 +583,75 @@ document.getElementById("btnVolverSalon").onclick = volverDesdeCobro;
 
 document.getElementById("btnVolverCobro").onclick = volverDesdeCobro;
 
+function calcularDescuentoCuentaCorriente(
+    productos,
+    descuentoComidas,
+    descuentoBebidas
+){
+
+    const categoriasBebidas = [
+
+        "Cerveza Artesanal",
+
+        "Con Alcohol",
+
+        "Sin Alcohol"
+
+    ];
+
+    let totalComidas = 0;
+    let totalBebidas = 0;
+
+    productos.forEach(producto=>{
+
+        const subtotal =
+
+            producto.precio * producto.cantidad;
+
+        if(categoriasBebidas.includes(producto.categoria)){
+
+            totalBebidas += subtotal;
+
+        }else{
+
+            totalComidas += subtotal;
+
+        }
+
+    });
+
+    const descuentoComidasImporte = Math.round(
+        totalComidas * descuentoComidas / 100
+    );
+
+    const descuentoBebidasImporte = Math.round(
+        totalBebidas * descuentoBebidas / 100
+    );
+
+    return{
+
+        importeOriginal:
+            totalComidas + totalBebidas,
+
+        descuentoComidas:
+            descuentoComidasImporte,
+
+        descuentoBebidas:
+            descuentoBebidasImporte,
+
+        descuentoTotal:
+            descuentoComidasImporte +
+            descuentoBebidasImporte,
+
+        importeFinal:
+            (totalComidas + totalBebidas) -
+            (descuentoComidasImporte +
+            descuentoBebidasImporte)
+
+    };
+
+}
+
 document.getElementById("btnConfirmarCobro").onclick = async () => {
 
     const confirmar = confirm(
@@ -572,6 +667,12 @@ document.getElementById("btnConfirmarCobro").onclick = async () => {
         mesa.pedidoId
 
     );
+
+    for (const item of items) {
+
+    item.categoria = await obtenerCategoria(item.productoId);
+
+}
 
 const jornada = await obtenerJornadaActual();
 
@@ -602,8 +703,6 @@ document.querySelectorAll(".filaPagoExtra").forEach(fila => {
     });
 
 });
-
-console.log("Medios de pago:", mediosPago);
 
 const ventaRef = await addDoc(
 
@@ -682,6 +781,16 @@ if(document.getElementById("medioPago").value === "Cuenta Corriente"){
 
     const selector = document.getElementById("empleadoCuenta");
 
+    const resumen = calcularDescuentoCuentaCorriente(
+
+    items,
+
+    descuentoComidasCC,
+
+    descuentoBebidasCC
+
+);
+   
     await addDoc(
 
         collection(db,"cuentasCorrientes"),
@@ -707,6 +816,18 @@ if(document.getElementById("medioPago").value === "Cuenta Corriente"){
                     .trim()
             ),
 
+importeOriginal: resumen.importeOriginal,
+
+descuentoComidas: resumen.descuentoComidas,
+
+descuentoBebidas: resumen.descuentoBebidas,
+
+descuentoTotal: resumen.descuentoTotal,
+
+importeFinal: resumen.importeFinal,
+
+productos: items,
+
             fecha: serverTimestamp(),
 
             estado: "Pendiente",
@@ -718,9 +839,6 @@ if(document.getElementById("medioPago").value === "Cuenta Corriente"){
     );
 
 }
-
-    console.log("Pedido ID:", mesa.pedidoId);
-console.log("Mesa:", mesa);
 
     await updateDoc(
 
@@ -801,8 +919,6 @@ document.getElementById("vistaMesa").classList.remove("oculto");
 // AQUÍ VAMOS A RECARGAR EL SALÓN
 
 };
-
-    calcularTotal();
 
 calcularTotal();
 
@@ -960,7 +1076,6 @@ function validarCobro(){
     // ==========================
     // BOTÓN
     // ==========================
-    console.log("VALIDO =", valido);
 
     document.getElementById("btnConfirmarCobro").disabled = !valido;
 

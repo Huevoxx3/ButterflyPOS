@@ -72,9 +72,11 @@ async function cargarCuentas(){
 
         }
 
-        empleados[movimiento.empleado] +=
+ empleados[movimiento.empleado] +=
 
-            movimiento.importe;
+    movimiento.importeFinal ??
+
+    movimiento.importe;
 
     });
 
@@ -167,7 +169,15 @@ async function mostrarDetalleCuenta(nombre){
 
         if(movimiento.empleado !== nombre) return;
 
-        total += movimiento.importe;
+        if(movimiento.tipo === "Pago"){
+
+    total += movimiento.importe;
+
+}else{
+
+    total += movimiento.importeFinal;
+
+}
 
 const color =
 
@@ -185,6 +195,8 @@ const descripcion =
 
     : `🍽 Mesa ${movimiento.mesa}`;
 
+if(movimiento.tipo === "Pago"){
+
 html += `
 
 <div class="movimientoCuenta">
@@ -192,40 +204,96 @@ html += `
     <div class="movIzquierda">
 
         <div class="fechaMovimiento">
-
             📅 ${fechaTexto}
-
         </div>
 
         <div class="descripcionMovimiento">
-
-            ${descripcion}
-
+            💰 Pago registrado
         </div>
 
         <div class="estadoMovimiento">
-
             ${movimiento.estado}
-
         </div>
 
     </div>
 
     <div
-
         class="importeMovimiento"
+        style="color:#16a34a;">
 
-        style="color:${color};">
-
-        ${movimiento.tipo === "Pago" ? "-" : "+"}
-
-        $ ${Math.abs(movimiento.importe).toLocaleString()}
+        - $ ${Math.abs(movimiento.importe).toLocaleString()}
 
     </div>
 
 </div>
 
 `;
+
+}else{
+
+html += `
+
+<div class="movimientoCuenta">
+
+    <div class="movIzquierda">
+
+        <div class="fechaMovimiento">
+            📅 ${fechaTexto}
+        </div>
+
+        <div class="descripcionMovimiento">
+            🍽 Mesa ${movimiento.mesa}
+        </div>
+
+        <div class="estadoMovimiento">
+            ${movimiento.estado}
+        </div>
+
+        <div style="margin-top:8px;font-size:14px;color:#555;">
+
+            <div>
+                Consumido:
+                <strong>
+                    $ ${movimiento.importeOriginal.toLocaleString()}
+                </strong>
+            </div>
+
+            <div style="color:#16a34a;">
+                Beneficio empleado:
+                <strong>
+                    - $ ${movimiento.descuentoTotal.toLocaleString()}
+                </strong>
+            </div>
+
+            <div style="margin-top:4px;">
+
+                Total a descontar:
+
+                <strong>
+
+                    $ ${movimiento.importeFinal.toLocaleString()}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div
+        class="importeMovimiento"
+        style="color:#ea580c;">
+
+        $ ${movimiento.importeFinal.toLocaleString()}
+
+    </div>
+
+</div>
+
+`;
+
+}
 
     });
 

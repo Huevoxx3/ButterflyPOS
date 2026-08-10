@@ -2291,3 +2291,8 @@ min-height:300px;
 #contenidoDetalleVenta{
     border:5px solid green !important;
 }
+
+#detalleCuentaCorriente{
+    flex: 1;
+    overflow-y: auto;
+}

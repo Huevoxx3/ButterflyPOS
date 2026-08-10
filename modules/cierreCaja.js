@@ -94,27 +94,63 @@ export default async function(){
 
         });
 
-        switch(venta.medioPago){
+if (venta.mediosPago && venta.mediosPago.length > 0) {
 
-    case "Efectivo":
-        efectivo += venta.totalCobrado;
-        break;
+    venta.mediosPago.forEach(pago => {
 
-    case "MercadoPago":
-        mercadoPago += venta.totalCobrado;
-        break;
+        switch (pago.medio) {
 
-    case "Banco Provincia":
-        bancoProvincia += venta.totalCobrado;
-        break;
+            case "Efectivo":
+                efectivo += pago.importe;
+                break;
 
-    case "Cuenta Corriente":
-        cuenta += venta.totalCobrado;
-        break;
+            case "MercadoPago":
+                mercadoPago += pago.importe;
+                break;
 
-    case "Pendiente":
-        pendiente += venta.totalCobrado;
-        break;
+            case "Banco Provincia":
+                bancoProvincia += pago.importe;
+                break;
+
+            case "Cuenta Corriente":
+                cuenta += pago.importe;
+                break;
+
+            case "Pendiente":
+                pendiente += pago.importe;
+                break;
+
+        }
+
+    });
+
+} else {
+
+    // Compatibilidad con ventas anteriores
+
+    switch (venta.medioPago) {
+
+        case "Efectivo":
+            efectivo += venta.totalCobrado;
+            break;
+
+        case "MercadoPago":
+            mercadoPago += venta.totalCobrado;
+            break;
+
+        case "Banco Provincia":
+            bancoProvincia += venta.totalCobrado;
+            break;
+
+        case "Cuenta Corriente":
+            cuenta += venta.totalCobrado;
+            break;
+
+        case "Pendiente":
+            pendiente += venta.totalCobrado;
+            break;
+
+    }
 
 }
 
@@ -197,8 +233,6 @@ Jornada: <strong>${jornada}</strong>
     </div>
 
 </div>
-
-s
 
     <div class="cardResumen">
 
