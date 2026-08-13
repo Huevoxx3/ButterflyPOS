@@ -60,36 +60,15 @@ function actualizarResumenPagos(){
             .trim()
     );
 
-    const inputPrincipal = document.getElementById("importePagoPrincipal");
+    const inputPrincipal =
+        document.getElementById("importePagoPrincipal");
 
     const importePrincipal = inputPrincipal
         ? Number(inputPrincipal.value) || 0
         : 0;
 
-    const pagosExtra = document.querySelectorAll(".importePagoExtra");
-
-    if (pagosExtra.length > 0) {
-
-        let sumaExtras = 0;
-
-        pagosExtra.forEach((input, index) => {
-
-            if (index < pagosExtra.length - 1) {
-
-                sumaExtras += Number(input.value) || 0;
-
-            }
-
-        });
-
-        const ultimo = pagosExtra[pagosExtra.length - 1];
-
-        ultimo.value = Math.max(
-            0,
-            totalCuenta - importePrincipal - sumaExtras
-        );
-
-    }
+    const pagosExtra =
+        document.querySelectorAll(".importePagoExtra");
 
     let totalIngresado = importePrincipal;
 
@@ -99,11 +78,14 @@ function actualizarResumenPagos(){
 
     });
 
+    const diferencia =
+        totalCuenta - totalIngresado;
+
     document.getElementById("totalIngresado").textContent =
-        "$ " + totalIngresado.toLocaleString();
+        "$ " + totalIngresado.toLocaleString("es-AR");
 
     document.getElementById("diferenciaPago").textContent =
-        "$ " + (totalCuenta - totalIngresado).toLocaleString();
+        "$ " + diferencia.toLocaleString("es-AR");
 
 }
 
@@ -452,12 +434,20 @@ document.getElementById("btnAgregarPago").onclick = () => {
     style="width:120px;">
 
             <button
-                type="button"
-                class="btnEliminarPago">
+    type="button"
+    class="btnCompletarPago">
 
-                🗑
+    ⚡ Completar
 
-            </button>
+</button>
+
+<button
+    type="button"
+    class="btnEliminarPago">
+
+    🗑
+
+</button>
 
         </div>
 
@@ -471,20 +461,7 @@ const ultimaFila = filas[filas.length - 1];
 
 const inputNuevo = ultimaFila.querySelector(".importePagoExtra");
 
-const totalCuenta = Number(
-    document.getElementById("totalCuenta")
-        .textContent
-        .replace("$","")
-        .replace(/\./g,"")
-        .replace(",",".")
-        .trim()
-);
-
-const importePrincipal = Number(
-    document.getElementById("importePagoPrincipal").value
-) || 0;
-
-inputNuevo.value = totalCuenta - importePrincipal;
+inputNuevo.value = 0;
 
 actualizarResumenPagos();
 
@@ -516,6 +493,45 @@ document.addEventListener("click", (e) => {
         document.getElementById("importePagoPrincipal").readOnly = true;
 
     }
+
+    actualizarResumenPagos();
+
+});
+
+document.addEventListener("click", (e) => {
+
+    if (!e.target.classList.contains("btnCompletarPago")) return;
+
+    const fila = e.target.closest(".filaPagoExtra");
+
+    const totalCuenta = Number(
+        document.getElementById("totalCuenta")
+            .textContent
+            .replace("$","")
+            .replace(/\./g,"")
+            .replace(",",".")
+            .trim()
+    );
+
+    const importePrincipal =
+        Number(
+            document.getElementById("importePagoPrincipal").value
+        ) || 0;
+
+    let totalOtros = importePrincipal;
+
+    document.querySelectorAll(".importePagoExtra").forEach(input => {
+
+        if(input === fila.querySelector(".importePagoExtra")) return;
+
+        totalOtros += Number(input.value) || 0;
+
+    });
+
+    const importeFaltante = totalCuenta - totalOtros;
+
+    fila.querySelector(".importePagoExtra").value =
+        Math.max(0, importeFaltante);
 
     actualizarResumenPagos();
 
@@ -653,6 +669,41 @@ function calcularDescuentoCuentaCorriente(
 }
 
 document.getElementById("btnConfirmarCobro").onclick = async () => {
+
+    const totalCuenta = Number(
+    document.getElementById("totalCuenta")
+        .textContent
+        .replace("$","")
+        .replace(/\./g,"")
+        .replace(",",".")
+        .trim()
+);
+
+const importePrincipal =
+    Number(
+        document.getElementById("importePagoPrincipal").value
+    ) || 0;
+
+let totalIngresado = importePrincipal;
+
+document.querySelectorAll(".importePagoExtra").forEach(input => {
+
+    totalIngresado += Number(input.value) || 0;
+
+});
+
+if (Math.abs(totalIngresado - totalCuenta) > 0.01) {
+
+    alert(
+        `Los importes de los medios de pago no coinciden con el total de la cuenta.\n\n` +
+        `Total de la cuenta: $${totalCuenta.toLocaleString("es-AR")}\n` +
+        `Total ingresado: $${totalIngresado.toLocaleString("es-AR")}\n` +
+        `Diferencia: $${(totalIngresado - totalCuenta).toLocaleString("es-AR")}`
+    );
+
+    return;
+
+}
 
     const confirmar = confirm(
 
@@ -915,6 +966,24 @@ document.getElementById("vistaCobro").innerHTML = "";
 document.getElementById("vistaCobro").classList.add("oculto");
 
 document.getElementById("vistaMesa").classList.remove("oculto");
+
+const imprimirTicket = confirm(
+
+    `Mesa ${mesa.numero} cerrada correctamente.\n\n¿Desea imprimir el ticket?`
+
+);
+
+if(imprimirTicket){
+
+    window.open(
+
+        `../modules/ticket.html?venta=${ventaRef.id}`,
+
+        "_blank"
+
+    );
+
+}
 
 // AQUÍ VAMOS A RECARGAR EL SALÓN
 

@@ -34,6 +34,8 @@ const opciones = {
         "Inicio",
         "Salón",
         "Mesas Cerradas",
+        "Egresos",
+        "Cierre de Caja",
         "Configuración"
     ],
 
@@ -139,6 +141,16 @@ if (opcion === "Entregados") {
 if (opcion === "Cierre de Caja") {
 
     const modulo = await import("../modules/cierreCaja.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if (opcion === "Egresos") {
+
+    const modulo = await import("../modules/egresos.js");
 
     modulo.default();
 

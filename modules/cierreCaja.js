@@ -45,7 +45,7 @@ export default async function(){
     const jornada = caja.data().fechaJornada;
 
     const montoInicial = caja.data().montoInicial || 0;
-
+    
     // ==========================
     // VENTAS DEL DÍA
     // ==========================
@@ -61,6 +61,34 @@ export default async function(){
         )
 
     );
+
+    // ==========================
+// EGRESOS DE LA JORNADA
+// ==========================
+
+const egresos = await getDocs(
+
+    query(
+
+        collection(db,"egresos"),
+
+        where("jornada","==",jornada)
+
+    )
+
+);
+
+let totalEgresos = 0;
+
+egresos.forEach(documento => {
+
+    const egreso = documento.data();
+
+    if(egreso.estado !== "Activo") return;
+
+    totalEgresos += Number(egreso.importe) || 0;
+
+});
 
     let total = 0;
 
@@ -156,7 +184,10 @@ if (venta.mediosPago && venta.mediosPago.length > 0) {
 
     });
 
-    esperadoEnCaja = montoInicial + efectivo;
+   esperadoEnCaja =
+    montoInicial
+    + efectivo
+    - totalEgresos;
 
     const ticketPromedio =
 
@@ -229,6 +260,22 @@ Jornada: <strong>${jornada}</strong>
     <div class="valorResumen">
 
         $ ${esperadoEnCaja.toLocaleString()}
+
+    </div>
+
+</div>
+
+<div class="cardResumen">
+
+    <div class="tituloResumen">
+
+        💸 Egresos
+
+    </div>
+
+    <div class="valorResumen">
+
+        $ ${totalEgresos.toLocaleString()}
 
     </div>
 
@@ -454,6 +501,8 @@ if(!cierreExistente.empty){
             total,
 
             efectivo,
+
+            totalEgresos,
 
             mercadoPago,
 

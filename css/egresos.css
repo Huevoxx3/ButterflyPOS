@@ -1,0 +1,211 @@
+.contenedorEgresos {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1.5fr;
+
+    gap: 25px;
+
+    margin-top: 25px;
+
+}
+
+
+.cardNuevoEgreso,
+.listaEgresos {
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+
+}
+
+
+.cardNuevoEgreso h2,
+.listaEgresos h2 {
+
+    margin-top: 0;
+
+}
+
+
+.campoEgreso {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.campoEgreso label {
+
+    font-weight: 600;
+
+}
+
+
+.campoEgreso input {
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+
+}
+
+
+#btnRegistrarEgreso {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #222;
+
+    color: white;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+}
+
+
+#btnRegistrarEgreso:hover {
+
+    opacity: .85;
+
+}
+
+
+@media (max-width: 800px) {
+
+    .contenedorEgresos {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+.cardEgreso {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+
+.cardEgreso:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.cardEgreso strong {
+
+    font-size: 16px;
+
+}
+
+
+.infoEgreso {
+
+    margin-top: 3px;
+
+    font-size: 13px;
+
+    color: #777;
+
+}
+
+
+.importeEgresoLista {
+
+    white-space: nowrap;
+
+    font-size: 17px !important;
+
+}
+
+
+.totalEgresos {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 15px;
+
+    padding-top: 15px;
+
+    border-top: 2px solid #222;
+
+    font-size: 17px;
+
+}
+
+
+.totalEgresos strong {
+
+    font-size: 20px;
+
+}
+
+.accionesEgreso {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+}
+
+
+.btnAnularEgreso {
+
+    border: none;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    padding: 5px;
+
+}
+
+
+.btnAnularEgreso:hover {
+
+    transform: scale(1.1);
+
+}
