@@ -27,6 +27,40 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+const MESAS_SALON = [
+
+    "AFUERA1",
+    "AFUERA2",
+    "AFUERA3",
+    "AFUERA4",
+    "AFUERA5",
+    "AFUERA6",
+    "AFUERA7",
+    "AFUERA8",
+
+    "BOX1",
+    "BOX2",
+    "BOX3",
+    "BOX4",
+    "BOX5",
+
+    "MESA6",
+    "MESA7",
+    "MESA8",
+    "MESA9",
+    "MESA10",
+    "MESA11",
+    "MESA12",
+    "MESA14",
+
+    "COMUNITARIA-PUERTA",
+    "COMUNITARIA-CENTRO-PUERTA",
+    "COMUNITARIA-CENTRO",
+    "COMUNITARIA-CENTRO-PUNTA",
+    "COMUNITARIA-PUNTA"
+
+];
+
 let pedidoTemporal = [];
 
 let pedidoOriginal = [];
@@ -81,6 +115,72 @@ if(!estado || !boton){
 
 }
 
+async function gestionarAperturaCaja(){
+
+    const usuario = JSON.parse(
+        sessionStorage.getItem("usuario")
+    );
+
+    const esMediodia = confirm(
+        `¿Abrir la caja para el turno MEDIODÍA?
+
+Aceptar = MEDIODÍA
+Cancelar = NOCHE`
+    );
+
+    const turno = esMediodia
+        ? "MEDIODIA"
+        : "NOCHE";
+
+    const montoInicial = prompt(
+        "Dinero inicial de la caja:",
+        "0"
+    );
+
+    if(montoInicial === null){
+
+        return false;
+
+    }
+
+    const confirmar = confirm(
+        `Confirme la apertura de la caja
+
+Turno: ${turno}
+Monto inicial: $${Number(montoInicial).toLocaleString()}
+
+¿Desea continuar?`
+    );
+
+    if(!confirmar){
+
+        return false;
+
+    }
+
+    const abierta = await abrirCaja({
+
+        usuario: usuario.nombre,
+
+        turno,
+
+        montoInicial:
+            Number(montoInicial)
+
+    });
+
+    if(!abierta){
+
+        return false;
+
+    }
+
+    await actualizarEstadoCaja();
+
+    return true;
+
+}
+
 export default async function(admin = false){
 
     modoSoloLectura = admin;
@@ -94,60 +194,8 @@ export default async function(admin = false){
 
     await actualizarEstadoCaja();  
     
-document.getElementById("btnAbrirCaja").onclick = async () => {
-
-    const usuario = JSON.parse(
-        sessionStorage.getItem("usuario")
-    );
-
-const esMediodia = confirm(
-
-`¿Abrir la caja para el turno MEDIODÍA?
-
-Aceptar = MEDIODÍA
-
-Cancelar = NOCHE`
-
-);
-
-const turno = esMediodia ? "MEDIODIA" : "NOCHE";
-
-    const montoInicial = prompt(
-        "Dinero inicial de la caja:",
-        "0"
-    );
-
-    if(montoInicial === null) return;
-
-const confirmar = confirm(
-
-`Confirme la apertura de la caja
-
-Turno: ${turno}
-
-Monto inicial: $${Number(montoInicial).toLocaleString()}
-
-¿Desea continuar?`
-
-);
-
-if(!confirmar) return;
-
-const abierta = await abrirCaja({
-
-    usuario: usuario.nombre,
-
-    turno,
-
-    montoInicial: Number(montoInicial)
-
-});
-
-    if(!abierta) return;
-
-    await actualizarEstadoCaja();
-
-};
+document.getElementById("btnAbrirCaja").onclick =
+    gestionarAperturaCaja;
 
 document.getElementById("btnReiniciarSistema").onclick =
 reiniciarSistema;
@@ -160,51 +208,148 @@ async function dibujarMesas() {
 
     plano.innerHTML = "";
 
-    const snapshot = await getDocs(collection(db, "mesas"));
+    const snapshot = await getDocs(
+        collection(db, "mesas")
+    );
+
+    // ==========================
+    // ELEMENTOS FIJOS DEL PLANO
+    // ==========================
+
+    plano.innerHTML += `
+
+        <div class="zonaAfuera">
+            AFUERA
+        </div>
+
+        <div class="puertaSalon">
+            PUERTA
+        </div>
+
+        <div class="barraSalon">
+            BARRA
+        </div>
+
+    `;
+
 
     snapshot.forEach(documento => {
 
         const mesa = documento.data();
 
-        plano.innerHTML += `
+        const posiciones = {
 
-        <div class="mesaCard" data-mesa="${mesa.numero}">
+            // AFUERA
+            "AFUERA1": "pos-af1",
+            "AFUERA2": "pos-af2",
+            "AFUERA3": "pos-af3",
+            "AFUERA4": "pos-af4",
+            "AFUERA5": "pos-af5",
+            "AFUERA6": "pos-af6",
+            "AFUERA7": "pos-af7",
+            "AFUERA8": "pos-af8",
 
-            <div class="mesaNumero">
+            // BOX
+            "BOX1": "pos-box1",
+            "BOX2": "pos-box2",
+            "BOX3": "pos-box3",
+            "BOX4": "pos-box4",
+            "BOX5": "pos-box5",
 
-                ${mesa.numero}
+            // MESAS
+            "MESA6": "pos-mesa6",
+            "MESA7": "pos-mesa7",
+            "MESA8": "pos-mesa8",
+            "MESA9": "pos-mesa9",
+            "MESA10": "pos-mesa10",
+            "MESA11": "pos-mesa11",
+            "MESA12": "pos-mesa12",
+            "MESA14": "pos-mesa14",
 
-            </div>
+            // COMUNITARIA
+            "COMUNITARIA-PUERTA":
+                "pos-com-puerta",
 
-            <div class="mesaEstado ${obtenerClase(mesa.estado)}">
+            "COMUNITARIA-CENTRO-PUERTA":
+                "pos-com-centro-puerta",
 
-                ${mesa.estado}
+            "COMUNITARIA-CENTRO":
+                "pos-com-centro",
 
-            </div>
+            "COMUNITARIA-CENTRO-PUNTA":
+                "pos-com-centro-punta",
 
-        </div>
+            "COMUNITARIA-PUNTA":
+                "pos-com-punta"
 
-        `;
+        };
 
-    });
+        const clase =
+            posiciones[mesa.numero];
 
-document.querySelectorAll(".mesaCard").forEach(mesa => {
+        if(!clase){
 
-    mesa.addEventListener("click", () => {
-
-        if (modoSoloLectura) {
-
-            alert("Modo solo lectura.");
+            console.warn(
+                "Mesa sin posición:",
+                mesa.numero
+            );
 
             return;
 
         }
 
-        abrirMesa(mesa.dataset.mesa);
+        plano.innerHTML += `
+
+            <div
+                class="mesaCard ${clase}"
+                data-mesa="${mesa.numero}"
+            >
+
+                <div class="mesaNumero">
+
+                    ${mesa.numero}
+
+                </div>
+
+                <div
+                    class="mesaEstado ${obtenerClase(mesa.estado)}"
+                ></div>
+
+            </div>
+
+        `;
 
     });
 
-});
+
+    // ==========================
+    // CLICK EN MESA
+    // ==========================
+
+    document
+        .querySelectorAll(".mesaCard")
+        .forEach(mesa => {
+
+            mesa.addEventListener("click", () => {
+
+                if(modoSoloLectura){
+
+                    alert(
+                        "Modo solo lectura."
+                    );
+
+                    return;
+
+                }
+
+                abrirMesa(
+                    mesa.dataset.mesa
+                );
+
+            });
+
+        });
+
 }
 
 function obtenerClase(estado){
@@ -244,6 +389,40 @@ async function abrirMesa(numero){
 
     if(mesa.estado === "Libre"){
 
+                // ==========================
+        // VERIFICAR CAJA
+        // ==========================
+
+        const documentoCaja = await getDoc(
+            doc(db, "caja", "actual")
+        );
+
+        const caja = documentoCaja.data();
+
+        if(!caja?.abierta){
+
+            const abrirAhora = confirm(
+                "🔴 La caja está cerrada.\n\n" +
+                "¿Desea abrir la caja ahora?"
+            );
+
+            if(!abrirAhora){
+
+                return;
+
+            }
+
+            const cajaAbierta =
+                await gestionarAperturaCaja();
+
+            if(!cajaAbierta){
+
+                return;
+
+            }
+
+        }
+
         const personas = prompt("Cantidad de personas");
 
         if(!personas) return;
@@ -270,7 +449,7 @@ async function abrirMesa(numero){
 
             {
 
-                mesa:Number(numero),
+                mesa: numero,
 
                 estado:"Abierto",
 
@@ -323,7 +502,7 @@ await registrarActividad(
 
             {
 
-                mesa:Number(numero),
+                mmesa: numero,
 
                 estado:"Abierto",
 
@@ -1392,6 +1571,20 @@ async function reiniciarSistema(){
 
     }
 
+
+    // ==========================
+// BORRAR EGRESOS
+// ==========================
+
+const egresos = await getDocs(
+    collection(db,"egresos")
+);
+
+for(const egreso of egresos.docs){
+
+    await deleteDoc(egreso.ref);
+
+}
     // ==========================
     // BORRAR VENTAS
     // ==========================
@@ -1420,37 +1613,44 @@ async function reiniciarSistema(){
 
     }
 
-    // ==========================
-    // REINICIAR MESAS
-    // ==========================
+// ==========================
+// RECREAR MESAS DEL SALÓN
+// ==========================
 
-    const mesas = await getDocs(
-        collection(db,"mesas")
+const mesasActuales = await getDocs(
+    collection(db, "mesas")
+);
+
+// Eliminar mesas antiguas
+for(const mesa of mesasActuales.docs){
+
+    await deleteDoc(mesa.ref);
+
+}
+
+// Crear mesas nuevas
+for(const nombreMesa of MESAS_SALON){
+
+    await setDoc(
+
+        doc(
+            db,
+            "mesas",
+            nombreMesa
+        ),
+
+        {
+            numero: nombreMesa,
+            estado: "Libre",
+            mozo: "",
+            pedidoId: "",
+            personas: 0,
+            total: 0
+        }
+
     );
 
-    for(const mesa of mesas.docs){
-
-        await updateDoc(
-
-            mesa.ref,
-
-            {
-
-                estado: "Libre",
-
-                personas: 0,
-
-                mozo: "",
-
-                pedidoId: "",
-
-                total: 0
-
-            }
-
-        );
-
-    }
+}
 
     // ==========================
     // REINICIAR CAJA
@@ -1522,10 +1722,16 @@ async function abrirModalMudarMesa(mesa){
 
     });
 
-    mesasLibres.sort(
-        (a,b) =>
-            Number(a.numero) - Number(b.numero)
-    );
+mesasLibres.sort(
+    (a, b) =>
+        a.numero.localeCompare(
+            b.numero,
+            "es",
+            {
+                numeric: true
+            }
+        )
+);
 
     if(mesasLibres.length === 0){
 
@@ -1678,8 +1884,8 @@ async function abrirModalMudarMesa(mesa){
                 ),
 
                 {
-                    mesa: Number(numeroDestino)
-                }
+    mesa: numeroDestino
+}
 
             );
 

@@ -20,6 +20,8 @@ import {
 
     updateDoc,
 
+    deleteDoc,
+
     serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
@@ -523,6 +525,16 @@ if(!cierreExistente.empty){
         }
 
     );
+
+    // ==========================
+// LIMPIAR EGRESOS DE LA JORNADA
+// ==========================
+
+for(const egreso of egresos.docs){
+
+    await deleteDoc(egreso.ref);
+
+}
 
     await generarExcelCierre(jornada);
 
