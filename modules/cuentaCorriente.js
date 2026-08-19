@@ -28,6 +28,43 @@ export default async function(){
 
     await cargarCuentas();
 
+const btnAdelanto =
+    document.getElementById("btnRegistrarAdelanto");
+
+if (btnAdelanto) {
+
+    btnAdelanto.onclick = () => {
+
+        document
+            .getElementById("modalAdelanto")
+            .classList.remove("oculto");
+
+    };
+
+}
+
+console.log("BOTÓN ADELANTO:", btnAdelanto);
+
+if (btnAdelanto) {
+
+    btnAdelanto.onclick = async () => {
+
+        console.log("CLICK ADELANTO");
+
+        await cargarEmpleadosAdelanto();
+
+        document.getElementById("importeAdelanto").value = "";
+
+        document.getElementById("observacionAdelanto").value = "";
+
+        document
+            .getElementById("modalAdelanto")
+            .classList.remove("oculto");
+
+    };
+
+}
+
     document.getElementById(
 
     "cerrarCuentaCorriente"
@@ -41,6 +78,228 @@ export default async function(){
     ).classList.add("oculto");
 
 };
+
+
+
+document.getElementById("cancelarAdelanto").onclick = () => {
+
+    document
+        .getElementById("modalAdelanto")
+        .classList.add("oculto");
+
+};
+
+document.getElementById("guardarAdelanto").onclick =
+    guardarAdelanto;
+
+}
+
+async function cargarEmpleadosAdelanto(){
+
+    const selector =
+        document.getElementById("empleadoAdelanto");
+
+    selector.innerHTML = `
+        <option value="">
+            Seleccione un empleado
+        </option>
+    `;
+
+    const snapshot = await getDocs(
+        collection(db,"cuentasCorrientes")
+    );
+
+    const saldos = {};
+
+    snapshot.forEach(documento => {
+
+        const movimiento = documento.data();
+
+        if(!movimiento.empleado) return;
+
+        // No computar movimientos anulados
+        if(movimiento.estado === "Anulado") return;
+
+        if(!saldos[movimiento.empleado]){
+
+            saldos[movimiento.empleado] = 0;
+
+        }
+
+        if(movimiento.tipo === "Pago"){
+
+            saldos[movimiento.empleado] +=
+                movimiento.importe || 0;
+
+        }
+        else if(movimiento.tipo === "Adelanto"){
+
+            saldos[movimiento.empleado] +=
+                movimiento.importe || 0;
+
+        }
+        else{
+
+            saldos[movimiento.empleado] +=
+                movimiento.importeFinal || 0;
+
+        }
+
+    });
+
+
+    Object.entries(saldos)
+
+        .filter(([nombre, saldo]) => saldo !== 0)
+
+        .sort(([nombreA], [nombreB]) =>
+            nombreA.localeCompare(nombreB)
+        )
+
+        .forEach(([nombre, saldo]) => {
+
+            const opcion =
+                document.createElement("option");
+
+            opcion.value = nombre;
+
+            opcion.textContent =
+                `${nombre} — $ ${saldo.toLocaleString()}`;
+
+            opcion.dataset.nombre = nombre;
+
+            selector.appendChild(opcion);
+
+        });
+
+}
+
+async function guardarAdelanto(){
+
+    const selector =
+        document.getElementById("empleadoAdelanto");
+
+    const empleado =
+        selector.value;
+
+    const importe =
+        Number(
+            document.getElementById("importeAdelanto").value
+        ) || 0;
+
+    const observacion =
+        document.getElementById("observacionAdelanto")
+            .value
+            .trim();
+
+
+    // ==========================
+    // VALIDACIONES
+    // ==========================
+
+    if(!empleado){
+
+        alert("Seleccione un empleado.");
+
+        return;
+
+    }
+
+    if(importe <= 0){
+
+        alert("Ingrese un importe válido.");
+
+        return;
+
+    }
+
+
+    const confirmar = confirm(
+
+        `¿Confirma registrar un adelanto de $${importe.toLocaleString()} para ${empleado}?`
+
+    );
+
+    if(!confirmar) return;
+
+
+    // ==========================
+    // GUARDAR ADELANTO
+    // ==========================
+
+    await addDoc(
+
+        collection(db,"cuentasCorrientes"),
+
+        {
+
+            empleado,
+
+            tipo: "Adelanto",
+
+            // El adelanto aumenta lo pendiente
+            importe: importe,
+
+            fecha: serverTimestamp(),
+
+            estado: "Registrado",
+
+            observacion
+
+        }
+
+    );
+
+
+    // ==========================
+    // REGISTRAR ACTIVIDAD
+    // ==========================
+
+    const usuario = JSON.parse(
+        sessionStorage.getItem("usuario")
+    );
+
+
+    await registrarActividad(
+
+        usuario.nombre,
+
+        "Cuenta Corriente",
+
+        "Registrar Adelanto",
+
+        `${empleado} - Adelanto de $${importe.toLocaleString()}${
+            observacion
+                ? ` - ${observacion}`
+                : ""
+        }`
+
+    );
+
+
+    alert(
+        "✅ Adelanto registrado correctamente."
+    );
+
+
+    // ==========================
+    // LIMPIAR
+    // ==========================
+
+    document.getElementById(
+        "importeAdelanto"
+    ).value = "";
+
+    document.getElementById(
+        "observacionAdelanto"
+    ).value = "";
+
+    document.getElementById(
+        "modalAdelanto"
+    ).classList.add("oculto");
+
+
+    await cargarCuentas();
 
 }
 
@@ -80,11 +339,13 @@ async function cargarCuentas(){
 
     });
 
-    Object.keys(empleados)
+Object.keys(empleados)
 
-        .sort()
+    .filter(nombre => empleados[nombre] !== 0)
 
-        .forEach(nombre=>{
+    .sort()
+
+    .forEach(nombre=>{
 
 lista.innerHTML += `
 
@@ -169,13 +430,25 @@ async function mostrarDetalleCuenta(nombre){
 
         if(movimiento.empleado !== nombre) return;
 
-        if(movimiento.tipo === "Pago"){
+   if(movimiento.estado === "Anulado"){
 
-    total += movimiento.importe;
+    return;
 
-}else{
+}
 
-    total += movimiento.importeFinal;
+if(movimiento.tipo === "Pago"){
+
+    total += movimiento.importe || 0;
+
+}
+else if(movimiento.tipo === "Adelanto"){
+
+    total += movimiento.importe || 0;
+
+}
+else{
+
+    total += movimiento.importeFinal || 0;
 
 }
 
@@ -197,101 +470,165 @@ const descripcion =
 
 if(movimiento.tipo === "Pago"){
 
-html += `
+    html += `
 
-<div class="movimientoCuenta">
+    <div class="movimientoCuenta">
 
-    <div class="movIzquierda">
+        <div class="movIzquierda">
 
-        <div class="fechaMovimiento">
-            📅 ${fechaTexto}
-        </div>
-
-        <div class="descripcionMovimiento">
-            💰 Pago registrado
-        </div>
-
-        <div class="estadoMovimiento">
-            ${movimiento.estado}
-        </div>
-
-    </div>
-
-    <div
-        class="importeMovimiento"
-        style="color:#16a34a;">
-
-        - $ ${Math.abs(movimiento.importe).toLocaleString()}
-
-    </div>
-
-</div>
-
-`;
-
-}else{
-
-html += `
-
-<div class="movimientoCuenta">
-
-    <div class="movIzquierda">
-
-        <div class="fechaMovimiento">
-            📅 ${fechaTexto}
-        </div>
-
-        <div class="descripcionMovimiento">
-            🍽 Mesa ${movimiento.mesa}
-        </div>
-
-        <div class="estadoMovimiento">
-            ${movimiento.estado}
-        </div>
-
-        <div style="margin-top:8px;font-size:14px;color:#555;">
-
-            <div>
-                Consumido:
-                <strong>
-                    $ ${movimiento.importeOriginal.toLocaleString()}
-                </strong>
+            <div class="fechaMovimiento">
+                📅 ${fechaTexto}
             </div>
 
-            <div style="color:#16a34a;">
-                Beneficio empleado:
-                <strong>
-                    - $ ${movimiento.descuentoTotal.toLocaleString()}
-                </strong>
+            <div class="descripcionMovimiento">
+                💰 Pago registrado
             </div>
 
-            <div style="margin-top:4px;">
-
-                Total a descontar:
-
-                <strong>
-
-                    $ ${movimiento.importeFinal.toLocaleString()}
-
-                </strong>
-
+            <div class="estadoMovimiento">
+                ${movimiento.estado}
             </div>
 
         </div>
 
+        <div
+            class="importeMovimiento"
+            style="color:#16a34a;">
+
+            - $ ${Math.abs(movimiento.importe || 0).toLocaleString()}
+
+        </div>
+
     </div>
 
-    <div
-        class="importeMovimiento"
-        style="color:#ea580c;">
+    `;
 
-        $ ${movimiento.importeFinal.toLocaleString()}
+}
+else if(movimiento.tipo === "Adelanto"){
+
+    html += `
+
+    <div class="movimientoCuenta">
+
+        <div class="movIzquierda">
+
+            <div class="fechaMovimiento">
+                📅 ${fechaTexto}
+            </div>
+
+            <div class="descripcionMovimiento">
+                💵 Adelanto
+            </div>
+
+            <div class="estadoMovimiento">
+                ${movimiento.estado}
+            </div>
+
+            ${
+                movimiento.observacion
+                    ? `
+                    <div
+                        style="margin-top:8px;font-size:14px;color:#555;">
+
+                        📝 ${movimiento.observacion}
+
+                    </div>
+                    `
+                    : ""
+            }
+
+        </div>
+
+        <div
+            class="importeMovimiento"
+            style="color:#ea580c;">
+
+            $ ${(movimiento.importe || 0).toLocaleString()}
+
+        </div>
 
     </div>
 
-</div>
+    `;
 
-`;
+}
+else{
+
+    html += `
+
+    <div class="movimientoCuenta">
+
+        <div class="movIzquierda">
+
+            <div class="fechaMovimiento">
+                📅 ${fechaTexto}
+            </div>
+
+            <div class="descripcionMovimiento">
+                🍽 Mesa ${movimiento.mesa}
+            </div>
+
+            <div class="estadoMovimiento">
+                ${movimiento.estado}
+            </div>
+
+            <div
+                style="
+                    margin-top:8px;
+                    font-size:14px;
+                    color:#555;
+                ">
+
+                <div>
+
+                    Consumido:
+
+                    <strong>
+
+                        $ ${(movimiento.importeOriginal || 0).toLocaleString()}
+
+                    </strong>
+
+                </div>
+
+                <div style="color:#16a34a;">
+
+                    Beneficio empleado:
+
+                    <strong>
+
+                        - $ ${(movimiento.descuentoTotal || 0).toLocaleString()}
+
+                    </strong>
+
+                </div>
+
+                <div style="margin-top:4px;">
+
+                    Total a descontar:
+
+                    <strong>
+
+                        $ ${(movimiento.importeFinal || 0).toLocaleString()}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div
+            class="importeMovimiento"
+            style="color:#ea580c;">
+
+            $ ${(movimiento.importeFinal || 0).toLocaleString()}
+
+        </div>
+
+    </div>
+
+    `;
 
 }
 

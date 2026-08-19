@@ -604,6 +604,12 @@ async () => {
 
 };
 
+document.getElementById("btnMudarMesa").onclick = () => {
+
+    abrirModalMudarMesa(mesa);
+
+};
+
 }
 
 function cerrarModalMesa(){
@@ -1473,5 +1479,307 @@ async function reiniciarSistema(){
     await dibujarMesas();
 
     alert("✅ Sistema reiniciado correctamente.");
+
+}
+
+async function abrirModalMudarMesa(mesa){
+
+    const snapshot = await getDocs(
+        collection(db, "mesas")
+    );
+
+    const select = document.getElementById(
+        "selectMesaDestino"
+    );
+
+    const texto = document.getElementById(
+        "textoMesaMudar"
+    );
+
+    select.innerHTML = `
+        <option value="">
+            Seleccione una mesa
+        </option>
+    `;
+
+    texto.textContent =
+        `Mesa actual: ${mesa.numero}`;
+
+    const mesasLibres = [];
+
+    snapshot.forEach(documento => {
+
+        const otraMesa = documento.data();
+
+        if(
+            String(otraMesa.numero) !== String(mesa.numero) &&
+            otraMesa.estado === "Libre"
+        ){
+
+            mesasLibres.push(otraMesa);
+
+        }
+
+    });
+
+    mesasLibres.sort(
+        (a,b) =>
+            Number(a.numero) - Number(b.numero)
+    );
+
+    if(mesasLibres.length === 0){
+
+        alert(
+            "⚠ No hay mesas libres disponibles."
+        );
+
+        return;
+
+    }
+
+    mesasLibres.forEach(otraMesa => {
+
+        select.innerHTML += `
+
+            <option value="${otraMesa.numero}">
+
+                Mesa ${otraMesa.numero}
+
+            </option>
+
+        `;
+
+    });
+
+    document
+        .getElementById("modalMudarMesa")
+        .classList
+        .remove("oculto");
+
+
+    document.getElementById(
+        "cancelarMudarMesa"
+    ).onclick = () => {
+
+        document
+            .getElementById("modalMudarMesa")
+            .classList
+            .add("oculto");
+
+    };
+
+
+    document.getElementById(
+        "confirmarMudarMesa"
+    ).onclick = async () => {
+
+        const numeroDestino = select.value;
+
+        if(!numeroDestino){
+
+            alert(
+                "Seleccione una mesa destino."
+            );
+
+            return;
+
+        }
+
+        const confirmar = confirm(
+
+            `¿Confirma mudar la mesa ${mesa.numero} ` +
+            `a la mesa ${numeroDestino}?\n\n` +
+
+            `Toda la cuenta será trasladada ` +
+            `a la nueva mesa.`
+
+        );
+
+        if(!confirmar) return;
+
+
+        const referenciaOrigen = doc(
+            db,
+            "mesas",
+            String(mesa.numero)
+        );
+
+        const referenciaDestino = doc(
+            db,
+            "mesas",
+            String(numeroDestino)
+        );
+
+
+        const origenActual = await getDoc(
+            referenciaOrigen
+        );
+
+        const destinoActual = await getDoc(
+            referenciaDestino
+        );
+
+
+        if(
+            !origenActual.exists() ||
+            !destinoActual.exists()
+        ){
+
+            alert(
+                "❌ No se pudieron verificar las mesas."
+            );
+
+            return;
+
+        }
+
+
+        const datosOrigen =
+            origenActual.data();
+
+        const datosDestino =
+            destinoActual.data();
+
+
+        if(datosOrigen.estado !== "Ocupada"){
+
+            alert(
+                "⚠ La mesa original ya no está ocupada."
+            );
+
+            return;
+
+        }
+
+
+        if(datosDestino.estado !== "Libre"){
+
+            alert(
+                "⚠ La mesa destino ya no está libre."
+            );
+
+            return;
+
+        }
+
+
+        // ==========================
+        // ACTUALIZAR PEDIDO
+        // ==========================
+
+        if(datosOrigen.pedidoId){
+
+            await updateDoc(
+
+                doc(
+                    db,
+                    "pedidos",
+                    datosOrigen.pedidoId
+                ),
+
+                {
+                    mesa: Number(numeroDestino)
+                }
+
+            );
+
+        }
+
+
+        // ==========================
+        // LIBERAR ORIGEN
+        // ==========================
+
+        await updateDoc(
+
+            referenciaOrigen,
+
+            {
+
+                estado: "Libre",
+
+                personas: 0,
+
+                mozo: "",
+
+                pedidoId: "",
+
+                total: 0
+
+            }
+
+        );
+
+
+        // ==========================
+        // OCUPAR DESTINO
+        // ==========================
+
+        await updateDoc(
+
+            referenciaDestino,
+
+            {
+
+                estado: "Ocupada",
+
+                personas: datosOrigen.personas,
+
+                mozo: datosOrigen.mozo,
+
+                pedidoId: datosOrigen.pedidoId,
+
+                total: datosOrigen.total
+
+            }
+
+        );
+
+
+        // ==========================
+        // ACTIVIDAD
+        // ==========================
+
+        const usuario = JSON.parse(
+            sessionStorage.getItem("usuario")
+        );
+
+        await registrarActividad(
+
+            usuario.nombre,
+
+            "Salón",
+
+            "Mudar Mesa",
+
+            `Mesa ${mesa.numero} → Mesa ${numeroDestino}`
+
+        );
+
+
+        document
+            .getElementById("modalMudarMesa")
+            .classList
+            .add("oculto");
+
+
+        document
+            .getElementById("modalMesa")
+            .classList
+            .add("oculto");
+
+
+        await dibujarMesas();
+
+
+        alert(
+
+            `✅ Mesa trasladada correctamente.\n\n` +
+
+            `${mesa.numero} → ${numeroDestino}`
+
+        );
+
+    };
 
 }

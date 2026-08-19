@@ -1,5 +1,15 @@
 <h1>Cuenta Corriente</h1>
 
+<div class="accionesCuenta">
+
+    <button id="btnRegistrarAdelanto">
+
+        💵 Registrar Adelanto
+
+    </button>
+
+</div>
+
 <div id="listaCuentaCorriente">
 
 </div>
@@ -44,13 +54,90 @@
 
     </button>
 
-    <button id="cerrarCuentaCorriente" class="btnSecundario">
+    <button
+        id="cerrarCuentaCorriente"
+        class="btnSecundario">
 
         Cerrar
 
     </button>
 
 </div>
+
+    </div>
+
+</div>
+</div>
+
+<div
+    id="modalAdelanto"
+    class="modal oculto">
+
+    <div class="modalContenido">
+
+        <h2>💵 Registrar Adelanto</h2>
+
+        <div class="pagoCuenta">
+
+            <label>
+                👤 Empleado
+            </label>
+
+            <select id="empleadoAdelanto">
+
+                <option value="">
+                    Seleccione un empleado
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="pagoCuenta">
+
+            <label>
+                💰 Importe
+            </label>
+
+            <input
+                type="number"
+                id="importeAdelanto"
+                placeholder="Ingrese el importe"
+                min="0">
+
+        </div>
+
+        <div class="pagoCuenta">
+
+            <label>
+                📝 Observación
+            </label>
+
+            <input
+                type="text"
+                id="observacionAdelanto"
+                placeholder="Ej: Adelanto de sueldo"
+                maxlength="100">
+
+        </div>
+
+        <div class="accionesCuenta">
+
+            <button id="guardarAdelanto">
+
+                💵 Registrar Adelanto
+
+            </button>
+
+            <button
+                id="cancelarAdelanto"
+                class="btnSecundario">
+
+                Cancelar
+
+            </button>
+
+        </div>
 
     </div>
 

@@ -58,27 +58,60 @@
 
         </div>
 
-        <div class="campo">
+<div class="campo">
 
-            <label>Contraseña Temporal *</label>
+    <label>
 
-            <input type="password" id="passwordNuevo">
+        <input
+            type="checkbox"
+            id="tieneAcceso"
+            checked>
 
-        </div>
+        Tiene acceso al POS
 
-        <div class="campo">
+    </label>
 
-            <label>Perfil</label>
+</div>
 
-            <select id="perfilNuevo">
+<div
+    class="campo"
+    id="bloqueCredenciales">
 
-                <option value="salon">Salón</option>
+    <label>
 
-                <option value="cocina">Cocina</option>
+        Contraseña Temporal *
 
-            </select>
+    </label>
 
-        </div>
+    <input
+        type="password"
+        id="passwordNuevo">
+
+</div>
+
+<div
+    class="campo"
+    id="bloquePerfil">
+
+    <label>
+
+        Perfil
+
+    </label>
+
+    <select id="perfilNuevo">
+
+        <option value="salon">
+            Salón
+        </option>
+
+        <option value="cocina">
+            Cocina
+        </option>
+
+    </select>
+
+</div>
 
         <div class="botones">
 

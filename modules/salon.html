@@ -96,33 +96,87 @@
 
 <div class="accionesMesa">
 
-        <button id="btnAgregarProducto" class="btnPrincipal">
+    <button id="btnAgregarProducto" class="btnPrincipal">
 
-    ➕ Agregar Producto
+        ➕ Agregar Producto
 
-        </button>
+    </button>
 
-<button id="btnEditarPedido" class="btnSecundario">
+    <button id="btnEditarPedido" class="btnSecundario">
 
-    ✏️ Editar Pedido
+        ✏️ Editar Pedido
 
-</button>
+    </button>
 
-<button id="btnCobrar" class="btnVerde">
+    <button id="btnCobrar" class="btnVerde">
 
-    💳 Cobrar
+        💳 Cobrar
 
-</button>
+    </button>
 
-<button id="btnVolverSalon" class="btnGris">
+    <button id="btnMudarMesa" class="btnSecundario">
 
-    ← Volver
+        🔄 Mudar Mesa
 
-</button>
+    </button>
+
+    <button id="btnVolverSalon" class="btnGris">
+
+        ← Volver
+
+    </button>
 
 </div>
 
 </div>
+
+</div>
+
+<div id="modalMudarMesa" class="modal oculto">
+
+    <div class="modal-contenido">
+
+        <h2>🔄 Mudar Mesa</h2>
+
+        <p id="textoMesaMudar"></p>
+
+        <div class="campo">
+
+            <label>
+                Nueva mesa
+            </label>
+
+            <select id="selectMesaDestino">
+
+                <option value="">
+                    Seleccione una mesa
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="botones">
+
+            <button
+                id="confirmarMudarMesa"
+                class="btnPrincipal">
+
+                🔄 Mudar Mesa
+
+            </button>
+
+            <button
+                id="cancelarMudarMesa"
+                class="btnGris">
+
+                Cancelar
+
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
 

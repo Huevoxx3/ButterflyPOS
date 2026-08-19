@@ -34,6 +34,27 @@ export default async function () {
         .addEventListener("click", validarFormulario);
 
     await cargarUsuarios();
+
+    const tieneAcceso = document.getElementById("tieneAcceso");
+
+tieneAcceso.addEventListener("change", () => {
+
+    const mostrar = tieneAcceso.checked;
+
+    document.getElementById("bloqueCredenciales")
+        .style.display = mostrar ? "" : "none";
+
+    document.getElementById("bloquePerfil")
+        .style.display = mostrar ? "" : "none";
+
+    if(!mostrar){
+
+        document.getElementById("passwordNuevo").value = "";
+
+    }
+
+});
+
     document
 .getElementById("buscarUsuario")
 .addEventListener("keyup",filtrarUsuarios);
@@ -242,66 +263,134 @@ function cerrarModal(){
 function limpiarFormulario(){
 
     document.getElementById("nombre").value = "";
+
     document.getElementById("apellido").value = "";
+
     document.getElementById("dni").value = "";
+
+    document.getElementById("dni").disabled = false;
+
     document.getElementById("passwordNuevo").value = "";
+
     document.getElementById("perfilNuevo").selectedIndex = 0;
+
+    document.getElementById("tieneAcceso").checked = true;
+
+    document.getElementById("bloqueCredenciales")
+        .style.display = "";
+
+    document.getElementById("bloquePerfil")
+        .style.display = "";
 
 }
 
 function validarFormulario(){
 
-    const nombre=document.getElementById("nombre").value.trim();
-    const apellido=document.getElementById("apellido").value.trim();
-    const dni=document.getElementById("dni").value.trim();
-    const password=document.getElementById("passwordNuevo").value.trim();
-    const perfil=document.getElementById("perfilNuevo").value;
+    const nombre =
+        document.getElementById("nombre")
+            .value
+            .trim();
 
-    if(!nombre || !apellido || !dni || !password || !perfil){
+    const apellido =
+        document.getElementById("apellido")
+            .value
+            .trim();
 
-        alert("Complete todos los campos.");
+    const dni =
+        document.getElementById("dni")
+            .value
+            .trim();
+
+    const tieneAcceso =
+        document.getElementById("tieneAcceso")
+            .checked;
+
+    const password =
+        document.getElementById("passwordNuevo")
+            .value
+            .trim();
+
+    const perfil =
+        document.getElementById("perfilNuevo")
+            .value;
+
+
+    // ==========================
+    // DATOS OBLIGATORIOS
+    // ==========================
+
+    if(!nombre || !apellido || !dni){
+
+        alert("Complete nombre, apellido y DNI.");
 
         return;
 
     }
 
-  const nuevoUsuario = {
 
-    nombre,
+    // ==========================
+    // SI TIENE ACCESO AL POS
+    // ==========================
 
-    apellido,
+    if(tieneAcceso && !password){
 
-    dni,
+        alert(
+            "Ingrese una contraseña temporal para el acceso al POS."
+        );
 
-    usuario:dni,
+        return;
 
-    password,
+    }
 
-    perfil,
 
-    email:"",
+    const nuevoUsuario = {
 
-    telefono:"",
+        nombre,
 
-    foto:"",
+        apellido,
 
-    activo:true,
+        dni,
 
-    primerIngreso:true,
+        usuario: tieneAcceso
+            ? dni
+            : "",
 
-    fechaAlta:new Date()
+        password: tieneAcceso
+            ? password
+            : "",
 
-};
+        perfil: tieneAcceso
+            ? perfil
+            : "",
 
-if(usuarioEditando){
+        email: "",
 
-    actualizarUsuario(nuevoUsuario);
+        telefono: "",
 
-}else{
+        foto: "",
 
-    verificarDNI(nuevoUsuario);
+        activo: true,
 
-}
+        primerIngreso: tieneAcceso,
+
+        tieneAcceso,
+
+        fechaAlta: new Date()
+
+    };
+
+
+    if(usuarioEditando){
+
+        actualizarUsuario(nuevoUsuario);
+
+    }
+    else{
+
+        verificarDNI(nuevoUsuario);
+
+    }
+
 }
 
 function filtrarUsuarios(){
@@ -399,7 +488,20 @@ async function editarUsuario(id){
 
     document.getElementById("dni").value =
         usuario.dni;
-        document.getElementById("dni").disabled = true;
+
+    document.getElementById("tieneAcceso").checked =
+    usuario.tieneAcceso !== false;
+
+    const tieneAcceso =
+    usuario.tieneAcceso !== false;
+
+document.getElementById("bloqueCredenciales")
+    .style.display = tieneAcceso ? "" : "none";
+
+document.getElementById("bloquePerfil")
+    .style.display = tieneAcceso ? "" : "none";
+
+    document.getElementById("dni").disabled = true;
 
     document
 .getElementById("passwordNuevo")
@@ -428,21 +530,36 @@ async function actualizarUsuario(usuario){
 
         await updateDoc(
 
-            doc(db,"usuarios",usuarioEditando),
+            doc(
+                db,
+                "usuarios",
+                usuarioEditando
+            ),
 
             {
 
-                nombre:usuario.nombre,
+                nombre:
+                    usuario.nombre,
 
-                apellido:usuario.apellido,
+                apellido:
+                    usuario.apellido,
 
-                perfil:usuario.perfil
+                perfil:
+                    usuario.perfil,
+
+                tieneAcceso:
+                    usuario.tieneAcceso,
+
+                activo:
+                    usuario.activo
 
             }
 
         );
 
-        alert("✅ Empleado actualizado correctamente.");
+        alert(
+            "✅ Empleado actualizado correctamente."
+        );
 
         usuarioEditando = null;
 
@@ -456,7 +573,9 @@ async function actualizarUsuario(usuario){
 
         console.error(error);
 
-        alert("Error al actualizar el empleado.");
+        alert(
+            "Error al actualizar el empleado."
+        );
 
     }
 

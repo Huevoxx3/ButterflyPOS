@@ -1,6 +1,6 @@
 @page{
     size: A6 portrait;
-    margin: 6mm;
+    margin: 4mm;
 }
 
 *{
@@ -10,7 +10,7 @@
 }
 
 body{
-    font-family: Arial, Helvetica, sans-serif;
+    font-family:Arial, Helvetica, sans-serif;
     background:#ddd;
 }
 
@@ -19,15 +19,20 @@ body{
     width:105mm;
     min-height:148mm;
 
-    margin:20px auto;
+    margin:15px auto;
 
     background:#fff;
 
-    padding:8mm;
+    padding:5mm;
 
     color:#000;
 
 }
+
+
+/* ==========================
+   ENCABEZADO
+========================== */
 
 .ticketHeader{
 
@@ -35,45 +40,50 @@ body{
 
     border-bottom:2px solid #000;
 
-    padding-bottom:8px;
+    padding-bottom:5px;
 
-    margin-bottom:10px;
+    margin-bottom:7px;
 
 }
 
 #logoTicket{
 
-    width:75px;
+    width:62px;
 
-    margin-bottom:5px;
+    margin-bottom:3px;
 
 }
 
 .ticketHeader h2{
 
-    font-size:28px;
+    font-size:24px;
 
     letter-spacing:2px;
-
-    margin:3px 0;
-
-}
-
-.ticketHeader p{
-
-    font-size:14px;
 
     margin:2px 0;
 
 }
 
+.ticketHeader p{
+
+    font-size:12px;
+
+    margin:1px 0;
+
+}
+
+
+/* ==========================
+   DATOS
+========================== */
+
 #ticketDatos{
 
-    margin:10px 0;
+    margin:7px 0;
 
-    font-size:13px;
+    font-size:12px;
 
-    line-height:1.7;
+    line-height:1.4;
 
 }
 
@@ -85,11 +95,16 @@ body{
 
     align-items:center;
 
-    margin:4px 0;
+    margin:2px 0;
 
-    font-size:13px;
+    font-size:12px;
 
 }
+
+
+/* ==========================
+   PRODUCTOS
+========================== */
 
 .tablaTicket{
 
@@ -97,11 +112,11 @@ body{
 
     border-collapse:collapse;
 
-    margin-top:10px;
+    margin-top:6px;
 
-    margin-bottom:10px;
+    margin-bottom:6px;
 
-    font-size:13px;
+    font-size:11.5px;
 
 }
 
@@ -115,13 +130,13 @@ body{
 
 .tablaTicket th{
 
-    padding:5px;
+    padding:3px 2px;
 
 }
 
 .tablaTicket td{
 
-    padding:4px;
+    padding:2.5px 2px;
 
 }
 
@@ -132,15 +147,20 @@ body{
 
 }
 
+
+/* ==========================
+   TOTALES
+========================== */
+
 .lineaTotal{
 
     display:flex;
 
     justify-content:space-between;
 
-    padding:3px 0;
+    padding:2px 0;
 
-    font-size:14px;
+    font-size:12px;
 
 }
 
@@ -148,37 +168,57 @@ body{
 
     border-top:2px solid #000;
 
-    margin-top:8px;
+    margin-top:5px;
 
-    padding-top:8px;
+    padding-top:5px;
 
-    font-size:22px;
+    font-size:19px;
 
     font-weight:bold;
 
 }
 
+
+/* ==========================
+   MEDIOS DE PAGO
+========================== */
+
 .medioPago{
 
     border-top:1px dashed #999;
 
-    margin-top:15px;
+    margin-top:9px;
 
-    padding-top:10px;
+    padding-top:6px;
 
     text-align:center;
 
-    font-size:15px;
+    font-size:12px;
 
 }
+
+.filaPagoTicket{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:1.5px 0;
+
+}
+
+
+/* ==========================
+   PIE
+========================== */
 
 .ticketFooter{
 
     border-top:1px solid #000;
 
-    margin-top:20px;
+    margin-top:10px;
 
-    padding-top:15px;
+    padding-top:7px;
 
     text-align:center;
 
@@ -188,21 +228,26 @@ body{
 
     font-weight:bold;
 
-    margin-bottom:8px;
+    margin-bottom:4px;
 
 }
 
 .ticketFooter small{
 
-    font-size:11px;
+    font-size:9px;
 
 }
+
+
+/* ==========================
+   BOTÓN IMPRIMIR
+========================== */
 
 .accionesTicket{
 
     width:105mm;
 
-    margin:20px auto 10px;
+    margin:15px auto 8px;
 
     text-align:center;
 
@@ -232,6 +277,11 @@ body{
 
 }
 
+
+/* ==========================
+   IMPRESIÓN
+========================== */
+
 @media print{
 
     body{
@@ -248,7 +298,25 @@ body{
 
     #ticket{
 
+        width:100%;
+
+        min-height:0;
+
         margin:0;
+
+        padding:0;
+
+    }
+
+    .ticketHeader,
+    .tablaTicket,
+    .ticketFooter,
+    .medioPago,
+    .ticketTotales{
+
+        break-inside:avoid;
+
+        page-break-inside:avoid;
 
     }
 
