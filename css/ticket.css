@@ -110,13 +110,34 @@ body{
 
     width:100%;
 
+    max-width:100%;
+
+    table-layout:fixed;
+
     border-collapse:collapse;
 
     margin-top:6px;
 
     margin-bottom:6px;
 
-    font-size:11.5px;
+    font-size:10.5px;
+
+}
+
+.tablaTicket th,
+.tablaTicket td{
+
+    overflow-wrap:anywhere;
+
+    word-break:break-word;
+
+}
+
+.tablaTicket tr{
+
+    break-inside:avoid;
+
+    page-break-inside:avoid;
 
 }
 
@@ -288,6 +309,8 @@ body{
 
         background:white;
 
+        width:100%;
+
     }
 
     .accionesTicket{
@@ -300,6 +323,8 @@ body{
 
         width:100%;
 
+        max-width:100%;
+
         min-height:0;
 
         margin:0;
@@ -308,11 +333,19 @@ body{
 
     }
 
+    .tablaTicket{
+
+        width:100%;
+
+        max-width:100%;
+
+    }
+
     .ticketHeader,
     .tablaTicket,
-    .ticketFooter,
+    .ticketTotales,
     .medioPago,
-    .ticketTotales{
+    .ticketFooter{
 
         break-inside:avoid;
 

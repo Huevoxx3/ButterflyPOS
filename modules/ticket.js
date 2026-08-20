@@ -155,13 +155,10 @@ document.getElementById("ticketProductos").innerHTML = `
 
         <tr>
 
-            <th style="width:12%">Cant</th>
-
-            <th style="width:48%">Producto</th>
-
-            <th style="width:20%">P.Unit</th>
-
-            <th style="width:20%">Total</th>
+<th style="width:10%">Cant</th>
+<th style="width:50%">Producto</th>
+<th style="width:20%">P.Unit</th>
+<th style="width:20%">Total</th>
 
         </tr>
 

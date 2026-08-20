@@ -53,89 +53,127 @@ function imprimirCierre(cierre){
 
 <style>
 
+@page{
+
+    size:A6 portrait;
+
+    margin:5mm;
+
+}
+
 *{
+
     box-sizing:border-box;
+
+}
+
+html,
+body{
+
+    width:100%;
+
+    margin:0;
+
+    padding:0;
+
 }
 
 body{
 
     font-family:Arial,Helvetica,sans-serif;
 
-    margin:0;
-
-    padding:35px;
-
     color:#202938;
 
     background:white;
+
+    font-size:10px;
 
 }
 
 .contenedor{
 
-    max-width:750px;
+    width:100%;
 
-    margin:auto;
+    max-width:95mm;
+
+    margin:0 auto;
 
 }
+
+
+/* ==========================
+   CABECERA
+========================== */
 
 .cabecera{
 
     text-align:center;
 
-    border-bottom:3px solid #202938;
+    border-bottom:2px solid #202938;
 
-    padding-bottom:18px;
+    padding-bottom:6px;
 
-    margin-bottom:25px;
+    margin-bottom:10px;
 
 }
 
 .logo{
 
-    font-size:30px;
+    font-size:19px;
 
     font-weight:bold;
+
+    letter-spacing:1px;
+
+    margin-bottom:2px;
 
 }
 
 .titulo{
 
-    font-size:22px;
+    font-size:14px;
 
     font-weight:bold;
-
-    margin-top:5px;
 
 }
 
 .jornada{
 
-    margin-top:10px;
+    margin-top:4px;
 
-    color:#666;
+    color:#555;
 
-    font-size:14px;
+    font-size:9px;
 
 }
 
+
+/* ==========================
+   SECCIONES
+========================== */
+
 .seccion{
 
-    margin-bottom:25px;
+    margin-bottom:11px;
 
 }
 
 .seccion h2{
 
-    font-size:16px;
+    font-size:10px;
 
-    margin:0 0 10px 0;
+    margin:0 0 4px 0;
 
-    padding-bottom:7px;
+    padding-bottom:3px;
 
-    border-bottom:1px solid #ddd;
+    border-bottom:1px solid #ccc;
 
 }
+
+
+/* ==========================
+   FILAS
+========================== */
 
 .fila{
 
@@ -143,27 +181,59 @@ body{
 
     justify-content:space-between;
 
-    padding:8px 0;
+    align-items:center;
+
+    gap:8px;
+
+    padding:3px 0;
 
     border-bottom:1px solid #eee;
+
+    font-size:9.5px;
+
+}
+
+.fila span{
+
+    flex:1;
 
 }
 
 .fila strong{
 
-    font-size:15px;
+    white-space:nowrap;
+
+    font-size:9.5px;
 
 }
+
+
+/* ==========================
+   EFECTIVO ESPERADO
+========================== */
 
 .destacado{
 
-    font-size:20px;
+    font-size:11px;
 
     font-weight:bold;
 
-    padding:12px 0;
+    padding:5px 0;
+
+    border-bottom:2px solid #202938;
 
 }
+
+.destacado strong{
+
+    font-size:12px;
+
+}
+
+
+/* ==========================
+   ESTADÍSTICAS
+========================== */
 
 .grid{
 
@@ -171,17 +241,17 @@ body{
 
     grid-template-columns:repeat(3,1fr);
 
-    gap:10px;
+    gap:5px;
 
 }
 
 .card{
 
-    border:1px solid #ddd;
+    border:1px solid #ccc;
 
-    border-radius:8px;
+    border-radius:5px;
 
-    padding:12px;
+    padding:5px 2px;
 
     text-align:center;
 
@@ -189,43 +259,80 @@ body{
 
 .card .label{
 
-    font-size:12px;
+    font-size:7.5px;
 
     color:#666;
 
-    margin-bottom:6px;
+    margin-bottom:3px;
 
 }
 
 .card .valor{
 
-    font-size:18px;
+    font-size:10px;
 
     font-weight:bold;
 
 }
 
+
+/* ==========================
+   PIE
+========================== */
+
 .total{
 
-    margin-top:30px;
+    margin-top:12px;
 
-    padding-top:15px;
+    padding-top:6px;
 
-    border-top:3px solid #202938;
+    border-top:1px solid #202938;
 
     text-align:center;
 
-    font-size:12px;
+    font-size:7.5px;
 
     color:#666;
 
 }
 
+
+/* ==========================
+   IMPRESIÓN
+========================== */
+
 @media print{
 
     body{
 
-        padding:15px;
+        background:white;
+
+        width:100%;
+
+        padding:0;
+
+    }
+
+    .contenedor{
+
+        width:100%;
+
+        max-width:95mm;
+
+        margin:0 auto;
+
+    }
+
+    .seccion,
+    .fila,
+    .grid,
+    .card,
+    .cabecera,
+    .total{
+
+        break-inside:avoid;
+
+        page-break-inside:avoid;
 
     }
 

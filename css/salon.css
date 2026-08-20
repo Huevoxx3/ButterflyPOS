@@ -969,3 +969,125 @@
     z-index:1;
 
 }
+
+/* ==========================
+   MESAS ADICIONALES
+========================== */
+
+.pos-mesa6a,
+.pos-mesa7a,
+.pos-mesa10a,
+.pos-c1,
+.pos-c2,
+.pos-c3 {
+
+    position:absolute;
+
+    width:75px;
+    height:55px;
+
+    background:white;
+
+    border-radius:12px;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.12);
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+/* NOMBRE DE LA MESA */
+
+.pos-mesa6a .mesaNumero,
+.pos-mesa7a .mesaNumero,
+.pos-mesa10a .mesaNumero,
+.pos-c1 .mesaNumero,
+.pos-c2 .mesaNumero,
+.pos-c3 .mesaNumero {
+
+    width:auto;
+    height:auto;
+
+    background:none;
+
+    color:#202938;
+
+    font-size:13px;
+
+    margin:0 0 5px 0;
+
+}
+
+
+/* ESTADO */
+
+.pos-mesa6a .mesaEstado,
+.pos-mesa7a .mesaEstado,
+.pos-mesa10a .mesaEstado,
+.pos-c1 .mesaEstado,
+.pos-c2 .mesaEstado,
+.pos-c3 .mesaEstado {
+
+    width:42px;
+    height:7px;
+
+    border-radius:10px;
+
+}
+
+
+/* HOVER */
+
+.pos-mesa6a:hover,
+.pos-mesa7a:hover,
+.pos-mesa10a:hover,
+.pos-c1:hover,
+.pos-c2:hover,
+.pos-c3:hover {
+
+    transform:translateY(-3px);
+
+}
+
+/* ==========================
+   POSICIONES MESAS ADICIONALES
+========================== */
+
+.pos-mesa6a {
+    top:93%;
+    left:7%;
+}
+
+.pos-mesa7a {
+    top:93%;
+    left:15%;
+}
+
+.pos-mesa10a {
+    top:93%;
+    left:23%;
+}
+
+.pos-c1 {
+    top:93%;
+    left:69%;
+}
+
+.pos-c2 {
+    top:93%;
+    left:77%;
+}
+
+.pos-c3 {
+    top:93%;
+    left:85%;
+}

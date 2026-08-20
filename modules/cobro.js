@@ -615,20 +615,57 @@ function calcularDescuentoCuentaCorriente(
 
     ];
 
+    let importeOriginal = 0;
+
     let totalComidas = 0;
+
     let totalBebidas = 0;
 
-    productos.forEach(producto=>{
+
+    productos.forEach(producto => {
 
         const subtotal =
-
             producto.precio * producto.cantidad;
+
+
+        // ==========================
+        // TOTAL ORIGINAL
+        // ==========================
+
+        // TODOS los productos forman
+        // parte del consumo original,
+        // incluidas las PROMOCIONES.
+
+        importeOriginal += subtotal;
+
+
+        // ==========================
+        // PROMOCIONES
+        // NO TIENEN DESCUENTO
+        // ==========================
+
+        if(producto.categoria === "PROMOCIONES"){
+
+            return;
+
+        }
+
+
+        // ==========================
+        // BEBIDAS
+        // ==========================
 
         if(categoriasBebidas.includes(producto.categoria)){
 
             totalBebidas += subtotal;
 
-        }else{
+        }
+
+        // ==========================
+        // COMIDAS
+        // ==========================
+
+        else{
 
             totalComidas += subtotal;
 
@@ -636,33 +673,62 @@ function calcularDescuentoCuentaCorriente(
 
     });
 
-    const descuentoComidasImporte = Math.round(
-        totalComidas * descuentoComidas / 100
-    );
 
-    const descuentoBebidasImporte = Math.round(
-        totalBebidas * descuentoBebidas / 100
-    );
+    // ==========================
+    // CALCULAR DESCUENTOS
+    // ==========================
 
-    return{
+    const descuentoComidasImporte =
+        Math.round(
+            totalComidas *
+            descuentoComidas /
+            100
+        );
+
+
+    const descuentoBebidasImporte =
+        Math.round(
+            totalBebidas *
+            descuentoBebidas /
+            100
+        );
+
+
+    const descuentoTotal =
+        descuentoComidasImporte +
+        descuentoBebidasImporte;
+
+
+    // ==========================
+    // RESULTADO
+    // ==========================
+
+    return {
 
         importeOriginal:
-            totalComidas + totalBebidas,
+
+            importeOriginal,
+
 
         descuentoComidas:
+
             descuentoComidasImporte,
 
+
         descuentoBebidas:
+
             descuentoBebidasImporte,
+
 
         descuentoTotal:
-            descuentoComidasImporte +
-            descuentoBebidasImporte,
+
+            descuentoTotal,
+
 
         importeFinal:
-            (totalComidas + totalBebidas) -
-            (descuentoComidasImporte +
-            descuentoBebidasImporte)
+
+            importeOriginal -
+            descuentoTotal
 
     };
 
@@ -1212,6 +1278,51 @@ document.getElementById("bloqueMotivo").style.display =
 
 document.getElementById("totalCuenta").textContent =
     "$ " + total.toLocaleString("es-AR");
+
+
+// ==========================
+// ACTUALIZAR IMPORTE A PAGAR
+// ==========================
+
+const importePrincipal =
+    document.getElementById("importePagoPrincipal");
+
+const pagosExtra =
+    document.querySelectorAll(".importePagoExtra");
+
+let totalPagosExtra = 0;
+
+pagosExtra.forEach(input => {
+
+    totalPagosExtra += Number(input.value) || 0;
+
+});
+
+if (importePrincipal) {
+
+    // Si no hay otros medios de pago,
+    // el principal debe ser exactamente
+    // el nuevo total de la cuenta.
+
+    if (pagosExtra.length === 0) {
+
+        importePrincipal.value = total;
+
+    }
+
+    // Si existen otros medios de pago,
+    // el principal completa la diferencia.
+
+    else {
+
+        importePrincipal.value =
+            Math.max(0, total - totalPagosExtra);
+
+    }
+
+}
+
+actualizarResumenPagos();
 
 }
 

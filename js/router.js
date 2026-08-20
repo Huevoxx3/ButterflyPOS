@@ -19,6 +19,8 @@ const opciones = {
 
     "Cuenta Corriente",
 
+    "Egresos",
+
     "Carta",
 
     "Actividad",
@@ -36,6 +38,7 @@ const opciones = {
         "Mesas Cerradas",
         "Egresos",
         "Cierre de Caja",
+        "Historial",
         "Configuración"
     ],
 

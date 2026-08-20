@@ -53,6 +53,13 @@ const MESAS_SALON = [
     "MESA12",
     "MESA14",
 
+    "6A",
+    "7A",
+    "10A",
+    "C1",
+    "C2",
+    "C3",
+
     "COMUNITARIA-PUERTA",
     "COMUNITARIA-CENTRO-PUERTA",
     "COMUNITARIA-CENTRO",
@@ -265,6 +272,14 @@ async function dibujarMesas() {
             "MESA11": "pos-mesa11",
             "MESA12": "pos-mesa12",
             "MESA14": "pos-mesa14",
+
+            // MESAS ADICIONALES
+"6A": "pos-mesa6a",
+"7A": "pos-mesa7a",
+"10A": "pos-mesa10a",
+"C1": "pos-c1",
+"C2": "pos-c2",
+"C3": "pos-c3",
 
             // COMUNITARIA
             "COMUNITARIA-PUERTA":

@@ -361,25 +361,62 @@ const jornada = cajaActual.fechaJornada;
 
 async function cargarCuentas(){
 
-    const lista = document.getElementById(
-
-        "listaCuentaCorriente"
-
-    );
+    const lista =
+        document.getElementById("listaCuentaCorriente");
 
     lista.innerHTML = "";
 
+    // ==========================
+    // OBTENER MOVIMIENTOS
+    // ==========================
+
     const snapshot = await getDocs(
-
         collection(db,"cuentasCorrientes")
-
     );
+
+    // ==========================
+    // OBTENER EMPLEADOS ACTIVOS
+    // ==========================
+
+    const usuariosSnapshot = await getDocs(
+        collection(db,"usuarios")
+    );
+
+    const empleadosActivos = {};
+
+    usuariosSnapshot.forEach(documento => {
+
+        const usuario = documento.data();
+
+        // Solo empleados activos
+        if(usuario.activo === false) return;
+
+        const nombreCompleto =
+            `${usuario.nombre} ${usuario.apellido}`;
+
+        empleadosActivos[nombreCompleto] = true;
+
+    });
+
+    // ==========================
+    // CALCULAR SALDOS
+    // ==========================
 
     const empleados = {};
 
-    snapshot.forEach(doc=>{
+    snapshot.forEach(documento => {
 
-        const movimiento = doc.data();
+        const movimiento = documento.data();
+
+        if(!movimiento.empleado) return;
+
+        // Si el empleado ya no existe
+        // o está inactivo, no mostrarlo.
+        if(!empleadosActivos[movimiento.empleado]){
+
+            return;
+
+        }
 
         if(!empleados[movimiento.empleado]){
 
@@ -387,80 +424,84 @@ async function cargarCuentas(){
 
         }
 
- empleados[movimiento.empleado] +=
-
-    movimiento.importeFinal ??
-
-    movimiento.importe;
+        empleados[movimiento.empleado] +=
+            movimiento.importeFinal ??
+            movimiento.importe;
 
     });
 
-Object.keys(empleados)
+    // ==========================
+    // MOSTRAR CUENTAS
+    // ==========================
 
-    .filter(nombre => empleados[nombre] !== 0)
+    Object.keys(empleados)
 
-    .sort()
+        .filter(nombre => empleados[nombre] !== 0)
 
-    .forEach(nombre=>{
+        .sort()
 
-lista.innerHTML += `
+        .forEach(nombre => {
 
-<div class="cardCuentaCorriente">
+            lista.innerHTML += `
 
-    <div class="datosUsuario">
+                <div class="cardCuentaCorriente">
 
-        <div class="nombreUsuario">
+                    <div class="datosUsuario">
 
-            👤 ${nombre}
+                        <div class="nombreUsuario">
 
-        </div>
+                            👤 ${nombre}
 
-        <div>
+                        </div>
 
-            Saldo pendiente
+                        <div>
 
-        </div>
+                            Saldo pendiente
 
-        <div class="saldoCuenta">
+                        </div>
 
-    💰 $ ${empleados[nombre].toLocaleString()}
+                        <div class="saldoCuenta">
 
-</div>
+                            💰 $ ${empleados[nombre].toLocaleString()}
 
-    </div>
+                        </div>
 
-    <button
+                    </div>
 
-        class="btnDetalleCuenta"
+                    <button
 
-        data-empleado="${nombre}">
+                        class="btnDetalleCuenta"
 
-        📄 Ver detalle
+                        data-empleado="${nombre}">
 
-    </button>
+                        📄 Ver detalle
 
-</div>
+                    </button>
 
-`;
+                </div>
 
+            `;
 
         });
 
+
+    // ==========================
+    // BOTONES DETALLE
+    // ==========================
+
     document
-.querySelectorAll(".btnDetalleCuenta")
-.forEach(boton=>{
+        .querySelectorAll(".btnDetalleCuenta")
+        .forEach(boton => {
 
-    boton.onclick=()=>{
+            boton.onclick = () => {
 
-        mostrarDetalleCuenta(
+                mostrarDetalleCuenta(
+                    boton.dataset.empleado
+                );
 
-            boton.dataset.empleado
+            };
 
-        );
-
-    };
-
-});
+        });
 
 }
 
