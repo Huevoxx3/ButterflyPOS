@@ -3,36 +3,112 @@ import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm";
 import { db } from "../firebase.js";
 
 import {
-
     collection,
     getDocs,
     query,
     where,
     orderBy
-
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+// ==========================
+// FORMATO DINERO
+// ==========================
 
 function dinero(valor){
 
     return new Intl.NumberFormat(
-
         "es-AR",
-
         {
-
             style: "currency",
-
             currency: "ARS",
-
             minimumFractionDigits: 0
-
         }
-
-    ).format(valor);
+    ).format(Number(valor) || 0);
 
 }
 
+
+// ==========================
+// FORMATO FECHA / HORA
+// ==========================
+
+function horaFecha(valor){
+
+    if(!valor?.toDate) return "";
+
+    return valor.toDate().toLocaleString(
+        "es-AR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+function hora(valor){
+
+    if(!valor?.toDate) return "";
+
+    return valor.toDate().toLocaleTimeString(
+        "es-AR",
+        {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        }
+    );
+
+}
+
+
+// ==========================
+// GENERAR EXCEL
+// ==========================
+
 export async function generarExcelCierre(jornada){
+
+
+    // ==========================
+    // OBTENER CIERRE
+    // ==========================
+
+    const cierresSnapshot = await getDocs(
+
+        query(
+
+            collection(db,"cierresCaja"),
+
+            where("jornada","==",jornada)
+
+        )
+
+    );
+
+
+    const cierreDocumento =
+        cierresSnapshot.docs[0];
+
+    const cierre =
+        cierreDocumento
+            ? cierreDocumento.data()
+            : null;
+
+
+    if(!cierre){
+
+        alert(
+            "⚠️ No se encontró el cierre correspondiente a esta jornada."
+        );
+
+        return;
+
+    }
+
 
     // ==========================
     // OBTENER VENTAS
@@ -50,115 +126,114 @@ export async function generarExcelCierre(jornada){
 
     );
 
-// ==========================
-// OBTENER ACTIVIDAD
-// ==========================
 
-const actividad = await getDocs(
+    // ==========================
+    // OBTENER ACTIVIDAD
+    // ==========================
 
-    query(
-
-        collection(db,"actividad"),
-
-        where("jornada","==",jornada),
-
-        orderBy("fecha","asc")
-
-    )
-
-);
-
-// ==========================
-// OBTENER COCINA
-// ==========================
-
-const cocina = await getDocs(
-
-    query(
-
-        collection(db,"cocina"),
+    const actividad = await getDocs(
 
         query(
 
-    collection(db,"cocina"),
+            collection(db,"actividad"),
 
-    where("jornada","==",jornada),
+            where("jornada","==",jornada),
 
-    orderBy("horaPedido","asc")
+            orderBy("fecha","asc")
 
-)
+        )
 
-    )
-
-);
-    // ==========================
-// HOJA VENTAS
-// ==========================
-
-const datosVentas = [
-
-    [
-        "Mesa",
-        "Mozo",
-        "Medio de Pago",
-        "Subtotal",
-        "Descuento %",
-        "Total Cobrado"
-    ]
-
-];
-
-ventas.forEach(documento => {
-
-    const venta = documento.data();
-
-    datosVentas.push([
-
-        venta.mesa,
-
-        venta.mozo,
-
-        venta.medioPago,
-
-        dinero(venta.subtotal),
-
-        venta.descuentoGeneral || 0,
-
-        dinero(venta.totalCobrado)
-
-    ]);
-
-});
-
-    let total = 0;
-
-    let cantidad = 0;
-
-    ventas.forEach(doc=>{
-
-        cantidad++;
-
-        total += doc.data().totalCobrado;
-
-    });
-
+    );
 
 
     // ==========================
-    // CREAR LIBRO
+    // OBTENER COCINA
     // ==========================
 
-    const libro = XLSX.utils.book_new();
+    const cocina = await getDocs(
+
+        query(
+
+            collection(db,"cocina"),
+
+            where("jornada","==",jornada),
+
+            orderBy("horaPedido","asc")
+
+        )
+
+    );
+
 
     // ==========================
+    // DATOS DEL CIERRE
+    // ==========================
+
+    const montoInicial =
+        Number(cierre.montoInicial) || 0;
+
+    const total =
+        Number(cierre.total) || 0;
+
+    const totalEgresos =
+        Number(cierre.totalEgresos) || 0;
+
+    const efectivo =
+        Number(cierre.efectivo) || 0;
+
+    const mercadoPago =
+        Number(cierre.mercadoPago) || 0;
+
+    const bancoProvincia =
+        Number(cierre.bancoProvincia) || 0;
+
+    const cuenta =
+        Number(cierre.cuenta) || 0;
+
+    const pendiente =
+        Number(cierre.pendiente) || 0;
+
+    const cantidadVentas =
+        Number(cierre.cantidadVentas) || 0;
+
+    const productosVendidos =
+        Number(cierre.productosVendidos) || 0;
+
+    const ticketPromedio =
+        Number(cierre.ticketPromedio) || 0;
+
+
+    const efectivoEsperado =
+        montoInicial
+        + efectivo
+        - totalEgresos;
+
+
+    // ==========================
+    // EGRESOS
+    // ==========================
+
+    const egresos =
+        Array.isArray(cierre.egresos)
+            ? cierre.egresos
+            : [];
+
+
+    // ==========================
+    // LIBRO
+    // ==========================
+
+    const libro =
+        XLSX.utils.book_new();
+
+
+    // =====================================================
     // HOJA RESUMEN
-    // ==========================
+    // =====================================================
 
     const resumen = [
 
         ["BUTTERFLY POS"],
-
-        [],
 
         ["CIERRE DE CAJA"],
 
@@ -166,394 +241,869 @@ ventas.forEach(documento => {
 
         ["Jornada", jornada],
 
-        ["Cantidad de Ventas", cantidad],
+        [
+            "Responsable",
+            cierre.usuario?.nombre
+                || cierre.usuario
+                || ""
+        ],
 
-        ["Total", dinero(total)]
+        [
+            "Apertura",
+            horaFecha(cierre.apertura)
+        ],
+
+        [
+            "Cierre",
+            horaFecha(cierre.cierre)
+        ],
+
+        [],
+
+        ["RESUMEN DE CAJA"],
+
+        ["Caja inicial", dinero(montoInicial)],
+
+        ["Total ventas", dinero(total)],
+
+        ["Total egresos", dinero(totalEgresos)],
+
+        ["Efectivo esperado", dinero(efectivoEsperado)],
+
+        [],
+
+        ["MEDIOS DE PAGO"],
+
+        ["Efectivo", dinero(efectivo)],
+
+        ["MercadoPago", dinero(mercadoPago)],
+
+        ["Banco Provincia", dinero(bancoProvincia)],
+
+        ["Cuenta Corriente", dinero(cuenta)],
+
+        ["Pendiente", dinero(pendiente)],
+
+        [],
+
+        ["ESTADÍSTICAS"],
+
+        ["Cantidad de ventas", cantidadVentas],
+
+        ["Productos vendidos", productosVendidos],
+
+        ["Ticket promedio", dinero(ticketPromedio)]
 
     ];
 
-    const hoja = XLSX.utils.aoa_to_sheet(resumen);
+
+    const hojaResumen =
+        XLSX.utils.aoa_to_sheet(resumen);
+
 
     XLSX.utils.book_append_sheet(
 
         libro,
 
-        hoja,
+        hojaResumen,
 
         "Resumen"
 
     );
 
-    const hojaVentas = XLSX.utils.aoa_to_sheet(datosVentas);
 
-XLSX.utils.book_append_sheet(
+    // =====================================================
+    // HOJA VENTAS
+    // =====================================================
 
-    libro,
+    const datosVentas = [
 
-    hojaVentas,
+        [
+            "Mesa",
+            "Mozo",
+            "Medio de Pago",
+            "Subtotal",
+            "Descuento %",
+            "Total Cobrado"
+        ]
 
-    "Ventas"
+    ];
 
-);
 
-const datosActividad = [
+    ventas.forEach(documento => {
 
-    [
-        "Hora",
-        "Usuario",
-        "Módulo",
-        "Acción",
-        "Descripción"
-    ]
+        const venta =
+            documento.data();
 
-];
 
-actividad.forEach(doc=>{
+        let medioPago =
+            venta.medioPago || "";
 
-    const a = doc.data();
 
-const hora = a.fecha?.toDate
-    ? a.fecha.toDate().toLocaleTimeString(
-        "es-AR",
-        {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
+        // Ventas nuevas con múltiples medios
+
+        if(
+            venta.mediosPago
+            &&
+            venta.mediosPago.length
+        ){
+
+            medioPago =
+                venta.mediosPago
+                    .map(p =>
+                        `${p.medio}: ${dinero(p.importe)}`
+                    )
+                    .join(" | ");
+
         }
-      )
-    : "";
-
-datosActividad.push([
-
-    hora,
-
-    a.usuario,
-
-    a.modulo,
-
-    a.accion,
-
-    a.descripcion
-
-]);
-
-});
 
 
+        datosVentas.push([
 
-const hojaActividad =
-XLSX.utils.aoa_to_sheet(datosActividad);
+            venta.mesa || "",
 
-XLSX.utils.book_append_sheet(
+            venta.mozo || "",
 
-    libro,
+            medioPago,
 
-    hojaActividad,
+            dinero(venta.subtotal),
 
-    "Actividad"
+            venta.descuentoGeneral || 0,
 
-);
-
-const datosCocina = [
-
-    [
-
-        "Mesa",
-
-        "Producto",
-
-        "Estado"
-
-    ]
-
-];
-
-cocina.forEach(doc=>{
-
-    const c = doc.data();
-
-    datosCocina.push([
-
-        c.mesa,
-
-        c.nombre,
-
-        c.estado
-
-    ]);
-
-});
-
-const hojaCocina =
-XLSX.utils.aoa_to_sheet(datosCocina);
-
-XLSX.utils.book_append_sheet(
-
-    libro,
-
-    hojaCocina,
-
-    "Cocina"
-
-);
-
-
-// ==========================
-// HOJA PRODUCTOS VENDIDOS
-// ==========================
-
-const datosProductos = [
-
-    [
-        "Mesa",
-        "Producto",
-        "Cantidad",
-        "Precio",
-        "Descuento %",
-        "Invitado",
-        "Motivo",
-        "Total"
-    ]
-
-];
-
-ventas.forEach(doc => {
-
-    const venta = doc.data();
-
-    venta.productos.forEach(producto => {
-
-        const totalProducto =
-            producto.invitado
-            ? 0
-            : producto.precio *
-              producto.cantidad *
-              (1 - (producto.descuento || 0) / 100);
-
-        datosProductos.push([
-
-            venta.mesa,
-
-            producto.nombre,
-
-            producto.cantidad,
-
-            dinero(producto.precio),
-
-            producto.descuento || 0,
-
-            producto.invitado ? "SI" : "NO",
-
-            producto.motivoNoCobrar ||
-            producto.motivoDescuento ||
-            "",
-
-            dinero(totalProducto)
+            dinero(venta.totalCobrado)
 
         ]);
 
     });
 
-});
 
-const hojaProductos =
-XLSX.utils.aoa_to_sheet(datosProductos);
+    const hojaVentas =
+        XLSX.utils.aoa_to_sheet(datosVentas);
 
-XLSX.utils.book_append_sheet(
 
-    libro,
+    XLSX.utils.book_append_sheet(
 
-    hojaProductos,
+        libro,
 
-    "Productos"
+        hojaVentas,
 
-);
+        "Ventas"
 
-// ==========================
-// HOJA ESTADÍSTICAS
-// ==========================
+    );
 
-let productosVendidos = 0;
 
-let totalDescuentos = 0;
+    // =====================================================
+    // HOJA PRODUCTOS
+    // =====================================================
 
-let totalInvitados = 0;
+    const datosProductos = [
 
-const rankingProductos = {};
+        [
+            "Mesa",
+            "Producto",
+            "Cantidad",
+            "Precio",
+            "Descuento %",
+            "Invitado",
+            "Motivo",
+            "Total"
+        ]
 
-const rankingMozos = {};
+    ];
 
-let mejorMesa = "";
 
-let mayorConsumo = 0;
+    ventas.forEach(documento => {
 
-ventas.forEach(doc=>{
+        const venta =
+            documento.data();
 
-    const venta = doc.data();
 
-    // Mesa con mayor consumo
+        const productos =
+            venta.productos || [];
 
-    if(venta.totalCobrado > mayorConsumo){
 
-        mayorConsumo = venta.totalCobrado;
+        productos.forEach(producto => {
 
-        mejorMesa = venta.mesa;
 
-    }
+            const totalProducto =
 
-    // Ranking de mozos
+                producto.invitado
 
-    rankingMozos[venta.mozo] =
-        (rankingMozos[venta.mozo] || 0)
-        + venta.totalCobrado;
+                ?
 
-    venta.productos.forEach(producto=>{
+                0
 
-        productosVendidos += producto.cantidad;
+                :
 
-        rankingProductos[producto.nombre] =
-            (rankingProductos[producto.nombre] || 0)
-            + producto.cantidad;
-
-        if(producto.invitado){
-
-            totalInvitados +=
-                producto.precio *
-                producto.cantidad;
-
-        }
-
-        if(producto.descuento){
-
-            totalDescuentos +=
-
-                (producto.precio *
-                 producto.cantidad)
+                (
+                    Number(producto.precio) || 0
+                )
 
                 *
 
-                (producto.descuento/100);
+                (
+                    Number(producto.cantidad) || 0
+                )
 
-        }
+                *
+
+                (
+                    1 -
+                    (
+                        Number(producto.descuento) || 0
+                    ) / 100
+                );
+
+
+            datosProductos.push([
+
+                venta.mesa || "",
+
+                producto.nombre || "",
+
+                producto.cantidad || 0,
+
+                dinero(producto.precio),
+
+                producto.descuento || 0,
+
+                producto.invitado
+                    ? "SI"
+                    : "NO",
+
+                producto.motivoNoCobrar
+                    ||
+                    producto.motivoDescuento
+                    ||
+                    "",
+
+                dinero(totalProducto)
+
+            ]);
+
+        });
 
     });
 
-});
 
-const productoTop =
-Object.entries(rankingProductos)
+    const hojaProductos =
+        XLSX.utils.aoa_to_sheet(
+            datosProductos
+        );
 
-.sort((a,b)=>b[1]-a[1])[0];
 
-const mozoTop =
-Object.entries(rankingMozos)
+    XLSX.utils.book_append_sheet(
 
-.sort((a,b)=>b[1]-a[1])[0];
+        libro,
 
-const estadisticas = [
+        hojaProductos,
 
-["ESTADÍSTICAS"],
+        "Productos"
 
-[],
+    );
 
-["Productos vendidos",productosVendidos],
 
-["Producto más vendido",
-productoTop ? productoTop[0] : ""],
+    // =====================================================
+    // HOJA EGRESOS
+    // =====================================================
 
-["Cantidad",
-productoTop ? productoTop[1] : ""],
+    const datosEgresos = [
 
-[],
+        [
+            "Hora",
+            "Tipo",
+            "Concepto",
+            "Empleado",
+            "Importe",
+            "Observación"
+        ]
 
-["Mozo con mayor facturación",
-mozoTop ? mozoTop[0] : ""],
+    ];
 
-["Facturación",
-mozoTop ? dinero(mozoTop[1]) : ""],
 
-[],
+    egresos.forEach(egreso => {
 
-["Mesa con mayor consumo",
-mejorMesa],
+        datosEgresos.push([
 
-["Importe",
-dinero(mayorConsumo)],
+            hora(egreso.fecha),
 
-[],
+            egreso.tipo || "",
 
-["Total descuentos",
-dinero(totalDescuentos)],
+            egreso.concepto || "",
 
-["Productos invitados",
-dinero(totalInvitados)]
+            egreso.empleado || "",
 
-];
+            dinero(egreso.importe),
 
-const hojaEstadisticas =
-XLSX.utils.aoa_to_sheet(estadisticas);
+            egreso.observacion || ""
 
-XLSX.utils.book_append_sheet(
+        ]);
 
-    libro,
+    });
 
-    hojaEstadisticas,
 
-    "Estadísticas"
+    // Si no hubo egresos
 
-);
-    // ==========================
-    // DESCARGAR
-    // ==========================
+    if(egresos.length === 0){
 
-    const hojas = [
+        datosEgresos.push([
 
-    hoja,
-    hojaVentas,
-    hojaActividad,
-    hojaCocina,
-    hojaProductos,
-    hojaEstadisticas
+            "",
+            "",
+            "No hubo egresos en esta jornada.",
+            "",
+            dinero(0),
+            ""
 
-];
-
-hojas.forEach(h => {
-
-    if(!h["!ref"]) return;
-
-    const rango = XLSX.utils.decode_range(h["!ref"]);
-
-    const anchos = [];
-
-    for(let C = rango.s.c; C <= rango.e.c; C++){
-
-        let max = 15;
-
-        for(let R = rango.s.r; R <= rango.e.r; R++){
-
-            const celda = h[XLSX.utils.encode_cell({r:R,c:C})];
-
-            if(celda){
-
-                max = Math.max(
-
-                    max,
-
-                    String(celda.v).length + 2
-
-                );
-
-            }
-
-        }
-
-        anchos.push({wch:max});
+        ]);
 
     }
 
-    h["!cols"] = anchos;
 
-});
+    const hojaEgresos =
+        XLSX.utils.aoa_to_sheet(
+            datosEgresos
+        );
+
+
+    XLSX.utils.book_append_sheet(
+
+        libro,
+
+        hojaEgresos,
+
+        "Egresos"
+
+    );
+
+
+    // =====================================================
+    // HOJA ACTIVIDAD
+    // =====================================================
+
+    const datosActividad = [
+
+        [
+            "Hora",
+            "Usuario",
+            "Módulo",
+            "Acción",
+            "Descripción"
+        ]
+
+    ];
+
+
+    actividad.forEach(documento => {
+
+        const a =
+            documento.data();
+
+
+        datosActividad.push([
+
+            hora(a.fecha),
+
+            a.usuario || "",
+
+            a.modulo || "",
+
+            a.accion || "",
+
+            a.descripcion || ""
+
+        ]);
+
+    });
+
+
+    const hojaActividad =
+        XLSX.utils.aoa_to_sheet(
+            datosActividad
+        );
+
+
+    XLSX.utils.book_append_sheet(
+
+        libro,
+
+        hojaActividad,
+
+        "Actividad"
+
+    );
+
+
+    // =====================================================
+    // HOJA COCINA
+    // =====================================================
+
+    const datosCocina = [
+
+        [
+            "Mesa",
+            "Producto",
+            "Estado"
+        ]
+
+    ];
+
+
+    cocina.forEach(documento => {
+
+        const c =
+            documento.data();
+
+
+        datosCocina.push([
+
+            c.mesa || "",
+
+            c.nombre || "",
+
+            c.estado || ""
+
+        ]);
+
+    });
+
+
+    const hojaCocina =
+        XLSX.utils.aoa_to_sheet(
+            datosCocina
+        );
+
+
+    XLSX.utils.book_append_sheet(
+
+        libro,
+
+        hojaCocina,
+
+        "Cocina"
+
+    );
+
+
+    // =====================================================
+    // ESTADÍSTICAS
+    // =====================================================
+
+    let productosVendidosCalculados = 0;
+
+    let totalDescuentos = 0;
+
+    let totalInvitados = 0;
+
+
+    const rankingProductos = {};
+
+    const rankingMozos = {};
+
+
+    let mejorMesa = "";
+
+    let mayorConsumo = 0;
+
+
+    ventas.forEach(documento => {
+
+        const venta =
+            documento.data();
+
+
+        const totalVenta =
+            Number(venta.totalCobrado) || 0;
+
+
+        // ==========================
+        // MESA CON MAYOR CONSUMO
+        // ==========================
+
+        if(totalVenta > mayorConsumo){
+
+            mayorConsumo =
+                totalVenta;
+
+            mejorMesa =
+                venta.mesa || "";
+
+        }
+
+
+        // ==========================
+        // RANKING MOZOS
+        // ==========================
+
+        const mozo =
+            venta.mozo || "Sin asignar";
+
+
+        rankingMozos[mozo] =
+
+            (
+                rankingMozos[mozo]
+                || 0
+            )
+
+            +
+
+            totalVenta;
+
+
+        // ==========================
+        // PRODUCTOS
+        // ==========================
+
+        const productos =
+            venta.productos || [];
+
+
+        productos.forEach(producto => {
+
+            const cantidad =
+                Number(producto.cantidad) || 0;
+
+            const precio =
+                Number(producto.precio) || 0;
+
+            const descuento =
+                Number(producto.descuento) || 0;
+
+
+            productosVendidosCalculados +=
+                cantidad;
+
+
+            const nombre =
+                producto.nombre
+                || "Sin nombre";
+
+
+            rankingProductos[nombre] =
+
+                (
+                    rankingProductos[nombre]
+                    || 0
+                )
+
+                +
+
+                cantidad;
+
+
+            if(producto.invitado){
+
+                totalInvitados +=
+
+                    precio * cantidad;
+
+            }
+
+
+            if(descuento){
+
+                totalDescuentos +=
+
+                    (
+                        precio * cantidad
+                    )
+
+                    *
+
+                    (
+                        descuento / 100
+                    );
+
+            }
+
+        });
+
+    });
+
+
+    const productoTop =
+
+        Object.entries(
+            rankingProductos
+        )
+
+        .sort(
+            (a,b) =>
+                b[1] - a[1]
+        )[0];
+
+
+    const mozoTop =
+
+        Object.entries(
+            rankingMozos
+        )
+
+        .sort(
+            (a,b) =>
+                b[1] - a[1]
+        )[0];
+
+
+    const estadisticas = [
+
+        ["ESTADÍSTICAS"],
+
+        [],
+
+        [
+            "Productos vendidos",
+            productosVendidosCalculados
+        ],
+
+        [
+            "Producto más vendido",
+            productoTop
+                ? productoTop[0]
+                : ""
+        ],
+
+        [
+            "Cantidad",
+            productoTop
+                ? productoTop[1]
+                : ""
+        ],
+
+        [],
+
+        [
+            "Mozo con mayor facturación",
+            mozoTop
+                ? mozoTop[0]
+                : ""
+        ],
+
+        [
+            "Facturación",
+            mozoTop
+                ? dinero(mozoTop[1])
+                : dinero(0)
+        ],
+
+        [],
+
+        [
+            "Mesa con mayor consumo",
+            mejorMesa
+        ],
+
+        [
+            "Importe",
+            dinero(mayorConsumo)
+        ],
+
+        [],
+
+        [
+            "Total descuentos",
+            dinero(totalDescuentos)
+        ],
+
+        [
+            "Productos invitados",
+            dinero(totalInvitados)
+        ]
+
+    ];
+
+
+    const hojaEstadisticas =
+        XLSX.utils.aoa_to_sheet(
+            estadisticas
+        );
+
+
+    XLSX.utils.book_append_sheet(
+
+        libro,
+
+        hojaEstadisticas,
+
+        "Estadísticas"
+
+    );
+
+
+    // =====================================================
+    // AJUSTAR ANCHOS
+    // =====================================================
+
+    const hojas = [
+
+        hojaResumen,
+        hojaVentas,
+        hojaProductos,
+        hojaEgresos,
+        hojaActividad,
+        hojaCocina,
+        hojaEstadisticas
+
+    ];
+
+
+    hojas.forEach(hoja => {
+
+        if(!hoja["!ref"]) return;
+
+
+        const rango =
+            XLSX.utils.decode_range(
+                hoja["!ref"]
+            );
+
+
+        const anchos = [];
+
+
+        for(
+
+            let C = rango.s.c;
+
+            C <= rango.e.c;
+
+            C++
+
+        ){
+
+            let max = 15;
+
+
+            for(
+
+                let R = rango.s.r;
+
+                R <= rango.e.r;
+
+                R++
+
+            ){
+
+                const celda =
+
+                    hoja[
+                        XLSX.utils.encode_cell({
+                            r:R,
+                            c:C
+                        })
+                    ];
+
+
+                if(celda){
+
+                    max = Math.max(
+
+                        max,
+
+                        String(celda.v).length + 2
+
+                    );
+
+                }
+
+            }
+
+
+            // Limitar columnas exageradamente largas
+
+            max =
+                Math.min(max, 45);
+
+
+            anchos.push({
+
+                wch:max
+
+            });
+
+        }
+
+
+        hoja["!cols"] =
+            anchos;
+
+    });
+
+
+    // ==========================
+    // CONGELAR PRIMERA FILA
+    // ==========================
+
+    hojaVentas["!freeze"] = {
+        xSplit:0,
+        ySplit:1
+    };
+
+    hojaProductos["!freeze"] = {
+        xSplit:0,
+        ySplit:1
+    };
+
+    hojaEgresos["!freeze"] = {
+        xSplit:0,
+        ySplit:1
+    };
+
+    hojaActividad["!freeze"] = {
+        xSplit:0,
+        ySplit:1
+    };
+
+    hojaCocina["!freeze"] = {
+        xSplit:0,
+        ySplit:1
+    };
+
+
+    // ==========================
+    // FILTROS
+    // ==========================
+
+    if(ventas.size > 0){
+
+        hojaVentas["!autofilter"] = {
+            ref: hojaVentas["!ref"]
+        };
+
+    }
+
+
+    if(datosProductos.length > 1){
+
+        hojaProductos["!autofilter"] = {
+            ref: hojaProductos["!ref"]
+        };
+
+    }
+
+
+    if(datosEgresos.length > 1){
+
+        hojaEgresos["!autofilter"] = {
+            ref: hojaEgresos["!ref"]
+        };
+
+    }
+
+
+    if(actividad.size > 0){
+
+        hojaActividad["!autofilter"] = {
+            ref: hojaActividad["!ref"]
+        };
+
+    }
+
+
+    // =====================================================
+    // DESCARGAR
+    // =====================================================
 
     XLSX.writeFile(
 

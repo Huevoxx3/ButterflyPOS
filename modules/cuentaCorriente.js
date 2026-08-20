@@ -2,6 +2,9 @@ import { registrarActividad } from "../js/services/actividadService.js";
 
 import { db } from "../js/firebase.js";
 
+import { obtenerJornadaActual }
+    from "../js/services/cajaService.js";
+
 import {
 
     collection,
@@ -9,6 +12,10 @@ import {
     getDocs,
 
     addDoc,
+
+    getDoc,
+
+    doc,
 
     serverTimestamp
 
@@ -105,72 +112,45 @@ async function cargarEmpleadosAdelanto(){
         </option>
     `;
 
+
+    // ==========================
+    // OBTENER TODOS LOS EMPLEADOS
+    // ==========================
+
     const snapshot = await getDocs(
-        collection(db,"cuentasCorrientes")
+        collection(db,"usuarios")
     );
 
-    const saldos = {};
 
     snapshot.forEach(documento => {
 
-        const movimiento = documento.data();
+        const empleado = documento.data();
 
-        if(!movimiento.empleado) return;
 
-        // No computar movimientos anulados
-        if(movimiento.estado === "Anulado") return;
+        // No mostrar usuarios inactivos
 
-        if(!saldos[movimiento.empleado]){
+        if(empleado.activo === false) return;
 
-            saldos[movimiento.empleado] = 0;
 
-        }
+        const opcion =
+            document.createElement("option");
 
-        if(movimiento.tipo === "Pago"){
 
-            saldos[movimiento.empleado] +=
-                movimiento.importe || 0;
+        opcion.value =
+            documento.id;
 
-        }
-        else if(movimiento.tipo === "Adelanto"){
 
-            saldos[movimiento.empleado] +=
-                movimiento.importe || 0;
+        opcion.textContent =
+            `${empleado.nombre} ${empleado.apellido}`;
 
-        }
-        else{
 
-            saldos[movimiento.empleado] +=
-                movimiento.importeFinal || 0;
+        opcion.dataset.nombre =
+            `${empleado.nombre} ${empleado.apellido}`;
 
-        }
+
+        selector.appendChild(opcion);
 
     });
-
-
-    Object.entries(saldos)
-
-        .filter(([nombre, saldo]) => saldo !== 0)
-
-        .sort(([nombreA], [nombreB]) =>
-            nombreA.localeCompare(nombreB)
-        )
-
-        .forEach(([nombre, saldo]) => {
-
-            const opcion =
-                document.createElement("option");
-
-            opcion.value = nombre;
-
-            opcion.textContent =
-                `${nombre} — $ ${saldo.toLocaleString()}`;
-
-            opcion.dataset.nombre = nombre;
-
-            selector.appendChild(opcion);
-
-        });
 
 }
 
@@ -179,8 +159,10 @@ async function guardarAdelanto(){
     const selector =
         document.getElementById("empleadoAdelanto");
 
+    const empleadoId = selector.value;
+
     const empleado =
-        selector.value;
+        selector.selectedOptions[0]?.dataset.nombre || "";
 
     const importe =
         Number(
@@ -197,12 +179,11 @@ async function guardarAdelanto(){
     // VALIDACIONES
     // ==========================
 
-    if(!empleado){
+    if(!empleadoId){
 
         alert("Seleccione un empleado.");
 
         return;
-
     }
 
     if(importe <= 0){
@@ -210,9 +191,44 @@ async function guardarAdelanto(){
         alert("Ingrese un importe válido.");
 
         return;
-
     }
 
+
+    // ==========================
+    // OBTENER JORNADA ACTUAL
+    // ==========================
+
+// ==========================
+// VERIFICAR ESTADO REAL DE CAJA
+// ==========================
+
+const referenciaCaja = doc(
+    db,
+    "caja",
+    "actual"
+);
+
+const documentoCaja = await getDoc(
+    referenciaCaja
+);
+
+const cajaActual = documentoCaja.data();
+
+if(!cajaActual || cajaActual.abierta !== true){
+
+    alert(
+        "⚠️ No hay una caja abierta.\n\n" +
+        "Abra la caja antes de registrar un adelanto en efectivo."
+    );
+
+    return;
+}
+
+const jornada = cajaActual.fechaJornada;
+
+    // ==========================
+    // CONFIRMAR
+    // ==========================
 
     const confirmar = confirm(
 
@@ -224,7 +240,7 @@ async function guardarAdelanto(){
 
 
     // ==========================
-    // GUARDAR ADELANTO
+    // GUARDAR EN CUENTA CORRIENTE
     // ==========================
 
     await addDoc(
@@ -233,12 +249,15 @@ async function guardarAdelanto(){
 
         {
 
+            empleadoId,
+
             empleado,
 
             tipo: "Adelanto",
 
-            // El adelanto aumenta lo pendiente
-            importe: importe,
+            importe: -importe,
+
+            jornada,
 
             fecha: serverTimestamp(),
 
@@ -252,11 +271,46 @@ async function guardarAdelanto(){
 
 
     // ==========================
+    // REGISTRAR EGRESO DE CAJA
+    // ==========================
+
+    await addDoc(
+
+        collection(db,"egresos"),
+
+        {
+
+            jornada,
+
+            tipo: "Adelanto",
+
+            concepto: `Adelanto - ${empleado}`,
+
+            empleadoId,
+
+            empleado,
+
+            importe,
+
+            observacion,
+
+            fecha: serverTimestamp(),
+
+            estado: "Activo"
+
+        }
+
+    );
+
+
+    // ==========================
     // REGISTRAR ACTIVIDAD
     // ==========================
 
     const usuario = JSON.parse(
+
         sessionStorage.getItem("usuario")
+
     );
 
 
@@ -278,12 +332,14 @@ async function guardarAdelanto(){
 
 
     alert(
+
         "✅ Adelanto registrado correctamente."
+
     );
 
 
     // ==========================
-    // LIMPIAR
+    // LIMPIAR Y CERRAR
     // ==========================
 
     document.getElementById(
