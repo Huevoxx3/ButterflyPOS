@@ -12,25 +12,92 @@ const parametros = new URLSearchParams(window.location.search);
 
 const ventaId = parametros.get("venta");
 
-console.log("Venta recibida:", ventaId);
+const esPreview =
+    parametros.get("preview") === "true";
 
-const documento = await getDoc(
+let venta;
 
-    doc(db, "ventas", ventaId)
 
-);
+// ==========================
+// TICKET DE VENTA COBRADA
+// ==========================
 
-if(!documento.exists()){
+if(ventaId){
 
-    alert("No se encontró la venta.");
+    console.log("Venta recibida:", ventaId);
 
-    throw new Error("Venta inexistente");
+    const documento = await getDoc(
+
+        doc(db, "ventas", ventaId)
+
+    );
+
+    if(!documento.exists()){
+
+        alert("No se encontró la venta.");
+
+        throw new Error("Venta inexistente");
+
+    }
+
+    venta = documento.data();
 
 }
 
-const venta = documento.data();
 
-const fechaVenta = venta.fecha.toDate();
+// ==========================
+// TICKET PREVIO AL COBRO
+// ==========================
+
+else if(esPreview){
+
+    const datosPreview =
+        sessionStorage.getItem("ticketPreview");
+
+    if(!datosPreview){
+
+        alert("No se encontraron los datos del ticket.");
+
+        throw new Error(
+            "Datos de ticket preview inexistentes"
+        );
+
+    }
+
+    venta = JSON.parse(datosPreview);
+
+}
+
+
+// ==========================
+// SIN DATOS
+// ==========================
+
+else{
+
+    alert("No se indicó ninguna venta.");
+
+    throw new Error(
+        "Ticket sin venta ni preview"
+    );
+
+}
+
+console.log("TICKET:", venta);
+
+let fechaVenta;
+
+if (venta.fecha && typeof venta.fecha.toDate === "function") {
+
+    // Venta ya cobrada desde Firebase
+    fechaVenta = venta.fecha.toDate();
+
+} else {
+
+    // Ticket previo al cobro
+    fechaVenta = new Date(venta.fecha);
+
+}
 
 const datos = {
 
@@ -40,11 +107,11 @@ const datos = {
 
     fecha: fechaVenta.toLocaleDateString("es-AR"),
 
-    hora: fechaVenta.toLocaleTimeString("es-AR",{
+    hora: fechaVenta.toLocaleTimeString("es-AR", {
 
-        hour:"2-digit",
+        hour: "2-digit",
 
-        minute:"2-digit"
+        minute: "2-digit"
 
     })
 

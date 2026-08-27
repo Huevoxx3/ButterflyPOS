@@ -350,6 +350,14 @@ html += `
     </button>
 
     <button
+        id="btnTicketCobro"
+        class="btnSecundario">
+
+        🧾 Ticket
+
+    </button>
+
+    <button
         id="btnConfirmarCobro"
         class="btnVerdeGrande">
 
@@ -1056,6 +1064,144 @@ if(imprimirTicket){
 };
 
 calcularTotal();
+
+
+// ==========================
+// BOTÓN TICKET PREVIO
+// ==========================
+
+document.getElementById("btnTicketCobro").onclick = () => {
+
+    const productosTicket = items.map((item,index) => {
+
+        const descuento =
+            Number(
+                document.querySelectorAll(".txtDescuento")[index].value
+            ) || 0;
+
+        const invitado =
+            document.querySelectorAll(".chkNoCobrar")[index].checked;
+
+        return {
+
+            ...item,
+
+            descuento,
+
+            motivoDescuento:
+                motivosDescuento[index] || "",
+
+            invitado,
+
+            motivoNoCobrar:
+                motivosNoCobrar[index] || ""
+
+        };
+
+    });
+
+
+    const subtotal = mesa.total;
+
+    const descuentoGeneral =
+        Number(
+            document.getElementById("descuentoGeneral").value
+        ) || 0;
+
+
+    const totalCobrado = Number(
+        document.getElementById("totalCuenta")
+            .textContent
+            .replace("$","")
+            .replace(/\./g,"")
+            .replace(",",".")
+            .trim()
+    );
+
+
+    const mediosPago = [];
+
+    // Medio principal
+    mediosPago.push({
+
+        medio:
+            document.getElementById("medioPago").value,
+
+        importe:
+            Number(
+                document.getElementById(
+                    "importePagoPrincipal"
+                ).value
+            ) || 0
+
+    });
+
+
+    // Medios adicionales
+    document
+        .querySelectorAll(".filaPagoExtra")
+        .forEach(fila => {
+
+            mediosPago.push({
+
+                medio:
+                    fila.querySelector(
+                        ".medioPagoExtra"
+                    ).value,
+
+                importe:
+                    Number(
+                        fila.querySelector(
+                            ".importePagoExtra"
+                        ).value
+                    ) || 0
+
+            });
+
+        });
+
+
+    const ticketPreview = {
+
+        mesa: mesa.numero,
+
+        mozo: mesa.mozo,
+
+        fecha:
+            new Date().toISOString(),
+
+        subtotal,
+
+        descuentoGeneral,
+
+        totalCobrado,
+
+        productos:
+            productosTicket,
+
+        mediosPago
+
+    };
+
+
+    sessionStorage.setItem(
+
+        "ticketPreview",
+
+        JSON.stringify(ticketPreview)
+
+    );
+
+
+    window.open(
+
+        "../modules/ticket.html?preview=true",
+
+        "_blank"
+
+    );
+
+};
 
 // ==========================
 // EVENTOS DE NO COBRAR
