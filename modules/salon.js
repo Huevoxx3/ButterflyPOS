@@ -37,6 +37,8 @@ const MESAS_SALON = [
     "AFUERA6",
     "AFUERA7",
     "AFUERA8",
+    "AD1",
+    "AD2",
 
     "BOX1",
     "BOX2",
@@ -280,6 +282,8 @@ async function dibujarMesas() {
 "C1": "pos-c1",
 "C2": "pos-c2",
 "C3": "pos-c3",
+"AD1": "pos-ad1",
+"AD2": "pos-ad2",
 
             // COMUNITARIA
             "COMUNITARIA-PUERTA":

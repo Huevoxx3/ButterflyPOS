@@ -979,12 +979,14 @@
 .pos-mesa10a,
 .pos-c1,
 .pos-c2,
-.pos-c3 {
+.pos-c3,
+.pos-ad1,
+.pos-ad2 {
 
     position:absolute;
 
-    width:75px;
-    height:55px;
+    width:70px;
+    height:50px;
 
     background:white;
 
@@ -1002,6 +1004,8 @@
 
     transition:.2s;
 
+    background-color: rgb(215, 211, 211);
+
 }
 
 
@@ -1012,7 +1016,9 @@
 .pos-mesa10a .mesaNumero,
 .pos-c1 .mesaNumero,
 .pos-c2 .mesaNumero,
-.pos-c3 .mesaNumero {
+.pos-c3 .mesaNumero,
+.pos-ad1 .mesaNumero,
+.pos-ad2 .mesaNumero {
 
     width:auto;
     height:auto;
@@ -1035,7 +1041,9 @@
 .pos-mesa10a .mesaEstado,
 .pos-c1 .mesaEstado,
 .pos-c2 .mesaEstado,
-.pos-c3 .mesaEstado {
+.pos-c3 .mesaEstado,
+.pos-ad1 .mesaEstado,
+.pos-ad2 .mesaEstado {
 
     width:42px;
     height:7px;
@@ -1052,7 +1060,9 @@
 .pos-mesa10a:hover,
 .pos-c1:hover,
 .pos-c2:hover,
-.pos-c3:hover {
+.pos-c3:hover,
+.pos-ad1:hover,
+.pos-ad2:hover {
 
     transform:translateY(-3px);
 
@@ -1063,31 +1073,41 @@
 ========================== */
 
 .pos-mesa6a {
-    top:93%;
-    left:7%;
+    top:94%;
+    left:9%;
 }
 
 .pos-mesa7a {
-    top:93%;
+    top:94%;
     left:15%;
 }
 
 .pos-mesa10a {
-    top:93%;
-    left:23%;
+    top:94%;
+    left:21%;
 }
 
 .pos-c1 {
-    top:93%;
-    left:69%;
+    top:94%;
+    left:71%;
 }
 
 .pos-c2 {
-    top:93%;
+    top:94%;
     left:77%;
 }
 
 .pos-c3 {
-    top:93%;
-    left:85%;
+    top:94%;
+    left:83%;
+}
+
+.pos-ad1 {
+    top:30%;
+    left:2%;
+}
+
+.pos-ad2 {
+    top:30%;
+    left:8%;
 }
