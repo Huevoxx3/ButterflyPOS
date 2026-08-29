@@ -1,5 +1,7 @@
 import { obtenerJornadaActual } from "../js/services/cajaService.js";
 
+import { registrarActividad } from "../js/services/actividadService.js";
+
 import { db } from "../js/firebase.js";
 
 import {
@@ -204,11 +206,18 @@ export default async function mostrarMesasCerradas(admin = null){
 
     <div>
 
-        <strong>
+<strong>
 
-            $ ${venta.totalCobrado}
+    $ ${
+        venta.medioPago === "Cuenta Corriente" &&
+        venta.importeCuentaCorriente !== undefined
 
-        </strong>
+            ? Number(venta.importeCuentaCorriente).toLocaleString()
+
+            : Number(venta.totalCobrado).toLocaleString()
+    }
+
+</strong>
 
     </div>
 
@@ -316,13 +325,27 @@ let html = `
 
     </p>
 
-    <p class="totalVenta">
+<p class="totalVenta">
 
-        Total Cobrado
+    ${
+        venta.medioPago === "Cuenta Corriente" &&
+        venta.importeCuentaCorriente !== undefined
 
-        $ ${Number(venta.totalCobrado).toLocaleString()}
+            ? "Total Cuenta Corriente"
 
-    </p>
+            : "Total Cobrado"
+    }
+
+    $ ${
+        venta.medioPago === "Cuenta Corriente" &&
+        venta.importeCuentaCorriente !== undefined
+
+            ? Number(venta.importeCuentaCorriente).toLocaleString()
+
+            : Number(venta.totalCobrado).toLocaleString()
+    }
+
+</p>
 
 </div>
 
@@ -667,17 +690,17 @@ document.getElementById("btnVolverVentas").onclick = () => {
     // DATOS A ACTUALIZAR
     // ==========================
 
-    const datosActualizar = {
+const datosActualizar = {
 
-        medioPago: medioPago,
+    medioPago: medioPago,
 
-        observaciones:
-            document.getElementById("observacionesVenta").value,
+    observaciones:
+        document.getElementById("observacionesVenta").value,
 
-        ultimaEdicion:
-            serverTimestamp()
+    ultimaEdicion:
+        serverTimestamp()
 
-    };
+};
 
 
     // ==========================
@@ -724,6 +747,14 @@ if(
             20
         );
 
+    // Guardar los valores de Cuenta Corriente
+// también dentro de la venta.
+
+datosActualizar.descuentoCuentaCorriente =
+    resumen.descuentoTotal;
+
+datosActualizar.importeCuentaCorriente =
+    resumen.importeFinal;
 
     await addDoc(
 
@@ -770,7 +801,82 @@ if(
 
     );
 
+    // ==========================
+// REGISTRAR EN ACTIVIDAD
+// ==========================
+
+await registrarActividad(
+
+    venta.mozo || "Sistema",
+
+    "Cobro",
+
+    "Cambio medio de pago",
+
+    `Mesa ${venta.mesa} - ${venta.medioPago} → Cuenta Corriente - ` +
+    `Empleado: ${empleado} - ` +
+    `Importe original: $${resumen.importeOriginal.toLocaleString("es-AR")} - ` +
+    `Descuento empleado: $${resumen.descuentoTotal.toLocaleString("es-AR")} - ` +
+    `Importe final: $${resumen.importeFinal.toLocaleString("es-AR")}`,
+
+    {
+
+        ventaId: id,
+
+        pedidoId: venta.pedidoId || "",
+
+        mesa: venta.mesa,
+
+        medioPagoAnterior:
+            venta.medioPago,
+
+        medioPagoNuevo:
+            "Cuenta Corriente",
+
+        empleadoId:
+            empleadoId,
+
+        empleado:
+            empleado,
+
+        importeOriginal:
+            resumen.importeOriginal,
+
+        descuentoCuentaCorriente:
+            resumen.descuentoTotal,
+
+        importeCuentaCorriente:
+            resumen.importeFinal
+
+    }
+
+);
+
 }
+
+
+// ==================================================
+// CASO 2:
+// ANTES ERA CUENTA CORRIENTE
+// AHORA PASA A OTRO MEDIO
+// ==================================================
+
+if(
+    venta.medioPago === "Cuenta Corriente" &&
+    medioPago !== "Cuenta Corriente"
+){
+
+    const movimientosSnapshot = await getDocs(
+
+        query(
+
+            collection(db,"cuentasCorrientes"),
+
+            where("ventaId","==",id)
+
+        )
+
+    );
 
 
 // ==================================================
@@ -835,6 +941,63 @@ if(
 
     }
 
+
+    // ==========================
+    // REGISTRAR EN ACTIVIDAD
+    // ==========================
+
+    await registrarActividad(
+
+        venta.mozo || "Sistema",
+
+        "Cobro",
+
+        "Cambio medio de pago",
+
+        `Mesa ${venta.mesa} - Cuenta Corriente → ${medioPago} - ` +
+        `Empleado: ${venta.cuentaCorrienteEmpleado || "Sin empleado"} - ` +
+        `Importe Cuenta Corriente: $${(
+            Number(venta.importeCuentaCorriente) ||
+            Number(venta.totalCobrado) ||
+            0
+        ).toLocaleString("es-AR")} - ` +
+        `Movimiento de Cuenta Corriente: Anulado`,
+
+        {
+
+            ventaId: id,
+
+            pedidoId:
+                venta.pedidoId || "",
+
+            mesa:
+                venta.mesa,
+
+            medioPagoAnterior:
+                "Cuenta Corriente",
+
+            medioPagoNuevo:
+                medioPago,
+
+            empleadoId:
+                venta.cuentaCorrienteEmpleadoId || "",
+
+            empleado:
+                venta.cuentaCorrienteEmpleado || "",
+
+            importeCuentaCorriente:
+                Number(venta.importeCuentaCorriente) ||
+                Number(venta.totalCobrado) ||
+                0,
+
+            movimientoCuentaCorriente:
+                "Anulado"
+
+        }
+
+    );
+
+}
 }
 
 
@@ -951,6 +1114,12 @@ if(
                 20
             );
 
+        datosActualizar.descuentoCuentaCorriente =
+    resumen.descuentoTotal;
+
+datosActualizar.importeCuentaCorriente =
+    resumen.importeFinal;
+
 
         // Creamos el nuevo movimiento
         // para el nuevo empleado.
@@ -1005,6 +1174,61 @@ if(
 
                 tipo:
                     "Consumo"
+
+            }
+
+        );
+            // ==========================
+        // REGISTRAR EN ACTIVIDAD
+        // ==========================
+
+        await registrarActividad(
+
+            venta.mozo || "Sistema",
+
+            "Cobro",
+
+            "Cambio empleado Cuenta Corriente",
+
+            `Mesa ${venta.mesa} - ` +
+            `Cuenta Corriente: ${venta.cuentaCorrienteEmpleado || "Sin empleado"} → ${empleadoNuevo} - ` +
+            `Importe: $${resumen.importeFinal.toLocaleString("es-AR")} - ` +
+            `Descuento empleado: $${resumen.descuentoTotal.toLocaleString("es-AR")}`,
+
+            {
+
+                ventaId:
+                    id,
+
+                pedidoId:
+                    venta.pedidoId || "",
+
+                mesa:
+                    venta.mesa,
+
+                empleadoAnteriorId:
+                    venta.cuentaCorrienteEmpleadoId || "",
+
+                empleadoAnterior:
+                    venta.cuentaCorrienteEmpleado || "",
+
+                empleadoNuevoId:
+                    empleadoNuevoId,
+
+                empleadoNuevo:
+                    empleadoNuevo,
+
+                importeOriginal:
+                    resumen.importeOriginal,
+
+                descuentoCuentaCorriente:
+                    resumen.descuentoTotal,
+
+                importeCuentaCorriente:
+                    resumen.importeFinal,
+
+                movimientoCuentaCorriente:
+                    "Anterior anulado / Nuevo creado"
 
             }
 

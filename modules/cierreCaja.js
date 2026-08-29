@@ -691,11 +691,14 @@ if (venta.ultimaEdicion) {
             break;
 
 
-        case "Cuenta Corriente":
+       case "Cuenta Corriente":
 
-            cuenta += Number(venta.totalCobrado) || 0;
+    cuenta +=
+        Number(
+            venta.importeCuentaCorriente
+        ) || Number(venta.totalCobrado) || 0;
 
-            break;
+    break;
 
 
         case "Pendiente":

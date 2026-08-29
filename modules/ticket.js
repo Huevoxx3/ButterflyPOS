@@ -241,6 +241,32 @@ document.getElementById("ticketProductos").innerHTML = `
 
 `;
 
+// ==========================
+// TOTAL DEL TICKET
+// ==========================
+
+// Si la venta es Cuenta Corriente
+// y tiene descuento de empleado,
+// usamos el importe final de CC.
+
+const esCuentaCorriente =
+    venta.medioPago === "Cuenta Corriente";
+
+const tieneDescuentoCC =
+    esCuentaCorriente &&
+    venta.importeCuentaCorriente !== undefined;
+
+const descuentoMostrar =
+    tieneDescuentoCC
+        ? Number(venta.descuentoCuentaCorriente) || 0
+        : descuentoReal;
+
+const totalMostrar =
+    tieneDescuentoCC
+        ? Number(venta.importeCuentaCorriente)
+        : Number(venta.totalCobrado);
+
+
 document.getElementById("ticketTotales").innerHTML = `
 
 <div class="lineaTotal">
@@ -248,27 +274,33 @@ document.getElementById("ticketTotales").innerHTML = `
     <span>Subtotal</span>
 
     <strong>
-        $${venta.subtotal.toLocaleString("es-AR")}
+        $${Number(venta.subtotal).toLocaleString("es-AR")}
     </strong>
 
 </div>
 
+
 <div class="lineaTotal">
 
-    <span>Descuento</span>
+    <span>
+        ${tieneDescuentoCC
+            ? "Descuento empleado"
+            : "Descuento"}
+    </span>
 
-<strong>
-    $${descuentoReal.toLocaleString("es-AR")}
-</strong>
+    <strong>
+        $${descuentoMostrar.toLocaleString("es-AR")}
+    </strong>
 
 </div>
+
 
 <div class="lineaTotal totalFinal">
 
     <span>TOTAL</span>
 
     <strong>
-        $${venta.totalCobrado.toLocaleString("es-AR")}
+        $${totalMostrar.toLocaleString("es-AR")}
     </strong>
 
 </div>
@@ -277,23 +309,89 @@ document.getElementById("ticketTotales").innerHTML = `
 
 let pagosHTML = "";
 
-venta.mediosPago.forEach(pago => {
 
-    pagosHTML += `
+// ==========================
+// MEDIO DE PAGO ACTUAL
+// ==========================
+
+// Si la venta fue modificada después
+// del cobro, usamos el medio actual
+// guardado en venta.medioPago.
+
+if (venta.ultimaEdicion) {
+
+    const importePago =
+        esCuentaCorriente &&
+        venta.importeCuentaCorriente !== undefined
+
+            ? Number(venta.importeCuentaCorriente)
+
+            : Number(venta.totalCobrado);
+
+
+    pagosHTML = `
 
         <div class="filaPagoTicket">
 
-            <span>${pago.medio}</span>
+            <span>${venta.medioPago}</span>
 
             <strong>
-                $${pago.importe.toLocaleString("es-AR")}
+                $${importePago.toLocaleString("es-AR")}
             </strong>
 
         </div>
 
     `;
 
-});
+}
+
+
+// ==========================
+// VENTA ORIGINAL
+// ==========================
+
+else if (
+    venta.mediosPago &&
+    venta.mediosPago.length > 0
+) {
+
+    venta.mediosPago.forEach(pago => {
+
+        pagosHTML += `
+
+            <div class="filaPagoTicket">
+
+                <span>${pago.medio}</span>
+
+                <strong>
+                    $${Number(pago.importe).toLocaleString("es-AR")}
+                </strong>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+else {
+
+    pagosHTML = `
+
+        <div class="filaPagoTicket">
+
+            <span>${venta.medioPago}</span>
+
+            <strong>
+                $${Number(venta.totalCobrado).toLocaleString("es-AR")}
+            </strong>
+
+        </div>
+
+    `;
+
+}
 
 document.getElementById("ticketPago").innerHTML = `
 
