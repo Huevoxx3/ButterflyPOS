@@ -1,6 +1,6 @@
 @page{
     size: A6 portrait;
-    margin: 4mm;
+    margin: 0;
 }
 
 *{
@@ -16,7 +16,9 @@ body{
 
 #ticket{
 
-    width:105mm;
+    width:100%;
+    max-width:105mm;
+
     min-height:148mm;
 
     margin:15px auto;
@@ -127,9 +129,18 @@ body{
 .tablaTicket th,
 .tablaTicket td{
 
-    overflow-wrap:anywhere;
+    overflow-wrap:break-word;
 
-    word-break:break-word;
+}
+
+.tablaTicket th:nth-child(1),
+.tablaTicket td:nth-child(1),
+.tablaTicket th:nth-child(3),
+.tablaTicket td:nth-child(3),
+.tablaTicket th:nth-child(4),
+.tablaTicket td:nth-child(4){
+
+    white-space:nowrap;
 
 }
 

@@ -384,98 +384,63 @@ body{
     </div>
 
 
-    <div class="seccion">
+ <div class="seccion">
 
-        <h2>💰 Resumen de Caja</h2>
+    <h2>💰 Resumen de Caja</h2>
 
-        <div class="fila">
+    <div class="fila destacado">
 
-            <span>Caja inicial</span>
+        <span>💰 Dinero en caja</span>
 
-            <strong>
-                $ ${montoInicial.toLocaleString()}
-            </strong>
-
-        </div>
-
-        <div class="fila">
-
-            <span>Total de ventas</span>
-
-            <strong>
-                $ ${total.toLocaleString()}
-            </strong>
-
-        </div>
-
-        <div class="fila">
-
-            <span>Egresos</span>
-
-            <strong>
-                $ ${totalEgresos.toLocaleString()}
-            </strong>
-
-        </div>
-
-        <div class="fila destacado">
-
-            <span>Efectivo esperado</span>
-
-            <strong>
-                $ ${esperadoEnCaja.toLocaleString()}
-            </strong>
-
-        </div>
+        <strong>
+            $ ${esperadoEnCaja.toLocaleString()}
+        </strong>
 
     </div>
 
+    <div class="fila">
 
-    <div class="seccion">
+        <span>💵 Caja inicial</span>
 
-        <h2>📊 Estadísticas</h2>
-
-        <div class="grid">
-
-            <div class="card">
-
-                <div class="label">
-                    Ventas
-                </div>
-
-                <div class="valor">
-                    ${cantidadVentas}
-                </div>
-
-            </div>
-
-            <div class="card">
-
-                <div class="label">
-                    Productos
-                </div>
-
-                <div class="valor">
-                    ${productosVendidos}
-                </div>
-
-            </div>
-
-            <div class="card">
-
-                <div class="label">
-                    Ticket promedio
-                </div>
-
-                <div class="valor">
-                    $ ${ticketPromedio.toLocaleString()}
-                </div>
-
-            </div>
-
-        </div>
+        <strong>
+            $ ${montoInicial.toLocaleString()}
+        </strong>
 
     </div>
+
+    <div class="fila">
+
+        <span>💸 Egresos</span>
+
+        <strong>
+            $ ${totalEgresos.toLocaleString()}
+        </strong>
+
+    </div>
+
+    <div class="fila">
+
+        <span>🧾 Ventas</span>
+
+        <strong>
+            ${cantidadVentas}
+        </strong>
+
+    </div>
+
+    <div class="fila">
+
+        <span>💰 Total</span>
+
+        <strong>
+            $ ${total.toLocaleString()}
+        </strong>
+
+    </div>
+
+</div>
+
+
 
 
     <div class="seccion">
@@ -690,61 +655,161 @@ egresos.forEach(documento => {
 
         });
 
-if (venta.mediosPago && venta.mediosPago.length > 0) {
+// ==========================
+// MEDIOS DE PAGO
+// ==========================
 
-    venta.mediosPago.forEach(pago => {
+// Si la venta fue modificada después del cobro,
+// usamos el medio de pago actualmente guardado
+// en venta.medioPago.
+//
+// Si NO fue modificada, mantenemos la lógica
+// original usando venta.mediosPago.
 
-        switch (pago.medio) {
-
-            case "Efectivo":
-                efectivo += pago.importe;
-                break;
-
-            case "MercadoPago":
-                mercadoPago += pago.importe;
-                break;
-
-            case "Banco Provincia":
-                bancoProvincia += pago.importe;
-                break;
-
-            case "Cuenta Corriente":
-                cuenta += pago.importe;
-                break;
-
-            case "Pendiente":
-                pendiente += pago.importe;
-                break;
-
-        }
-
-    });
-
-} else {
-
-    // Compatibilidad con ventas anteriores
+if (venta.ultimaEdicion) {
 
     switch (venta.medioPago) {
 
         case "Efectivo":
-            efectivo += venta.totalCobrado;
+
+            efectivo += Number(venta.totalCobrado) || 0;
+
             break;
+
 
         case "MercadoPago":
-            mercadoPago += venta.totalCobrado;
+
+            mercadoPago += Number(venta.totalCobrado) || 0;
+
             break;
+
 
         case "Banco Provincia":
-            bancoProvincia += venta.totalCobrado;
+
+            bancoProvincia += Number(venta.totalCobrado) || 0;
+
             break;
+
 
         case "Cuenta Corriente":
-            cuenta += venta.totalCobrado;
+
+            cuenta += Number(venta.totalCobrado) || 0;
+
             break;
 
+
         case "Pendiente":
-            pendiente += venta.totalCobrado;
+
+            pendiente += Number(venta.totalCobrado) || 0;
+
             break;
+
+    }
+
+} else {
+
+    // ==========================
+    // VENTAS SIN MODIFICACIONES
+    // ==========================
+
+    if (
+        venta.mediosPago &&
+        venta.mediosPago.length > 0
+    ) {
+
+        venta.mediosPago.forEach(pago => {
+
+            switch (pago.medio) {
+
+                case "Efectivo":
+
+                    efectivo +=
+                        Number(pago.importe) || 0;
+
+                    break;
+
+
+                case "MercadoPago":
+
+                    mercadoPago +=
+                        Number(pago.importe) || 0;
+
+                    break;
+
+
+                case "Banco Provincia":
+
+                    bancoProvincia +=
+                        Number(pago.importe) || 0;
+
+                    break;
+
+
+                case "Cuenta Corriente":
+
+                    cuenta +=
+                        Number(pago.importe) || 0;
+
+                    break;
+
+
+                case "Pendiente":
+
+                    pendiente +=
+                        Number(pago.importe) || 0;
+
+                    break;
+
+            }
+
+        });
+
+    } else {
+
+        // Compatibilidad con ventas antiguas
+
+        switch (venta.medioPago) {
+
+            case "Efectivo":
+
+                efectivo +=
+                    Number(venta.totalCobrado) || 0;
+
+                break;
+
+
+            case "MercadoPago":
+
+                mercadoPago +=
+                    Number(venta.totalCobrado) || 0;
+
+                break;
+
+
+            case "Banco Provincia":
+
+                bancoProvincia +=
+                    Number(venta.totalCobrado) || 0;
+
+                break;
+
+
+            case "Cuenta Corriente":
+
+                cuenta +=
+                    Number(venta.totalCobrado) || 0;
+
+                break;
+
+
+            case "Pendiente":
+
+                pendiente +=
+                    Number(venta.totalCobrado) || 0;
+
+                break;
+
+        }
 
     }
 
@@ -788,111 +853,63 @@ Jornada: <strong>${jornada}</strong>
     <div class="cardResumen">
 
         <div class="tituloResumen">
-
-            💰 Total
-
+            💰 Dinero en caja
         </div>
 
         <div class="valorResumen">
-
-            $ ${total.toLocaleString()}
-
+            $ ${esperadoEnCaja.toLocaleString()}
         </div>
 
     </div>
 
-    <div class="cardResumen">
-
-    <div class="tituloResumen">
-
-        💵 Caja Inicial
-
-    </div>
-
-    <div class="valorResumen">
-
-        $ ${montoInicial.toLocaleString()}
-
-    </div>
-
-</div>
-
-<div class="cardResumen">
-
-    <div class="tituloResumen">
-
-        🏦 Efectivo Esperado
-
-    </div>
-
-    <div class="valorResumen">
-
-        $ ${esperadoEnCaja.toLocaleString()}
-
-    </div>
-
-</div>
-
-<div class="cardResumen">
-
-    <div class="tituloResumen">
-
-        💸 Egresos
-
-    </div>
-
-    <div class="valorResumen">
-
-        $ ${totalEgresos.toLocaleString()}
-
-    </div>
-
-</div>
 
     <div class="cardResumen">
 
         <div class="tituloResumen">
+            💵 Caja Inicial
+        </div>
 
+        <div class="valorResumen">
+            $ ${montoInicial.toLocaleString()}
+        </div>
+
+    </div>
+
+
+    <div class="cardResumen">
+
+        <div class="tituloResumen">
+            💸 Egresos
+        </div>
+
+        <div class="valorResumen">
+            $ ${totalEgresos.toLocaleString()}
+        </div>
+
+    </div>
+
+
+    <div class="cardResumen">
+
+        <div class="tituloResumen">
             🧾 Ventas
-
         </div>
 
         <div class="valorResumen">
-
             ${cantidadVentas}
-
         </div>
 
     </div>
 
-    <div class="cardResumen">
-
-        <div class="tituloResumen">
-
-            🍽 Productos
-
-        </div>
-
-        <div class="valorResumen">
-
-            ${productosVendidos}
-
-        </div>
-
-    </div>
 
     <div class="cardResumen">
 
         <div class="tituloResumen">
-
-            📈 Ticket Promedio
-
+            💰 Total
         </div>
 
         <div class="valorResumen">
-
-            $ ${ticketPromedio.toLocaleString()}
-
+            $ ${total.toLocaleString()}
         </div>
 
     </div>
@@ -1200,7 +1217,7 @@ document.querySelector(".resumenCaja").innerHTML = `
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💰 Total
+            💰 Dinero en caja
         </div>
 
         <div class="valorResumen">
@@ -1208,6 +1225,7 @@ document.querySelector(".resumenCaja").innerHTML = `
         </div>
 
     </div>
+
 
     <div class="cardResumen">
 
@@ -1221,17 +1239,6 @@ document.querySelector(".resumenCaja").innerHTML = `
 
     </div>
 
-    <div class="cardResumen">
-
-        <div class="tituloResumen">
-            🏦 Efectivo Esperado
-        </div>
-
-        <div class="valorResumen">
-            $ 0
-        </div>
-
-    </div>
 
     <div class="cardResumen">
 
@@ -1245,6 +1252,7 @@ document.querySelector(".resumenCaja").innerHTML = `
 
     </div>
 
+
     <div class="cardResumen">
 
         <div class="tituloResumen">
@@ -1257,22 +1265,11 @@ document.querySelector(".resumenCaja").innerHTML = `
 
     </div>
 
-    <div class="cardResumen">
-
-        <div class="tituloResumen">
-            🍽 Productos
-        </div>
-
-        <div class="valorResumen">
-            0
-        </div>
-
-    </div>
 
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            📈 Ticket Promedio
+            💰 Total
         </div>
 
         <div class="valorResumen">

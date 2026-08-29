@@ -6,6 +6,8 @@ import {
 
     collection,
 
+    addDoc,
+
     getDocs,
 
     getDoc,
@@ -19,9 +21,124 @@ import {
     orderBy,
 
     updateDoc,
+
 serverTimestamp
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+function calcularDescuentoCuentaCorriente(
+    productos,
+    descuentoComidas,
+    descuentoBebidas
+){
+
+    const categoriasBebidas = [
+
+        "Cerveza Artesanal",
+        "Con Alcohol",
+        "Sin Alcohol"
+
+    ];
+
+    let importeOriginal = 0;
+
+    let totalComidas = 0;
+
+    let totalBebidas = 0;
+
+
+    productos.forEach(producto => {
+
+        const subtotal =
+            producto.precio * producto.cantidad;
+
+
+        // ==========================
+        // TOTAL ORIGINAL
+        // ==========================
+
+        importeOriginal += subtotal;
+
+
+        // ==========================
+        // PROMOCIONES
+        // SIN DESCUENTO
+        // ==========================
+
+        if(producto.categoria === "PROMOCIONES"){
+
+            return;
+
+        }
+
+
+        // ==========================
+        // BEBIDAS
+        // ==========================
+
+        if(
+            categoriasBebidas.includes(
+                producto.categoria
+            )
+        ){
+
+            totalBebidas += subtotal;
+
+        }
+
+        // ==========================
+        // COMIDAS
+        // ==========================
+
+        else{
+
+            totalComidas += subtotal;
+
+        }
+
+    });
+
+
+    const descuentoComidasImporte =
+        Math.round(
+            totalComidas *
+            descuentoComidas /
+            100
+        );
+
+
+    const descuentoBebidasImporte =
+        Math.round(
+            totalBebidas *
+            descuentoBebidas /
+            100
+        );
+
+
+    const descuentoTotal =
+        descuentoComidasImporte +
+        descuentoBebidasImporte;
+
+
+    return {
+
+        importeOriginal,
+
+        descuentoComidas:
+            descuentoComidasImporte,
+
+        descuentoBebidas:
+            descuentoBebidasImporte,
+
+        descuentoTotal,
+
+        importeFinal:
+            importeOriginal -
+            descuentoTotal
+
+    };
+
+}
 
 let modoSoloLectura = false;
 
@@ -360,19 +477,41 @@ Medio de Pago
 
 <select id="medioPagoEditar">
 
-<option value="Efectivo">💵 Efectivo</option>
+    <option value="Efectivo">💵 Efectivo</option>
 
-<option value="MercadoPago">📱 MercadoPago</option>
+    <option value="MercadoPago">📱 MercadoPago</option>
 
-<option value="Banco Provincia">🏦 Banco Provincia</option>
+    <option value="Banco Provincia">🏦 Banco Provincia</option>
 
-<option value="Cuenta Corriente">📒 Cuenta Corriente</option>
+    <option value="Cuenta Corriente">📒 Cuenta Corriente</option>
 
-<option value="Pendiente">⏳ Pendiente</option>
+    <option value="Pendiente">⏳ Pendiente</option>
 
 </select>
 
-<br><br>
+<div
+    id="grupoEmpleadoCuenta"
+    style="display:none; margin-top:15px;">
+
+    <label>
+
+        👤 <strong>Empleado</strong>
+
+    </label>
+
+    <select
+        id="empleadoCuentaEditar"
+        style="width:100%; margin-top:5px;">
+
+        <option value="">
+            Seleccione un empleado
+        </option>
+
+    </select>
+
+</div>
+
+<br>
 
 <h3>
 
@@ -414,6 +553,79 @@ Observaciones
     document.getElementById("medioPagoEditar").value =
     venta.medioPago;
 
+    // ==========================
+// EMPLEADO CUENTA CORRIENTE
+// ==========================
+
+const selectorEmpleado =
+    document.getElementById("empleadoCuentaEditar");
+
+const grupoEmpleado =
+    document.getElementById("grupoEmpleadoCuenta");
+
+
+// Cargar empleados activos
+
+const usuariosSnapshot = await getDocs(
+    collection(db,"usuarios")
+);
+
+usuariosSnapshot.forEach(documento => {
+
+    const usuario = documento.data();
+
+    if(usuario.activo === false) return;
+
+    const option =
+        document.createElement("option");
+
+    option.value = documento.id;
+
+    option.textContent =
+        `${usuario.nombre} ${usuario.apellido}`;
+
+    selectorEmpleado.appendChild(option);
+
+});
+
+
+// Mostrar / ocultar según medio de pago
+
+function actualizarEmpleadoCuenta(){
+
+    if(
+        document.getElementById("medioPagoEditar").value
+        === "Cuenta Corriente"
+    ){
+
+        grupoEmpleado.style.display = "";
+
+    }else{
+
+        grupoEmpleado.style.display = "none";
+
+        selectorEmpleado.value = "";
+
+    }
+
+}
+
+
+// Detectar cambios
+
+document
+    .getElementById("medioPagoEditar")
+    .addEventListener(
+        "change",
+        actualizarEmpleadoCuenta
+    );
+
+
+// Si la venta ya era Cuenta Corriente,
+// mostrar el selector automáticamente.
+
+actualizarEmpleadoCuenta();
+
 document.getElementById("observacionesVenta").value =
     venta.observaciones || "";
 
@@ -425,26 +637,393 @@ document.getElementById("btnVolverVentas").onclick = () => {
 
     document.getElementById("btnGuardarVenta").onclick = async () => {
 
-    await updateDoc(
+    const medioPago =
+        document.getElementById("medioPagoEditar").value;
 
-        doc(db,"ventas",id),
+    const selectorEmpleado =
+        document.getElementById("empleadoCuentaEditar");
+
+
+    // ==========================
+    // VALIDAR CUENTA CORRIENTE
+    // ==========================
+
+    if(medioPago === "Cuenta Corriente"){
+
+        if(!selectorEmpleado.value){
+
+            alert(
+                "⚠️ Debe seleccionar el empleado para la Cuenta Corriente."
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    // ==========================
+    // DATOS A ACTUALIZAR
+    // ==========================
+
+    const datosActualizar = {
+
+        medioPago: medioPago,
+
+        observaciones:
+            document.getElementById("observacionesVenta").value,
+
+        ultimaEdicion:
+            serverTimestamp()
+
+    };
+
+
+    // ==========================
+    // GUARDAR EMPLEADO
+    // ==========================
+
+    if(medioPago === "Cuenta Corriente"){
+
+        datosActualizar.cuentaCorrienteEmpleadoId =
+            selectorEmpleado.value;
+
+        datosActualizar.cuentaCorrienteEmpleado =
+            selectorEmpleado.selectedOptions[0].textContent;
+
+    }
+
+// ==========================
+// GESTIONAR CUENTA CORRIENTE
+// ==========================
+
+
+// ==================================================
+// CASO 1:
+// ANTES NO ERA CUENTA CORRIENTE
+// AHORA PASA A CUENTA CORRIENTE
+// ==================================================
+
+if(
+    venta.medioPago !== "Cuenta Corriente" &&
+    medioPago === "Cuenta Corriente"
+){
+
+    const empleadoId =
+        selectorEmpleado.value;
+
+    const empleado =
+        selectorEmpleado.selectedOptions[0].textContent;
+
+
+    const resumen =
+        calcularDescuentoCuentaCorriente(
+            venta.productos,
+            25,
+            20
+        );
+
+
+    await addDoc(
+
+        collection(db,"cuentasCorrientes"),
 
         {
 
-            medioPago:
-                document.getElementById("medioPagoEditar").value,
+            empleadoId: empleadoId,
 
-            observaciones:
-                document.getElementById("observacionesVenta").value,
+            empleado: empleado,
 
-            ultimaEdicion:
-                serverTimestamp()
+            ventaId: id,
+
+            pedidoId: venta.pedidoId || "",
+
+            mesa: venta.mesa,
+
+            importe: resumen.importeFinal,
+
+            importeOriginal:
+                resumen.importeOriginal,
+
+            descuentoComidas:
+                resumen.descuentoComidas,
+
+            descuentoBebidas:
+                resumen.descuentoBebidas,
+
+            descuentoTotal:
+                resumen.descuentoTotal,
+
+            importeFinal:
+                resumen.importeFinal,
+
+            productos: venta.productos,
+
+            fecha: serverTimestamp(),
+
+            estado: "Pendiente",
+
+            tipo: "Consumo"
 
         }
 
     );
 
-  mostrarMesasCerradas();
+}
+
+
+// ==================================================
+// CASO 2:
+// ANTES ERA CUENTA CORRIENTE
+// AHORA PASA A OTRO MEDIO
+// ==================================================
+
+if(
+    venta.medioPago === "Cuenta Corriente" &&
+    medioPago !== "Cuenta Corriente"
+){
+
+    const movimientosSnapshot = await getDocs(
+
+        query(
+
+            collection(db,"cuentasCorrientes"),
+
+            where("ventaId","==",id)
+
+        )
+
+    );
+
+
+    for(
+        const movimiento of movimientosSnapshot.docs
+    ){
+
+        const datosMovimiento =
+            movimiento.data();
+
+
+        // Solo anulamos movimientos
+        // que todavía estén activos.
+
+        if(
+            datosMovimiento.estado !== "Anulado"
+        ){
+
+            await updateDoc(
+
+                doc(
+                    db,
+                    "cuentasCorrientes",
+                    movimiento.id
+                ),
+
+                {
+
+                    estado: "Anulado",
+
+                    fechaAnulacion:
+                        serverTimestamp()
+
+                }
+
+            );
+
+        }
+
+    }
+
+}
+
+
+// ==================================================
+// CASO 3:
+// SIGUE SIENDO CUENTA CORRIENTE
+// PERO CAMBIA EL EMPLEADO
+// ==================================================
+
+if(
+    venta.medioPago === "Cuenta Corriente" &&
+    medioPago === "Cuenta Corriente"
+){
+
+    const empleadoNuevoId =
+        selectorEmpleado.value;
+
+    const empleadoNuevo =
+        selectorEmpleado.selectedOptions[0].textContent;
+
+
+    const movimientosSnapshot = await getDocs(
+
+        query(
+
+            collection(db,"cuentasCorrientes"),
+
+            where("ventaId","==",id)
+
+        )
+
+    );
+
+
+    let movimientoActivo = null;
+
+
+    movimientosSnapshot.forEach(movimiento => {
+
+        const datos =
+            movimiento.data();
+
+
+        if(
+            datos.estado !== "Anulado"
+        ){
+
+            movimientoActivo = {
+
+                id: movimiento.id,
+
+                ...datos
+
+            };
+
+        }
+
+    });
+
+
+    // ------------------------------------------
+    // MISMO EMPLEADO
+    // ------------------------------------------
+
+    if(
+        movimientoActivo &&
+        movimientoActivo.empleadoId === empleadoNuevoId
+    ){
+
+        // No hacemos nada.
+        // La cuenta ya pertenece a ese empleado.
+
+    }
+
+
+    // ------------------------------------------
+    // EMPLEADO DIFERENTE
+    // ------------------------------------------
+
+    else{
+
+        // Primero anulamos el movimiento anterior.
+
+        if(movimientoActivo){
+
+            await updateDoc(
+
+                doc(
+                    db,
+                    "cuentasCorrientes",
+                    movimientoActivo.id
+                ),
+
+                {
+
+                    estado: "Anulado",
+
+                    fechaAnulacion:
+                        serverTimestamp()
+
+                }
+
+            );
+
+        }
+
+
+        // Calculamos nuevamente el descuento.
+
+        const resumen =
+            calcularDescuentoCuentaCorriente(
+                venta.productos,
+                25,
+                20
+            );
+
+
+        // Creamos el nuevo movimiento
+        // para el nuevo empleado.
+
+        await addDoc(
+
+            collection(db,"cuentasCorrientes"),
+
+            {
+
+                empleadoId:
+                    empleadoNuevoId,
+
+                empleado:
+                    empleadoNuevo,
+
+                ventaId:
+                    id,
+
+                pedidoId:
+                    venta.pedidoId || "",
+
+                mesa:
+                    venta.mesa,
+
+                importe:
+                    resumen.importeFinal,
+
+                importeOriginal:
+                    resumen.importeOriginal,
+
+                descuentoComidas:
+                    resumen.descuentoComidas,
+
+                descuentoBebidas:
+                    resumen.descuentoBebidas,
+
+                descuentoTotal:
+                    resumen.descuentoTotal,
+
+                importeFinal:
+                    resumen.importeFinal,
+
+                productos:
+                    venta.productos,
+
+                fecha:
+                    serverTimestamp(),
+
+                estado:
+                    "Pendiente",
+
+                tipo:
+                    "Consumo"
+
+            }
+
+        );
+
+    }
+
+}
+
+    await updateDoc(
+
+        doc(db,"ventas",id),
+
+        datosActualizar
+
+    );
+
+
+    mostrarMesasCerradas();
 
 };
 

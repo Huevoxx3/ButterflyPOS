@@ -374,61 +374,97 @@ async function cargarCuentas(){
         collection(db,"cuentasCorrientes")
     );
 
-    // ==========================
-    // OBTENER EMPLEADOS ACTIVOS
-    // ==========================
+// ==========================
+// OBTENER EMPLEADOS ACTIVOS
+// ==========================
 
-    const usuariosSnapshot = await getDocs(
-        collection(db,"usuarios")
-    );
+const usuariosSnapshot = await getDocs(
+    collection(db,"usuarios")
+);
 
-    const empleadosActivos = {};
+const empleadosActivosPorId = {};
+const empleadosActivosPorNombre = {};
 
-    usuariosSnapshot.forEach(documento => {
+usuariosSnapshot.forEach(documento => {
 
-        const usuario = documento.data();
+    const usuario = documento.data();
 
-        // Solo empleados activos
-        if(usuario.activo === false) return;
+    if(usuario.activo === false) return;
 
-        const nombreCompleto =
-            `${usuario.nombre} ${usuario.apellido}`;
+    const nombreCompleto =
+        `${usuario.nombre} ${usuario.apellido}`.trim();
 
-        empleadosActivos[nombreCompleto] = true;
+    empleadosActivosPorId[documento.id] =
+        nombreCompleto;
 
-    });
+    empleadosActivosPorNombre[nombreCompleto] = true;
 
-    // ==========================
-    // CALCULAR SALDOS
-    // ==========================
+});
 
-    const empleados = {};
 
-    snapshot.forEach(documento => {
+// ==========================
+// CALCULAR SALDOS
+// ==========================
 
-        const movimiento = documento.data();
+const empleados = {};
 
-        if(!movimiento.empleado) return;
+snapshot.forEach(documento => {
 
-        // Si el empleado ya no existe
-        // o está inactivo, no mostrarlo.
-        if(!empleadosActivos[movimiento.empleado]){
+const movimiento = documento.data();
 
-            return;
+if(movimiento.estado === "Anulado"){
+    return;
+}
 
-        }
+if(!movimiento.empleado && !movimiento.empleadoId){
+    return;
+}
 
-        if(!empleados[movimiento.empleado]){
+    let nombreEmpleado = movimiento.empleado;
 
-            empleados[movimiento.empleado] = 0;
+    if(
+        movimiento.empleadoId &&
+        empleadosActivosPorId[movimiento.empleadoId]
+    ){
 
-        }
+        nombreEmpleado =
+            empleadosActivosPorId[movimiento.empleadoId];
 
-        empleados[movimiento.empleado] +=
+    }
+
+    else if(
+        !nombreEmpleado ||
+        !empleadosActivosPorNombre[nombreEmpleado]
+    ){
+
+        return;
+
+    }
+
+    if(!empleados[nombreEmpleado]){
+
+        empleados[nombreEmpleado] = 0;
+
+    }
+
+    if(
+        movimiento.tipo === "Pago" ||
+        movimiento.tipo === "Adelanto"
+    ){
+
+        empleados[nombreEmpleado] +=
+            movimiento.importe || 0;
+
+    }else{
+
+        empleados[nombreEmpleado] +=
             movimiento.importeFinal ??
-            movimiento.importe;
+            movimiento.importe ??
+            0;
 
-    });
+    }
+
+});
 
     // ==========================
     // MOSTRAR CUENTAS
