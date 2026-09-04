@@ -234,3 +234,121 @@
     </div>
 
 </div>
+
+<!-- ==========================
+     MODAL CONSUMO EMPLEADOS
+     ========================== -->
+
+<div id="modalConsumoEmpleados" class="modal oculto">
+
+    <div class="modal-contenido">
+
+        <div class="cabeceraModal">
+
+            <h2>
+                👥 Consumo de Empleados
+            </h2>
+
+            <button
+                id="cerrarConsumoEmpleados"
+                class="btnCerrarModal">
+                ✕
+            </button>
+
+        </div>
+
+<div class="seccionPedido">
+
+    <h3>Agregar consumo</h3>
+
+    <label>
+        Empleado
+    </label>
+
+    <select id="empleadoConsumo">
+
+        <option value="">
+            Seleccionar empleado...
+        </option>
+
+    </select>
+
+
+    <label style="margin-top:15px;">
+        Producto
+    </label>
+
+    <select id="productoConsumo">
+
+        <option value="">
+            Seleccionar producto...
+        </option>
+
+    </select>
+
+
+    <label style="margin-top:15px;">
+        Cantidad
+    </label>
+
+    <div class="selectorCantidad">
+
+        <button
+            type="button"
+            id="btnMenosConsumo">
+            −
+        </button>
+
+        <span id="cantidadConsumo">
+            1
+        </span>
+
+        <button
+            type="button"
+            id="btnMasConsumo">
+            +
+        </button>
+
+    </div>
+
+</div>
+
+        <div class="seccionPedido">
+
+            <h3>Consumos cargados</h3>
+
+            <div id="listaConsumosEmpleados">
+
+                <p>
+                    Todavía no hay consumos cargados.
+                </p>
+
+            </div>
+
+        </div>
+
+<div class="accionesMesa">
+
+    <button
+        id="btnAgregarConsumoEmpleado"
+        class="btnPrincipal">
+        ➕ Agregar consumo
+    </button>
+
+    <button
+        id="btnGuardarConsumosEmpleados"
+        class="btnPrincipal">
+        💾 Guardar consumos
+    </button>
+
+    <button
+        id="btnCerrarConsumoEmpleados"
+        class="btnGris">
+        ← Volver
+    </button>
+
+</div>
+
+    </div>
+
+</div>

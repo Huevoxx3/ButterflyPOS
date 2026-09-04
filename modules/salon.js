@@ -24,7 +24,8 @@ import {
     setDoc,
     increment,
     deleteDoc,
-    serverTimestamp
+    serverTimestamp,
+    writeBatch
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const MESAS_SALON = [
@@ -66,7 +67,9 @@ const MESAS_SALON = [
     "COMUNITARIA-CENTRO-PUERTA",
     "COMUNITARIA-CENTRO",
     "COMUNITARIA-CENTRO-PUNTA",
-    "COMUNITARIA-PUNTA"
+    "COMUNITARIA-PUNTA",
+
+    "EMPLEADOS"
 
 ];
 
@@ -77,6 +80,8 @@ let pedidoOriginal = [];
 let itemsEliminados = [];
 
 let carritoCarta = [];
+
+let consumosEmpleados = [];
 
 let totalTemporal = 0;
 
@@ -225,21 +230,32 @@ async function dibujarMesas() {
     // ELEMENTOS FIJOS DEL PLANO
     // ==========================
 
-    plano.innerHTML += `
+plano.innerHTML += `
 
-        <div class="zonaAfuera">
-            AFUERA
+    <div class="zonaAfuera">
+        AFUERA
+    </div>
+
+    <div class="puertaSalon">
+        PUERTA
+    </div>
+
+    <div class="barraSalon">
+        BARRA
+    </div>
+
+    <div
+        class="mesaCard mesaEmpleados"
+        data-mesa="EMPLEADOS"
+    >
+        <div class="mesaNumero">
+            👥 EMPLEADOS
         </div>
 
-        <div class="puertaSalon">
-            PUERTA
-        </div>
+        <div class="mesaEstado libre"></div>
+    </div>
 
-        <div class="barraSalon">
-            BARRA
-        </div>
-
-    `;
+`;
 
 
     snapshot.forEach(documento => {
@@ -349,27 +365,42 @@ async function dibujarMesas() {
         .querySelectorAll(".mesaCard")
         .forEach(mesa => {
 
-            mesa.addEventListener("click", () => {
+mesa.addEventListener("click", () => {
 
-                if(modoSoloLectura){
+    if(modoSoloLectura){
+        alert(
+            "Modo solo lectura."
+        );
 
-                    alert(
-                        "Modo solo lectura."
-                    );
+        return;
+    }
 
-                    return;
+    // ==========================
+    // CONSUMO EMPLEADOS
+    // ==========================
 
-                }
+    if(mesa.dataset.mesa === "EMPLEADOS"){
 
-                abrirMesa(
-                    mesa.dataset.mesa
-                );
+        abrirMesaEmpleados();
 
-            });
+        return;
+    }
+
+    // ==========================
+    // MESA NORMAL
+    // ==========================
+
+    abrirMesa(
+        mesa.dataset.mesa
+    );
+
+});
 
         });
 
 }
+
+
 
 function obtenerClase(estado){
 
@@ -389,6 +420,783 @@ function obtenerClase(estado){
 
         default:
             return "libre";
+
+    }
+
+}
+
+// ==========================
+// CONSUMO DE EMPLEADOS
+// ==========================
+
+// ==========================
+// CONSUMO DE EMPLEADOS
+// ==========================
+
+async function guardarConsumosEmpleados(){
+
+    if(consumosEmpleados.length === 0){
+
+        alert(
+            "No hay consumos cargados para guardar."
+        );
+
+        return;
+    }
+
+    try{
+
+        const usuario =
+            JSON.parse(
+                sessionStorage.getItem("usuario")
+            );
+
+        if(!usuario){
+
+            alert(
+                "No se pudo identificar al usuario que carga los consumos."
+            );
+
+            return;
+        }
+
+        // ==========================
+        // OBTENER JORNADA ACTUAL
+        // ==========================
+
+        const documentoCaja =
+            await getDoc(
+                doc(db, "caja", "actual")
+            );
+
+        const caja =
+            documentoCaja.exists()
+                ? documentoCaja.data()
+                : {};
+
+        const jornada =
+            caja.turno || "";
+
+        if(!jornada){
+
+            alert(
+                "No se pudo determinar la jornada actual."
+            );
+
+            return;
+        }
+
+        // ==========================
+        // GUARDAR CONSUMOS
+        // ==========================
+
+        const batch = writeBatch(db);
+
+        consumosEmpleados.forEach(consumo => {
+
+            const referencia =
+                doc(
+                    collection(
+                        db,
+                        "consumoEmpleados"
+                    )
+                );
+
+            batch.set(
+                referencia,
+                {
+                    empleadoId:
+                        consumo.empleadoId,
+
+                    empleadoNombre:
+                        consumo.empleadoNombre,
+
+                    productoId:
+                        consumo.productoId,
+
+                    productoNombre:
+                        consumo.productoNombre,
+
+                    cantidad:
+                        Number(consumo.cantidad),
+
+                    usuarioCarga:
+                        usuario.nombre || "",
+
+                    jornada:
+                        jornada,
+
+                    fecha:
+                        serverTimestamp()
+                }
+            );
+
+        });
+
+        await batch.commit();
+
+        console.log(
+            "✅ Consumos de empleados guardados:",
+            consumosEmpleados
+        );
+
+alert(
+    "✅ Consumos de empleados guardados correctamente."
+);
+
+// ==========================
+// LIMPIAR MEMORIA TEMPORAL
+// ==========================
+
+consumosEmpleados = [];
+
+// ==========================
+// RECARGAR LISTA DE JORNADA
+// ==========================
+
+try{
+
+    await cargarConsumosEmpleadosJornada();
+
+}catch(error){
+
+    console.error(
+        "⚠️ Los consumos se guardaron, pero no se pudo recargar la lista:",
+        error
+    );
+
+}
+
+    }catch(error){
+
+        console.error(
+            "❌ Error guardando consumos de empleados:",
+            error
+        );
+
+        alert(
+            "❌ No se pudieron guardar los consumos.\n\n" +
+            "Los consumos permanecen cargados para intentar nuevamente."
+        );
+
+    }
+
+}
+
+async function cargarConsumosEmpleadosJornada(){
+
+    const lista =
+        document.getElementById(
+            "listaConsumosEmpleados"
+        );
+
+    if(!lista){
+        return;
+    }
+
+    try{
+
+        // ==========================
+        // OBTENER JORNADA ACTUAL
+        // ==========================
+
+        const documentoCaja =
+            await getDoc(
+                doc(db, "caja", "actual")
+            );
+
+        if(!documentoCaja.exists()){
+            return;
+        }
+
+        const caja =
+            documentoCaja.data();
+
+        const jornada =
+            caja.turno || "";
+
+        if(!jornada){
+            return;
+        }
+
+        // ==========================
+        // BUSCAR CONSUMOS
+        // ==========================
+
+        const consulta =
+            query(
+                collection(
+                    db,
+                    "consumoEmpleados"
+                ),
+                where(
+                    "jornada",
+                    "==",
+                    jornada
+                )
+            );
+
+        const snapshot =
+            await getDocs(consulta);
+
+        // ==========================
+        // LIMPIAR LISTA
+        // ==========================
+
+        lista.innerHTML = "";
+
+        if(snapshot.empty){
+
+            lista.innerHTML = `
+                <p>
+                    Todavía no hay consumos cargados.
+                </p>
+            `;
+
+            return;
+        }
+
+        // ==========================
+        // MOSTRAR CONSUMOS
+        // ==========================
+
+        snapshot.forEach(documento => {
+
+            const consumo =
+                documento.data();
+
+            const fila =
+                document.createElement("div");
+
+            fila.className =
+                "cardUsuario";
+
+            fila.innerHTML = `
+                <div>
+                    <strong>
+                        ${consumo.empleadoNombre || ""}
+                    </strong>
+                    <br>
+                    ${consumo.productoNombre || ""}
+                </div>
+
+                <div>
+                    <strong>
+                        x${consumo.cantidad || 0}
+                    </strong>
+                </div>
+            `;
+
+            lista.appendChild(fila);
+
+        });
+
+        console.log(
+            "👥 Consumos de jornada cargados:",
+            snapshot.size,
+            jornada
+        );
+
+    }catch(error){
+
+        console.error(
+            "❌ Error cargando consumos de empleados:",
+            error
+        );
+
+        lista.innerHTML = `
+            <p>
+                No se pudieron cargar los consumos.
+            </p>
+        `;
+    }
+
+}
+
+async function abrirMesaEmpleados(){
+
+    const modal =
+        document.getElementById(
+            "modalConsumoEmpleados"
+        );
+
+    if(!modal){
+
+        console.error(
+            "❌ No se encontró modalConsumoEmpleados"
+        );
+
+        return;
+
+    }
+
+    modal.classList.remove("oculto");
+
+// ==========================
+// CARGAR CONSUMOS DE LA JORNADA
+// ==========================
+
+await cargarConsumosEmpleadosJornada();
+
+
+    // ==========================
+    // CARGAR EMPLEADOS
+    // ==========================
+
+    const selector =
+        document.getElementById(
+            "empleadoConsumo"
+        );
+
+    if(!selector){
+
+        console.error(
+            "❌ No se encontró empleadoConsumo"
+        );
+
+        return;
+
+    }
+
+
+    selector.innerHTML = `
+        <option value="">
+            Seleccionar empleado...
+        </option>
+    `;
+
+
+    // ==========================
+    // CARGAR PRODUCTOS
+    // ==========================
+
+    const selectorProducto =
+        document.getElementById(
+            "productoConsumo"
+        );
+
+    if(!selectorProducto){
+
+        console.error(
+            "❌ No se encontró productoConsumo"
+        );
+
+        return;
+
+    }
+
+
+    selectorProducto.innerHTML = `
+        <option value="">
+            Seleccionar producto...
+        </option>
+    `;
+
+
+    try{
+
+        const productos =
+            await obtenerCarta();
+
+
+        productos
+            .filter(producto => producto.disponible)
+            .forEach(producto => {
+
+                const opcion =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                opcion.value =
+                    producto.id;
+
+
+                opcion.textContent =
+                    `${producto.nombre} - $${Number(producto.precio).toLocaleString()}`;
+
+
+                selectorProducto.appendChild(
+                    opcion
+                );
+
+            });
+
+
+        console.log(
+            "🍔 Productos cargados:",
+            selectorProducto.options.length - 1
+        );
+
+    }catch(error){
+
+        console.error(
+            "❌ Error cargando productos:",
+            error
+        );
+
+        alert(
+            "No se pudieron cargar los productos."
+        );
+
+    }
+
+
+    // ==========================
+    // CANTIDAD
+    // ==========================
+
+    let cantidadConsumo = 1;
+
+    const cantidad =
+        document.getElementById(
+            "cantidadConsumo"
+        );
+
+    const btnMenos =
+        document.getElementById(
+            "btnMenosConsumo"
+        );
+
+    const btnMas =
+        document.getElementById(
+            "btnMasConsumo"
+        );
+
+
+    if(cantidad){
+
+        cantidad.textContent =
+            cantidadConsumo;
+
+    }
+
+
+    if(btnMenos){
+
+        btnMenos.onclick = () => {
+
+            if(cantidadConsumo > 1){
+
+                cantidadConsumo--;
+
+                cantidad.textContent =
+                    cantidadConsumo;
+
+            }
+
+        };
+
+    }
+
+
+    if(btnMas){
+
+        btnMas.onclick = () => {
+
+            cantidadConsumo++;
+
+            cantidad.textContent =
+                cantidadConsumo;
+
+        };
+
+    }
+
+    try{
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "usuarios"
+                )
+            );
+
+
+        snapshot.forEach(documento => {
+
+            const empleado =
+                documento.data();
+
+
+            if(
+                empleado.activo === false
+            ){
+
+                return;
+
+            }
+
+
+            const nombre =
+                `${empleado.nombre || ""} ${empleado.apellido || ""}`
+                .trim();
+
+
+            if(!nombre){
+
+                return;
+
+            }
+
+
+            const opcion =
+                document.createElement(
+                    "option"
+                );
+
+
+            opcion.value =
+                documento.id;
+
+            opcion.textContent =
+                nombre;
+
+
+            selector.appendChild(
+                opcion
+            );
+
+        });
+
+
+        console.log(
+            "👥 Empleados cargados:",
+            selector.options.length - 1
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "❌ Error cargando empleados:",
+            error
+        );
+
+        alert(
+            "No se pudieron cargar los empleados."
+        );
+
+    }
+
+
+    // ==========================
+    // BOTÓN CERRAR ✕
+    // ==========================
+
+    const cerrarX =
+        document.getElementById(
+            "cerrarConsumoEmpleados"
+        );
+
+    if(cerrarX){
+
+        cerrarX.onclick = () => {
+
+            modal.classList.add("oculto");
+
+        };
+
+    }
+
+        // ==========================
+    // AGREGAR CONSUMO A LA LISTA
+    // ==========================
+
+const btnAgregar =
+    document.getElementById(
+        "btnAgregarConsumoEmpleado"
+    );
+
+const listaConsumos =
+    document.getElementById(
+        "listaConsumosEmpleados"
+    );
+
+if(btnAgregar){
+
+    btnAgregar.onclick = () => {
+
+        const empleadoId = selector.value;
+        const empleadoNombre =
+            selector.options[
+                selector.selectedIndex
+            ]?.textContent;
+
+        const productoId = selectorProducto.value;
+
+        const productoTexto =
+            selectorProducto.options[
+                selectorProducto.selectedIndex
+            ]?.textContent || "";
+
+        const productoNombre =
+            productoTexto.replace(
+                /\s-\s\$[\d.,]+$/,
+                ""
+            );
+
+        if(!empleadoId){
+            alert("Seleccione un empleado.");
+            return;
+        }
+
+        if(!productoId){
+            alert("Seleccione un producto.");
+            return;
+        }
+
+        const cantidad =
+            Number(
+                document.getElementById(
+                    "cantidadConsumo"
+                ).textContent
+            );
+
+        if(!cantidad || cantidad < 1){
+            alert("La cantidad debe ser mayor a 0.");
+            return;
+        }
+
+        // Guardamos el consumo en el array
+        const consumo = {
+            empleadoId,
+            empleadoNombre,
+            productoId,
+            productoNombre,
+            cantidad
+        };
+
+        consumosEmpleados.push(consumo);
+
+        // Mostramos el consumo en pantalla
+        const fila = document.createElement("div");
+        fila.className = "cardUsuario";
+
+        fila.innerHTML = `
+            <div>
+                <strong>${empleadoNombre}</strong>
+                <br>
+                ${productoNombre}
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px;">
+                <strong>x${cantidad}</strong>
+
+                <button
+                    type="button"
+                    class="btnEliminarConsumo"
+                    style="cursor:pointer;">
+                    🗑
+                </button>
+            </div>
+        `;
+
+        if(
+            listaConsumos.textContent.includes(
+                "Todavía no hay consumos cargados"
+            )
+        ){
+            listaConsumos.innerHTML = "";
+        }
+
+        listaConsumos.appendChild(fila);
+
+        // Eliminar también del array
+        const btnEliminar =
+            fila.querySelector(
+                ".btnEliminarConsumo"
+            );
+
+        btnEliminar.onclick = () => {
+
+            const indice =
+                consumosEmpleados.indexOf(consumo);
+
+            if(indice !== -1){
+                consumosEmpleados.splice(indice, 1);
+            }
+
+            fila.remove();
+
+            if(listaConsumos.children.length === 0){
+                listaConsumos.innerHTML = `
+                    <p>
+                        Todavía no hay consumos cargados.
+                    </p>
+                `;
+            }
+        };
+
+        // Limpiar formulario para cargar otro consumo
+        selector.value = "";
+        selectorProducto.value = "";
+
+        document.getElementById(
+            "cantidadConsumo"
+        ).textContent = "1";
+    };
+}
+
+// ==========================
+// GUARDAR CONSUMOS
+// ==========================
+
+const btnGuardar =
+    document.getElementById(
+        "btnGuardarConsumosEmpleados"
+    );
+
+if(btnGuardar){
+
+    btnGuardar.onclick = async () => {
+
+        if(btnGuardar.disabled){
+            return;
+        }
+
+        btnGuardar.disabled = true;
+
+        const textoOriginal =
+            btnGuardar.textContent;
+
+        btnGuardar.textContent =
+            "⏳ Guardando...";
+
+        try{
+
+            await guardarConsumosEmpleados();
+
+        }finally{
+
+            btnGuardar.disabled = false;
+
+            btnGuardar.textContent =
+                textoOriginal;
+        }
+
+    };
+
+}
+
+    // ==========================
+    // BOTÓN VOLVER
+    // ==========================
+
+    const volver =
+        document.getElementById(
+            "btnCerrarConsumoEmpleados"
+        );
+
+    if(volver){
+
+        volver.onclick = () => {
+
+            modal.classList.add("oculto");
+
+        };
 
     }
 
