@@ -1487,7 +1487,32 @@ document
 
 document.getElementById("btnAceptarPedido").onclick = async () => {
 
-    await aceptarPedidoCarta(mesa);
+    const boton = document.getElementById("btnAceptarPedido");
+
+    if (boton.disabled) return;
+
+    boton.disabled = true;
+    boton.textContent = "⏳ Guardando pedido...";
+
+    try {
+
+        await aceptarPedidoCarta(mesa);
+
+    } catch (error) {
+
+        console.error("Error al guardar el pedido:", error);
+
+        alert(
+            "❌ No se pudo guardar el pedido.\n\n" +
+            "Por favor, intente nuevamente."
+        );
+
+    } finally {
+
+        boton.disabled = false;
+        boton.textContent = "Agregar pedido";
+
+    }
 
 };
 

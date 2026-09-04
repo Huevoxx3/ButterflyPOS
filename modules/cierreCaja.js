@@ -394,7 +394,7 @@ body{
 
     <div class="fila destacado">
 
-        <span>💰 Dinero en caja</span>
+        <span>💰 Efectivo en caja</span>
 
         <strong>
             $ ${esperadoEnCaja.toLocaleString()}
@@ -404,7 +404,7 @@ body{
 
     <div class="fila">
 
-        <span>💵 Caja inicial</span>
+        <span>💵 Saldo inicial</span>
 
         <strong>
             $ ${montoInicial.toLocaleString()}
@@ -414,7 +414,7 @@ body{
 
     <div class="fila">
 
-        <span>💸 Egresos</span>
+        <span>💸 Gastos</span>
 
         <strong>
             $ ${totalEgresos.toLocaleString()}
@@ -434,7 +434,7 @@ body{
 
     <div class="fila">
 
-        <span>💰 Total</span>
+        <span>💰 Total de ventas</span>
 
         <strong>
             $ ${total.toLocaleString()}
@@ -860,7 +860,7 @@ Jornada: <strong>${jornada}</strong>
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💰 Dinero en caja
+            💰 Efectivo en caja
         </div>
 
         <div class="valorResumen">
@@ -873,7 +873,7 @@ Jornada: <strong>${jornada}</strong>
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💵 Caja Inicial
+            💵 Saldo Inicial
         </div>
 
         <div class="valorResumen">
@@ -886,7 +886,7 @@ Jornada: <strong>${jornada}</strong>
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💸 Egresos
+            💸 Gastos
         </div>
 
         <div class="valorResumen">
@@ -912,7 +912,7 @@ Jornada: <strong>${jornada}</strong>
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💰 Total
+            💰 Total de ventas
         </div>
 
         <div class="valorResumen">
@@ -1457,7 +1457,7 @@ document.querySelector(".resumenCaja").innerHTML = `
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💰 Dinero en caja
+            💰 Efectivo en caja
         </div>
 
         <div class="valorResumen">
@@ -1470,7 +1470,7 @@ document.querySelector(".resumenCaja").innerHTML = `
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💵 Caja Inicial
+            💵 Saldo Inicial
         </div>
 
         <div class="valorResumen">
@@ -1483,7 +1483,7 @@ document.querySelector(".resumenCaja").innerHTML = `
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💸 Egresos
+            💸 Gastos
         </div>
 
         <div class="valorResumen">
@@ -1509,7 +1509,7 @@ document.querySelector(".resumenCaja").innerHTML = `
     <div class="cardResumen">
 
         <div class="tituloResumen">
-            💰 Total
+            💰 Total de ventas
         </div>
 
         <div class="valorResumen">
