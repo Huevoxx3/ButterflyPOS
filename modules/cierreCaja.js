@@ -2,6 +2,10 @@ import { generarExcelCierre } from "../js/services/excelService.js";
 
 import { db } from "../js/firebase.js";
 
+import { registrarActividad } from "../js/services/actividadService.js";
+
+import { abrirCaja } from "../js/services/cajaService.js";
+
 import {
 
     collection,
@@ -999,6 +1003,79 @@ if(!confirmar) return;
 
 
 // ==========================
+// RETIRO DE EFECTIVO
+// ==========================
+
+let efectivoRetirado = prompt(
+
+    `💵 Dinero esperado en caja: $${esperadoEnCaja.toLocaleString("es-AR")}\n\n` +
+    `¿Cuánto efectivo desea retirar?\n\n` +
+    `Ingrese 0 si no desea retirar dinero.`
+
+);
+
+if(efectivoRetirado === null){
+
+    return;
+
+}
+
+efectivoRetirado = Number(
+
+    efectivoRetirado
+        .replace(/\./g, "")
+        .replace(",", ".")
+
+);
+
+if(
+
+    isNaN(efectivoRetirado) ||
+    efectivoRetirado < 0 ||
+    efectivoRetirado > esperadoEnCaja
+
+){
+
+    alert(
+
+        "⚠️ El importe ingresado no es válido.\n\n" +
+        "El retiro no puede ser negativo ni superar el dinero esperado en caja."
+
+    );
+
+    return;
+
+}
+
+
+const efectivoRestante =
+
+    esperadoEnCaja -
+    efectivoRetirado;
+
+
+const confirmarRetiro = confirm(
+
+    `💰 RESUMEN DE EFECTIVO\n\n` +
+
+    `Dinero esperado: $${esperadoEnCaja.toLocaleString("es-AR")}\n` +
+
+    `Retiro: $${efectivoRetirado.toLocaleString("es-AR")}\n` +
+
+    `Queda en caja: $${efectivoRestante.toLocaleString("es-AR")}\n\n` +
+
+    `¿Confirmar el retiro y continuar con el cierre?`
+
+);
+
+if(!confirmarRetiro){
+
+    return;
+
+}
+
+
+// ==========================
 // PREGUNTAR SI QUIERE IMPRIMIR
 // ==========================
 
@@ -1042,7 +1119,9 @@ if(imprimir){
 
 }
 
-    // ==========================
+let transferirANoche = false;
+let mesasTransferidas = [];
+// ==========================
 // VERIFICAR MESAS ABIERTAS
 // ==========================
 
@@ -1058,27 +1137,78 @@ const mesasAbiertas = await getDocs(
 
 );
 
+
 if(!mesasAbiertas.empty){
 
+    const turnoActual =
+        caja.data().turno;
+
+
     let mensaje =
+        "⚠️ Actualmente hay mesas abiertas:\n\n";
 
-        "⚠️ No es posible cerrar la caja.\n\n";
-
-    mensaje +=
-
-        "Existen mesas abiertas:\n\n";
 
     mesasAbiertas.forEach(doc=>{
 
         mensaje +=
-
             `• Mesa ${doc.data().numero}\n`;
 
     });
 
-    alert(mensaje);
 
-    return;
+    // ==========================
+    // MEDIODÍA
+    // ==========================
+
+    if(turnoActual === "MEDIODIA"){
+
+        mensaje +=
+            "\n¿Desea cerrar la caja y transferir estas mesas al turno NOCHE?";
+
+
+        const transferir =
+            confirm(mensaje);
+
+
+        if(!transferir){
+
+            return;
+
+        }
+
+        // Guardamos la intención de transferencia
+        // para utilizarla en el siguiente paso.
+
+transferirANoche = true;
+
+mesasTransferidas = mesasAbiertas.docs.map(doc => ({
+    numero: doc.data().numero,
+    pedidoId: doc.data().pedidoId
+}));
+
+
+    }
+
+    // ==========================
+    // NOCHE
+    // ==========================
+
+    else{
+
+        alert(
+
+            mensaje +
+
+            "\n\n❌ La jornada NOCHE no puede cerrarse " +
+            "mientras existan mesas abiertas.\n\n" +
+
+            "Todas las mesas deben ser cobradas antes del cierre."
+
+        );
+
+        return;
+
+    }
 
 }
 
@@ -1137,6 +1267,15 @@ if(!cierreExistente.empty){
 
             efectivo,
 
+            efectivoEsperado:
+                esperadoEnCaja,
+
+            efectivoRetirado:
+                efectivoRetirado,
+
+            efectivoRestante:
+                efectivoRestante,
+
             totalEgresos,
 
             egresos: detalleEgresos,
@@ -1161,6 +1300,57 @@ if(!cierreExistente.empty){
 
     );
 
+// ==========================
+// REGISTRAR CIERRE EN ACTIVIDAD
+// ==========================
+
+await registrarActividad(
+
+    caja.data().usuario || "Sistema",
+
+    "Caja",
+
+    "Cierre de caja",
+
+    `Jornada ${jornada} - ` +
+    `Efectivo esperado: $${esperadoEnCaja.toLocaleString("es-AR")} - ` +
+    `Retiro: $${efectivoRetirado.toLocaleString("es-AR")} - ` +
+    `Efectivo restante: $${efectivoRestante.toLocaleString("es-AR")}`,
+
+    {
+
+        jornada:
+
+            jornada,
+
+        montoInicial:
+
+            montoInicial,
+
+        efectivoEsperado:
+
+            esperadoEnCaja,
+
+        efectivoRetirado:
+
+            efectivoRetirado,
+
+        efectivoRestante:
+
+            efectivoRestante,
+
+        totalVentas:
+
+            total,
+
+        totalEgresos:
+
+            totalEgresos
+
+    }
+
+);
+    
     // ==========================
 // LIMPIAR EGRESOS DE LA JORNADA
 // ==========================
@@ -1186,6 +1376,53 @@ await updateDoc(
     }
 
 );
+
+// ==========================
+// ABRIR TURNO NOCHE
+// SI SE TRANSFIRIERON MESAS
+// ==========================
+
+if (transferirANoche) {
+
+    console.log("🌙 Iniciando transferencia MEDIODÍA → NOCHE");
+    console.log("💰 Efectivo restante:", efectivoRestante);
+    console.log("🪑 Mesas transferidas:", mesasTransferidas);
+
+    const aperturaNoche = await abrirCaja({
+        usuario: caja.data().usuario,
+        turno: "NOCHE",
+        montoInicial: efectivoRestante
+    });
+
+    console.log("🌙 Resultado apertura NOCHE:", aperturaNoche);
+
+    if (!aperturaNoche) {
+
+        alert(
+            "⚠️ La jornada MEDIODÍA fue cerrada, " +
+            "pero no se pudo abrir automáticamente la jornada NOCHE."
+        );
+
+        return;
+    }
+
+    console.log("✅ Jornada NOCHE abierta automáticamente.");
+
+    alert(
+        "✅ Jornada MEDIODÍA cerrada correctamente.\n\n" +
+        "🌙 Jornada NOCHE abierta automáticamente.\n\n" +
+        "💰 Efectivo inicial NOCHE: $" +
+        efectivoRestante.toLocaleString("es-AR") +
+        "\n\n" +
+        "🪑 Las mesas abiertas continúan en el nuevo turno."
+    );
+
+    // Recargamos la pantalla para que Cierre de Caja
+    // vuelva a leer la jornada NOCHE desde Firebase.
+    window.location.reload();
+
+    return;
+}
 
 
 // ==========================
