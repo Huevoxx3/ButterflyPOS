@@ -25,6 +25,8 @@ const opciones = {
 
     "Stock",
 
+    "Mensajería",
+
     "Actividad",
 
     "Historial",
@@ -37,6 +39,7 @@ const opciones = {
     salon: [
         "Inicio",
         "Salón",
+        "Mensajería",
         "Mesas Cerradas",
         "Egresos",
         "Cierre de Caja",
@@ -46,6 +49,7 @@ const opciones = {
 
     cocina: [
         "Inicio",
+        "Mensajería",
         "Pendientes",
         "Entregados",
         "Configuración"
@@ -106,6 +110,16 @@ if (opcion === "Carta") {
 if (opcion === "Stock") {
 
     const modulo = await import("../modules/stock.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if (opcion === "Mensajería") {
+
+    const modulo = await import("../modules/mensajeria.js");
 
     modulo.default();
 
