@@ -375,57 +375,61 @@ Jornada: <strong>${jornadaTexto}</strong>
 
 <div class="fila">
 
-<span>Caja inicial</span>
+    <span>💵 Saldo inicial</span>
 
-<strong>
-
-$ ${Number(cierre.montoInicial || 0).toLocaleString()}
-
-</strong>
+    <strong>
+        $ ${Number(cierre.montoInicial || 0).toLocaleString()}
+    </strong>
 
 </div>
 
 <div class="fila">
 
-<span>Total de ventas</span>
+    <span>💰 Total de ventas</span>
 
-<strong>
-
-$ ${Number(cierre.total || 0).toLocaleString()}
-
-</strong>
+    <strong>
+        $ ${Number(cierre.total || 0).toLocaleString()}
+    </strong>
 
 </div>
 
 <div class="fila">
 
-<span>Egresos</span>
+    <span>💸 Gastos</span>
 
-<strong>
-
-$ ${Number(cierre.totalEgresos || 0).toLocaleString()}
-
-</strong>
+    <strong>
+        $ ${Number(cierre.totalEgresos || 0).toLocaleString()}
+    </strong>
 
 </div>
 
 <div class="fila destacado">
 
-<span>Efectivo esperado</span>
+    <span>💰 Efectivo esperado</span>
 
-<strong>
+    <strong>
+        $ ${Number(cierre.efectivoEsperado || 0).toLocaleString()}
+    </strong>
 
-$ ${(
+</div>
 
-    Number(cierre.montoInicial || 0)
+<div class="fila">
 
-    + Number(cierre.efectivo || 0)
+    <span>💶 Efectivo retirado</span>
 
-    - Number(cierre.totalEgresos || 0)
+    <strong>
+        $ ${Number(cierre.efectivoRetirado || 0).toLocaleString()}
+    </strong>
 
-).toLocaleString()}
+</div>
 
-</strong>
+<div class="fila">
+
+    <span>🏦 Efectivo restante en caja</span>
+
+    <strong>
+        $ ${Number(cierre.efectivoRestante || 0).toLocaleString()}
+    </strong>
 
 </div>
 
@@ -813,52 +817,114 @@ cierreAbierto = boton.dataset.id;
 document.getElementById("panelDetalleHistorial").innerHTML = `
 
 <h2>
+    📅 Jornada ${(() => {
 
-📅 Jornada ${(() => {
+        const partes = cierre.jornada.split("-");
 
-    const partes = cierre.jornada.split("-");
+        const fecha = `${partes[2].split("_")[0]}/${partes[1]}/${partes[0]}`;
 
-    const fecha = `${partes[2].split("_")[0]}/${partes[1]}/${partes[0]}`;
+        const turno = partes[2].split("_")[1];
 
-    const turno = partes[2].split("_")[1];
+        return `${fecha}_${turno === "MEDIODIA" ? "MEDIODÍA" : turno}`;
 
-    return `${fecha}_${turno === "MEDIODIA" ? "MEDIODÍA" : turno}`;
-
-})()}
-
+    })()}
 </h2>
+
+<hr>
+
+<h3>
+    💰 Resumen de Caja
+</h3>
+
+<div class="filaDetalle">
+
+    <span>💵 Saldo inicial</span>
+
+    <strong>
+        $ ${Number(cierre.montoInicial || 0).toLocaleString()}
+    </strong>
+
+</div>
+
+<div class="filaDetalle">
+
+    <span>💰 Total de ventas</span>
+
+    <strong>
+        $ ${Number(cierre.total || 0).toLocaleString()}
+    </strong>
+
+</div>
+
+<div class="filaDetalle">
+
+    <span>💸 Gastos</span>
+
+    <strong>
+        $ ${Number(cierre.totalEgresos || 0).toLocaleString()}
+    </strong>
+
+</div>
+
+<div class="filaDetalle">
+
+    <span>💰 Efectivo esperado</span>
+
+    <strong>
+        $ ${Number(cierre.efectivoEsperado || 0).toLocaleString()}
+    </strong>
+
+</div>
+
+<div class="filaDetalle">
+
+    <span>💶 Efectivo retirado</span>
+
+    <strong>
+        $ ${Number(cierre.efectivoRetirado || 0).toLocaleString()}
+    </strong>
+
+</div>
+
+<div class="filaDetalle">
+
+    <span>🏦 Efectivo restante en caja</span>
+
+    <strong>
+        $ ${Number(cierre.efectivoRestante || 0).toLocaleString()}
+    </strong>
+
+</div>
 
 <hr>
 
 <div class="filaDetalle">
 
-<span>💰 Total</span>
+    <span>🧾 Ventas</span>
 
-<strong>$ ${Number(cierre.total).toLocaleString()}</strong>
-
-</div>
-
-<div class="filaDetalle">
-
-<span>🧾 Ventas</span>
-
-<strong>${cierre.cantidadVentas}</strong>
+    <strong>
+        ${Number(cierre.cantidadVentas || 0)}
+    </strong>
 
 </div>
 
 <div class="filaDetalle">
 
-<span>🍽 Productos</span>
+    <span>🍽 Productos</span>
 
-<strong>${cierre.productosVendidos}</strong>
+    <strong>
+        ${Number(cierre.productosVendidos || 0)}
+    </strong>
 
 </div>
 
 <div class="filaDetalle">
 
-<span>📈 Ticket Promedio</span>
+    <span>📈 Ticket Promedio</span>
 
-<strong>$ ${Number(cierre.ticketPromedio).toLocaleString()}</strong>
+    <strong>
+        $ ${Number(cierre.ticketPromedio || 0).toLocaleString()}
+    </strong>
 
 </div>
 

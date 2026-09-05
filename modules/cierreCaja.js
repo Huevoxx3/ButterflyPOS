@@ -36,6 +36,8 @@ function imprimirResumenCaja({
     montoInicial,
     total,
     esperadoEnCaja,
+    efectivoRetirado,
+    efectivoRestante,
     totalEgresos,
     efectivo,
     mercadoPago,
@@ -394,33 +396,53 @@ body{
 
     <div class="fila destacado">
 
-        <span>💰 Efectivo en caja</span>
+    <span>💰 Efectivo en caja</span>
 
-        <strong>
-            $ ${esperadoEnCaja.toLocaleString()}
-        </strong>
+    <strong>
+        $ ${esperadoEnCaja.toLocaleString()}
+    </strong>
 
-    </div>
+</div>
 
-    <div class="fila">
+<div class="fila">
 
-        <span>💵 Saldo inicial</span>
+    <span>💵 Saldo inicial</span>
 
-        <strong>
-            $ ${montoInicial.toLocaleString()}
-        </strong>
+    <strong>
+        $ ${montoInicial.toLocaleString()}
+    </strong>
 
-    </div>
+</div>
 
-    <div class="fila">
+<div class="fila">
 
-        <span>💸 Gastos</span>
+    <span>💸 Gastos</span>
 
-        <strong>
-            $ ${totalEgresos.toLocaleString()}
-        </strong>
+    <strong>
+        $ ${totalEgresos.toLocaleString()}
+    </strong>
 
-    </div>
+</div>
+
+<div class="fila">
+
+    <span>💶 Efectivo retirado</span>
+
+    <strong>
+        $ ${efectivoRetirado.toLocaleString()}
+    </strong>
+
+</div>
+
+<div class="fila">
+
+    <span>🏦 Efectivo restante en caja</span>
+
+    <strong>
+        $ ${efectivoRestante.toLocaleString()}
+    </strong>
+
+</div>
 
     <div class="fila">
 
@@ -544,15 +566,129 @@ export default async function(){
     // JORNADA ACTUAL
     // ==========================
 
-    const caja = await getDoc(
+const caja = await getDoc(
+    doc(db,"caja","actual")
+);
 
-        doc(db,"caja","actual")
+// ==========================
+// VERIFICAR SI HAY CAJA ABIERTA
+// ==========================
 
-    );
+if(!caja.exists() || caja.data().abierta !== true){
 
-    const jornada = caja.data().fechaJornada;
+    contenido.innerHTML = `
 
-    const montoInicial = caja.data().montoInicial || 0;
+        <h1 style="margin-bottom:5px;">
+            💰 Cierre de Caja
+        </h1>
+
+        <p style="color:#777;margin-bottom:25px;">
+            <strong style="color:#e74c3c;">
+                🔴 No hay una jornada abierta
+            </strong>
+        </p>
+
+        <div class="resumenCaja">
+
+            <div class="cardResumen">
+                <div class="tituloResumen">
+                    💰 Efectivo en caja
+                </div>
+                <div class="valorResumen">
+                    $ 0
+                </div>
+            </div>
+
+            <div class="cardResumen">
+                <div class="tituloResumen">
+                    💵 Saldo Inicial
+                </div>
+                <div class="valorResumen">
+                    $ 0
+                </div>
+            </div>
+
+            <div class="cardResumen">
+                <div class="tituloResumen">
+                    💸 Gastos
+                </div>
+                <div class="valorResumen">
+                    $ 0
+                </div>
+            </div>
+
+            <div class="cardResumen">
+                <div class="tituloResumen">
+                    🧾 Ventas
+                </div>
+                <div class="valorResumen">
+                    0
+                </div>
+            </div>
+
+            <div class="cardResumen">
+                <div class="tituloResumen">
+                    💰 Total de ventas
+                </div>
+                <div class="valorResumen">
+                    $ 0
+                </div>
+            </div>
+
+        </div>
+
+        <div class="cardCaja">
+
+            <h2>
+                💳 Medios de Pago
+            </h2>
+
+            <div class="filaCaja">
+                <span>💵 Efectivo</span>
+                <strong>$ 0</strong>
+            </div>
+
+            <div class="filaCaja">
+                <span>📱 MercadoPago</span>
+                <strong>$ 0</strong>
+            </div>
+
+            <div class="filaCaja">
+                <span>🏦 Banco Provincia</span>
+                <strong>$ 0</strong>
+            </div>
+
+            <div class="filaCaja">
+                <span>📒 Cuenta Corriente</span>
+                <strong>$ 0</strong>
+            </div>
+
+            <div class="filaCaja">
+                <span>⏳ Pendiente</span>
+                <strong>$ 0</strong>
+            </div>
+
+        </div>
+
+        <div style="
+            margin-top:25px;
+            padding:20px;
+            text-align:center;
+            background:#f8f8f8;
+            border-radius:10px;
+            color:#777;
+        ">
+            🔒 La jornada actual se encuentra cerrada.
+        </div>
+
+    `;
+
+    return;
+}
+
+const jornada = caja.data().fechaJornada;
+
+const montoInicial = caja.data().montoInicial || 0;
     
     // ==========================
     // VENTAS DEL DÍA
@@ -1097,6 +1233,10 @@ if(imprimir){
 
         esperadoEnCaja,
 
+        efectivoRetirado,
+
+        efectivoRestante,
+
         totalEgresos,
 
         efectivo,
@@ -1591,6 +1731,10 @@ document.getElementById("btnImprimirResumen").onclick = () => {
         total,
 
         esperadoEnCaja,
+        
+        efectivoRetirado,
+        
+        efectivoRestante,
 
         totalEgresos,
 

@@ -23,6 +23,8 @@ const opciones = {
 
     "Carta",
 
+    "Stock",
+
     "Actividad",
 
     "Historial",
@@ -94,6 +96,16 @@ if (opcion === "Usuarios") {
 if (opcion === "Carta") {
 
     const modulo = await import("../modules/carta.js");
+
+    modulo.default();
+
+    return;
+
+}
+
+if (opcion === "Stock") {
+
+    const modulo = await import("../modules/stock.js");
 
     modulo.default();
 
