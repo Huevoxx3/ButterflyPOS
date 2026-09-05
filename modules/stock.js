@@ -46,6 +46,10 @@ export default async function cargarStock() {
         Consumo
     </button>
 
+    <button class="tab-stock" data-seccion="stock-estimado">
+    Stock estimado
+</button>
+
 </div>
 
 
@@ -230,10 +234,19 @@ if (seccion === "recetas") {
     return;
 }
 
-        if (seccion === "consumo") {
-            alert("Consumo: próximamente");
-            return;
-        }
+if (seccion === "consumo") {
+
+    mostrarConsumo();
+
+    return;
+}
+
+if (seccion === "stock-estimado") {
+
+    mostrarStockEstimado();
+
+    return;
+}
 
     });
 
@@ -627,7 +640,7 @@ if (seccion === "recetas") {
 
     }
 
-    async function mostrarRecetas() {
+async function mostrarRecetas() {
 
     const tablaStock =
         document.getElementById("tablaStock");
@@ -655,10 +668,15 @@ if (seccion === "recetas") {
 
     try {
 
+        // =========================================
+        // CARGAR PRODUCTOS DE CARTA
+        // =========================================
+
         const snapshot =
             await getDocs(
                 collection(db, "carta")
             );
+
 
         if (snapshot.empty) {
 
@@ -673,7 +691,9 @@ if (seccion === "recetas") {
             return;
         }
 
+
         let productos = [];
+
 
         snapshot.forEach(docSnap => {
 
@@ -684,18 +704,72 @@ if (seccion === "recetas") {
 
         });
 
+
         productos = productos
-            .filter(producto => producto.disponible !== false)
-            .sort((a, b) =>
-                a.nombre.localeCompare(b.nombre)
+            .filter(
+                producto =>
+                    producto.disponible !== false
+            )
+            .sort(
+                (a, b) =>
+                    a.nombre.localeCompare(b.nombre)
             );
+
+
+        // =========================================
+        // CARGAR RECETAS
+        // =========================================
+
+        const recetasSnapshot =
+            await getDocs(
+                collection(db, "recetas")
+            );
+
+
+        const recetasExistentes = {};
+
+
+        recetasSnapshot.forEach(docSnap => {
+
+            recetasExistentes[
+                docSnap.id
+            ] = docSnap.data();
+
+        });
+
+
+        // =========================================
+        // MOSTRAR PRODUCTOS
+        // =========================================
 
         tablaStock.innerHTML = "";
 
+
         productos.forEach(producto => {
+
+            const tieneReceta =
+                recetasExistentes[
+                    producto.id
+                ] &&
+                Array.isArray(
+                    recetasExistentes[
+                        producto.id
+                    ].ingredientes
+                ) &&
+                recetasExistentes[
+                    producto.id
+                ].ingredientes.length > 0;
+
 
             const fila =
                 document.createElement("tr");
+
+
+            fila.className =
+                tieneReceta
+                    ? "producto-con-receta"
+                    : "producto-sin-receta";
+
 
             fila.innerHTML = `
 
@@ -705,17 +779,36 @@ if (seccion === "recetas") {
                     </strong>
                 </td>
 
+
                 <td>
                     ${producto.categoria || "-"}
                 </td>
 
-                <td>
-                    -
-                </td>
 
                 <td>
                     -
                 </td>
+
+
+                <td>
+
+                    ${
+                        tieneReceta
+                            ? `
+                                <span class="estado-receta encontrada">
+                                    Receta cargada
+                                </span>
+                            `
+                            : `
+                                <span class="estado-receta sin-receta">
+                                    Sin receta
+                                </span>
+                            `
+
+                    }
+
+                </td>
+
 
                 <td>
 
@@ -723,37 +816,59 @@ if (seccion === "recetas") {
                         class="btn-editar-receta"
                         data-id="${producto.id}"
                     >
-                        Editar receta
+
+                        ${
+                            tieneReceta
+                                ? "Editar receta"
+                                : "Cargar receta"
+                        }
+
                     </button>
 
                 </td>
 
             `;
 
+
             tablaStock.appendChild(fila);
 
         });
+
+
+        // =========================================
+        // BOTONES
+        // =========================================
 
         document
             .querySelectorAll(".btn-editar-receta")
             .forEach(boton => {
 
-                boton.addEventListener("click", () => {
+                boton.addEventListener(
+                    "click",
+                    () => {
 
-                    const producto =
-                        productos.find(
-                            item =>
-                                item.id ===
-                                boton.dataset.id
+                        const producto =
+                            productos.find(
+                                item =>
+                                    item.id ===
+                                    boton.dataset.id
+                            );
+
+
+                        if (!producto) {
+                            return;
+                        }
+
+
+                        abrirEditorReceta(
+                            producto
                         );
 
-if (!producto) return;
-
-abrirEditorReceta(producto);
-
-                });
+                    }
+                );
 
             });
+
 
     } catch (error) {
 
@@ -762,6 +877,7 @@ abrirEditorReceta(producto);
             error
         );
 
+
         tablaStock.innerHTML = `
             <tr>
                 <td colspan="5">
@@ -769,7 +885,9 @@ abrirEditorReceta(producto);
                 </td>
             </tr>
         `;
+
     }
+
 }
 
 async function abrirEditorReceta(producto) {
@@ -1446,6 +1564,1114 @@ await setDoc(
 
 }
 
+async function mostrarConsumo() {
+
+    const tablaStock =
+        document.getElementById("tablaStock");
+
+    tablaStock.innerHTML = `
+
+        <tr>
+            <td colspan="5">
+
+                <div class="editor-receta">
+
+                    <h3>
+                        Consumo estimado
+                    </h3>
+
+                    <div class="filtros-consumo">
+
+                        <div class="campo-consumo">
+
+                            <label for="fechaDesdeConsumo">
+                                Desde
+                            </label>
+
+                            <input
+                                type="date"
+                                id="fechaDesdeConsumo"
+                            >
+
+                        </div>
+
+
+                        <div class="campo-consumo">
+
+                            <label for="fechaHastaConsumo">
+                                Hasta
+                            </label>
+
+                            <input
+                                type="date"
+                                id="fechaHastaConsumo"
+                            >
+
+                        </div>
+
+
+                        <button
+                            id="btnCalcularConsumo"
+                            class="btn-principal"
+                        >
+                            Calcular consumo
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="resultadoConsumo"
+                        class="resultado-consumo"
+                    >
+
+                        <p>
+                            Seleccioná un período para
+                            calcular el consumo estimado.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </td>
+        </tr>
+
+    `;
+
+
+    // =========================================
+    // CALCULAR CONSUMO
+    // =========================================
+
+    document
+        .getElementById("btnCalcularConsumo")
+        .addEventListener(
+            "click",
+            async () => {
+
+                const fechaDesde =
+                    document.getElementById(
+                        "fechaDesdeConsumo"
+                    ).value;
+
+                const fechaHasta =
+                    document.getElementById(
+                        "fechaHastaConsumo"
+                    ).value;
+
+
+                if (!fechaDesde || !fechaHasta) {
+
+                    alert(
+                        "Seleccioná las dos fechas."
+                    );
+
+                    return;
+                }
+
+
+                if (fechaDesde > fechaHasta) {
+
+                    alert(
+                        "La fecha Desde no puede ser posterior a la fecha Hasta."
+                    );
+
+                    return;
+                }
+
+
+                const resultado =
+                    document.getElementById(
+                        "resultadoConsumo"
+                    );
+
+
+                resultado.innerHTML = `
+                    <p>
+                        Cargando ventas...
+                    </p>
+                `;
+
+
+                try {
+
+                    const snapshot =
+                        await getDocs(
+                            collection(
+                                db,
+                                "ventas"
+                            )
+                        );
+
+
+                    // =========================================
+                    // CONVERTIR FECHAS SELECCIONADAS
+                    // =========================================
+
+                    const partesDesde =
+                        fechaDesde.split("-");
+
+                    const partesHasta =
+                        fechaHasta.split("-");
+
+
+                    const inicio =
+                        new Date(
+                            Number(partesDesde[0]),
+                            Number(partesDesde[1]) - 1,
+                            Number(partesDesde[2]),
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+
+
+                    // Usamos el día siguiente a "Hasta"
+                    // para incluir todas las ventas de ese día.
+
+                    const fin =
+                        new Date(
+                            Number(partesHasta[0]),
+                            Number(partesHasta[1]) - 1,
+                            Number(partesHasta[2]) + 1,
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+
+
+                    // =========================================
+                    // FILTRAR VENTAS
+                    // =========================================
+
+                    const ventasPeriodo = [];
+
+
+                    snapshot.forEach(
+                        documento => {
+
+                            const venta =
+                                documento.data();
+
+
+                            if (!venta.fecha) {
+                                return;
+                            }
+
+
+                            const fechaVenta =
+                                venta.fecha.toDate();
+
+
+                            if (
+                                fechaVenta >= inicio &&
+                                fechaVenta < fin
+                            ) {
+
+                                ventasPeriodo.push({
+                                    id: documento.id,
+                                    ...venta
+                                });
+
+                            }
+
+                        }
+                    );
+
+
+                    // =========================================
+                    // AGRUPAR PRODUCTOS VENDIDOS
+                    // =========================================
+
+                    const productosVendidos = {};
+
+
+                    ventasPeriodo.forEach(
+                        venta => {
+
+                            if (
+                                !Array.isArray(
+                                    venta.productos
+                                )
+                            ) {
+                                return;
+                            }
+
+
+                            venta.productos.forEach(
+    producto => {
+
+        if (
+            !producto.productoId
+        ) {
+            return;
+        }
+
+
+        if (
+            !productosVendidos[
+                producto.productoId
+            ]
+        ) {
+
+            productosVendidos[
+                producto.productoId
+            ] = {
+
+                id:
+                    producto.productoId,
+
+                nombre:
+                    producto.nombre ||
+                    "Producto sin nombre",
+
+                cantidad:
+                    0
+
+            };
+
+        }
+
+
+        productosVendidos[
+            producto.productoId
+        ].cantidad +=
+            Number(
+                producto.cantidad
+            ) || 0;
+
+    }
+);
+
+                        }
+                    );
+
+
+                    const listaProductos =
+                        Object.values(
+                            productosVendidos
+                        );
+
+// =========================================
+// BUSCAR RECETAS DE LOS PRODUCTOS
+// =========================================
+
+for (const producto of listaProductos) {
+
+    const referenciaReceta =
+        doc(
+            db,
+            "recetas",
+            producto.id
+        );
+
+    const recetaSnapshot =
+        await getDoc(
+            referenciaReceta
+        );
+
+    if (recetaSnapshot.exists()) {
+
+        producto.receta =
+            recetaSnapshot.data().ingredientes || [];
+
+    } else {
+
+        producto.receta = [];
+
+    }
+
+}
+
+// =========================================
+// CALCULAR CONSUMO DE INGREDIENTES
+// =========================================
+
+const consumoIngredientes = {};
+
+listaProductos.forEach(
+    producto => {
+
+        if (
+            !producto.receta ||
+            producto.receta.length === 0
+        ) {
+            return;
+        }
+
+        producto.receta.forEach(
+            ingrediente => {
+
+                if (
+                    !ingrediente.ingredienteId
+                ) {
+                    return;
+                }
+
+                if (
+                    !consumoIngredientes[
+                        ingrediente.ingredienteId
+                    ]
+                ) {
+
+                    consumoIngredientes[
+                        ingrediente.ingredienteId
+                    ] = {
+
+                        ingredienteId:
+                            ingrediente.ingredienteId,
+
+                        nombre:
+                            ingrediente.ingredienteNombre,
+
+                        unidad:
+                            ingrediente.unidad,
+
+                        cantidad:
+                            0
+
+                    };
+
+                }
+
+                consumoIngredientes[
+                    ingrediente.ingredienteId
+                ].cantidad +=
+                    (
+                        Number(
+                            producto.cantidad
+                        ) || 0
+                    ) *
+                    (
+                        Number(
+                            ingrediente.cantidad
+                        ) || 0
+                    );
+
+            }
+        );
+
+    }
+);
+
+const listaConsumo =
+    Object.values(
+        consumoIngredientes
+    );
+
+                    // =========================================
+                    // MOSTRAR RESULTADO
+                    // =========================================
+
+                    if (
+                        listaProductos.length === 0
+                    ) {
+
+                        resultado.innerHTML = `
+
+                            <p>
+                                No se encontraron ventas
+                                en el período seleccionado.
+                            </p>
+
+                        `;
+
+                        return;
+                    }
+
+
+ resultado.innerHTML = `
+
+    <h4>
+        Ventas del período
+    </h4>
+
+    <table class="tabla-receta">
+
+        <thead>
+
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad vendida</th>
+                <th>Receta</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            ${
+                listaProductos.map(
+                    producto => `
+
+<tr class="${
+    producto.receta.length > 0
+        ? "producto-con-receta"
+        : "producto-sin-receta"
+}">
+
+    <td>
+        ${producto.nombre}
+    </td>
+
+    <td>
+        ${producto.cantidad}
+    </td>
+
+    <td>
+
+        ${
+            producto.receta.length > 0
+                ? `<span class="estado-receta encontrada">Encontrada</span>`
+                : `<span class="estado-receta sin-receta">Sin receta</span>`
+        }
+
+    </td>
+
+</tr>
+
+                    `
+                ).join("")
+            }
+
+        </tbody>
+
+    </table>
+
+
+    <h4>
+        Consumo estimado de ingredientes
+    </h4>
+
+
+    <table class="tabla-receta">
+
+        <thead>
+
+            <tr>
+                <th>Ingrediente</th>
+                <th>Consumo estimado</th>
+                <th>Unidad</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            ${
+                listaConsumo.length > 0
+                    ? listaConsumo.map(
+                        ingrediente => `
+
+                            <tr>
+
+                                <td>
+                                    ${ingrediente.nombre}
+                                </td>
+
+                                <td>
+                                    ${ingrediente.cantidad}
+                                </td>
+
+                                <td>
+                                    ${ingrediente.unidad}
+                                </td>
+
+                            </tr>
+
+                        `
+                    ).join("")
+                    : `
+                        <tr>
+
+                            <td colspan="3">
+                                No hay consumo estimado
+                                para este período.
+                            </td>
+
+                        </tr>
+                    `
+            }
+
+        </tbody>
+
+    </table>
+
+`;
+                } catch (error) {
+
+                    console.error(
+                        "Error calculando consumo:",
+                        error
+                    );
+
+
+                    resultado.innerHTML = `
+
+                        <p>
+                            No se pudieron cargar
+                            las ventas.
+                        </p>
+
+                    `;
+
+                }
+
+            }
+        );
+
+}
+
+async function mostrarStockEstimado() {
+
+    const tablaStock =
+        document.getElementById("tablaStock");
+
+    const encabezado =
+        document.querySelector(".barra-stock");
+
+    encabezado.innerHTML = `
+        <div>
+            <strong>Stock estimado</strong>
+        </div>
+
+        <div>
+            Calculá el stock estimado según las ventas del período
+        </div>
+    `;
+
+    tablaStock.innerHTML = `
+        <tr>
+            <td colspan="5">
+
+                <div class="editor-receta">
+
+                    <h3>
+                        Stock estimado
+                    </h3>
+
+                    <div class="filtros-consumo">
+
+                        <div class="campo-consumo">
+
+                            <label for="fechaDesdeStock">
+                                Desde
+                            </label>
+
+                            <input
+                                type="date"
+                                id="fechaDesdeStock"
+                            >
+
+                        </div>
+
+
+                        <div class="campo-consumo">
+
+                            <label for="fechaHastaStock">
+                                Hasta
+                            </label>
+
+                            <input
+                                type="date"
+                                id="fechaHastaStock"
+                            >
+
+                        </div>
+
+
+                        <button
+                            id="btnCalcularStock"
+                            class="btn-principal"
+                        >
+                            Calcular stock
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="resultadoStockEstimado"
+                        class="resultado-consumo"
+                    >
+
+                        <p>
+                            Seleccioná un período para
+                            calcular el stock estimado.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </td>
+        </tr>
+    `;
+
+
+    // =========================================
+    // CALCULAR STOCK ESTIMADO
+    // =========================================
+
+    document
+        .getElementById("btnCalcularStock")
+        .addEventListener(
+            "click",
+            async () => {
+
+                const fechaDesde =
+                    document.getElementById(
+                        "fechaDesdeStock"
+                    ).value;
+
+                const fechaHasta =
+                    document.getElementById(
+                        "fechaHastaStock"
+                    ).value;
+
+
+                if (!fechaDesde || !fechaHasta) {
+
+                    alert(
+                        "Seleccioná las dos fechas."
+                    );
+
+                    return;
+                }
+
+
+                if (fechaDesde > fechaHasta) {
+
+                    alert(
+                        "La fecha Desde no puede ser posterior a la fecha Hasta."
+                    );
+
+                    return;
+                }
+
+
+                const resultado =
+                    document.getElementById(
+                        "resultadoStockEstimado"
+                    );
+
+
+                resultado.innerHTML = `
+                    <p>
+                        Calculando stock estimado...
+                    </p>
+                `;
+
+
+                try {
+
+                    // =========================================
+                    // CARGAR STOCK ACTUAL
+                    // =========================================
+
+                    const snapshotStock =
+                        await getDocs(
+                            collection(
+                                db,
+                                "ingredientesStock"
+                            )
+                        );
+
+
+                    const ingredientesStock = {};
+
+
+                    snapshotStock.forEach(
+                        documento => {
+
+                            const ingrediente =
+                                documento.data();
+
+                            ingredientesStock[
+                                documento.id
+                            ] = {
+
+                                id: documento.id,
+
+                                nombre:
+                                    ingrediente.nombre,
+
+                                unidad:
+                                    ingrediente.unidad,
+
+                                cantidad:
+                                    Number(
+                                        ingrediente.cantidad
+                                    ) || 0
+
+                            };
+
+                        }
+                    );
+
+
+                    // =========================================
+                    // CARGAR VENTAS
+                    // =========================================
+
+                    const snapshotVentas =
+                        await getDocs(
+                            collection(
+                                db,
+                                "ventas"
+                            )
+                        );
+
+
+                    // =========================================
+                    // CONVERTIR FECHAS
+                    // =========================================
+
+                    const partesDesde =
+                        fechaDesde.split("-");
+
+                    const partesHasta =
+                        fechaHasta.split("-");
+
+
+                    const inicio =
+                        new Date(
+                            Number(partesDesde[0]),
+                            Number(partesDesde[1]) - 1,
+                            Number(partesDesde[2]),
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+
+
+                    const fin =
+                        new Date(
+                            Number(partesHasta[0]),
+                            Number(partesHasta[1]) - 1,
+                            Number(partesHasta[2]) + 1,
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+
+
+                    // =========================================
+                    // AGRUPAR PRODUCTOS VENDIDOS
+                    // =========================================
+
+                    const productosVendidos = {};
+
+
+                    snapshotVentas.forEach(
+                        documento => {
+
+                            const venta =
+                                documento.data();
+
+
+                            if (!venta.fecha) {
+                                return;
+                            }
+
+
+                            const fechaVenta =
+                                venta.fecha.toDate();
+
+
+                            if (
+                                fechaVenta < inicio ||
+                                fechaVenta >= fin
+                            ) {
+                                return;
+                            }
+
+
+                            if (
+                                !Array.isArray(
+                                    venta.productos
+                                )
+                            ) {
+                                return;
+                            }
+
+
+                            venta.productos.forEach(
+                                producto => {
+
+                                    if (
+                                        !producto.productoId
+                                    ) {
+                                        return;
+                                    }
+
+
+                                    if (
+                                        !productosVendidos[
+                                            producto.productoId
+                                        ]
+                                    ) {
+
+                                        productosVendidos[
+                                            producto.productoId
+                                        ] = {
+
+                                            id:
+                                                producto.productoId,
+
+                                            cantidad:
+                                                0
+
+                                        };
+
+                                    }
+
+
+                                    productosVendidos[
+                                        producto.productoId
+                                    ].cantidad +=
+                                        Number(
+                                            producto.cantidad
+                                        ) || 0;
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    const listaProductos =
+                        Object.values(
+                            productosVendidos
+                        );
+
+
+                    // =========================================
+                    // CALCULAR CONSUMO DE INGREDIENTES
+                    // =========================================
+
+                    const consumoIngredientes = {};
+
+
+                    for (
+                        const producto
+                        of listaProductos
+                    ) {
+
+                        const referenciaReceta =
+                            doc(
+                                db,
+                                "recetas",
+                                producto.id
+                            );
+
+
+                        const recetaSnapshot =
+                            await getDoc(
+                                referenciaReceta
+                            );
+
+
+                        if (
+                            !recetaSnapshot.exists()
+                        ) {
+                            continue;
+                        }
+
+
+                        const ingredientesReceta =
+                            recetaSnapshot
+                                .data()
+                                .ingredientes || [];
+
+
+                        ingredientesReceta.forEach(
+                            ingrediente => {
+
+                                if (
+                                    !ingrediente.ingredienteId
+                                ) {
+                                    return;
+                                }
+
+
+                                if (
+                                    !consumoIngredientes[
+                                        ingrediente.ingredienteId
+                                    ]
+                                ) {
+
+                                    consumoIngredientes[
+                                        ingrediente.ingredienteId
+                                    ] = 0;
+
+                                }
+
+
+                                consumoIngredientes[
+                                    ingrediente.ingredienteId
+                                ] +=
+                                    (
+                                        Number(
+                                            producto.cantidad
+                                        ) || 0
+                                    ) *
+                                    (
+                                        Number(
+                                            ingrediente.cantidad
+                                        ) || 0
+                                    );
+
+                            }
+                        );
+
+                    }
+
+
+                    // =========================================
+                    // MOSTRAR STOCK ESTIMADO
+                    // =========================================
+
+                    let filas = "";
+
+
+                    Object.values(
+                        ingredientesStock
+                    )
+                    .sort(
+                        (a, b) =>
+                            a.nombre.localeCompare(
+                                b.nombre
+                            )
+                    )
+                    .forEach(
+                        ingrediente => {
+
+                            const consumo =
+                                consumoIngredientes[
+                                    ingrediente.id
+                                ] || 0;
+
+
+                            const stockEstimado =
+                                ingrediente.cantidad -
+                                consumo;
+
+
+                            filas += `
+
+                                <tr>
+
+                                    <td>
+                                        ${ingrediente.nombre}
+                                    </td>
+
+                                    <td>
+                                        ${ingrediente.cantidad}
+                                        ${ingrediente.unidad}
+                                    </td>
+
+                                    <td>
+                                        ${consumo}
+                                        ${ingrediente.unidad}
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            ${stockEstimado}
+                                            ${ingrediente.unidad}
+                                        </strong>
+                                    </td>
+
+                                </tr>
+
+                            `;
+
+                        }
+                    );
+
+
+                    resultado.innerHTML = `
+
+                        <h4>
+                            Stock estimado
+                        </h4>
+
+
+                        <table class="tabla-receta">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Ingrediente
+                                    </th>
+
+                                    <th>
+                                        Stock actual
+                                    </th>
+
+                                    <th>
+                                        Consumo
+                                    </th>
+
+                                    <th>
+                                        Stock estimado
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                ${
+                                    filas ||
+                                    `
+                                        <tr>
+                                            <td colspan="4">
+                                                No hay ingredientes cargados.
+                                            </td>
+                                        </tr>
+                                    `
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    `;
+
+                } catch (error) {
+
+                    console.error(
+                        "Error calculando stock estimado:",
+                        error
+                    );
+
+
+                    resultado.innerHTML = `
+
+                        <p>
+                            No se pudo calcular el stock estimado.
+                        </p>
+
+                    `;
+
+                }
+
+            }
+        );
+
+}
     await cargarIngredientes();
 
 }

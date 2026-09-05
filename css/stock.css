@@ -205,3 +205,89 @@
 .tabla-receta td:last-child {
     white-space: nowrap;
 }
+
+/* =========================================
+   CONSUMO
+   ========================================= */
+
+.filtros-consumo {
+    display: flex;
+    align-items: end;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 18px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.campo-consumo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo-consumo label {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.campo-consumo input {
+    padding: 9px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.resultado-consumo {
+    margin-top: 10px;
+}
+
+.resultado-consumo p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* =========================================
+   ESTADO DE RECETAS EN CONSUMO
+   ========================================= */
+
+.producto-con-receta {
+    background: rgba(40, 167, 69, 0.06);
+}
+
+.producto-con-receta:hover {
+    background: rgba(40, 167, 69, 0.10);
+}
+
+.producto-sin-receta {
+    background: rgba(255, 193, 7, 0.06);
+}
+
+.producto-sin-receta:hover {
+    background: rgba(255, 193, 7, 0.10);
+}
+
+
+/* =========================================
+   INDICADOR DE ESTADO
+   ========================================= */
+
+.estado-receta {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.estado-receta.encontrada {
+    background: rgba(40, 167, 69, 0.12);
+    color: #247a38;
+}
+
+.estado-receta.sin-receta {
+    background: rgba(255, 193, 7, 0.18);
+    color: #856404;
+}
