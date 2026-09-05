@@ -223,25 +223,46 @@ tabsStock.forEach(tab => {
         const seccion = tab.dataset.seccion;
 
 if (seccion === "existencias") {
+
+    document
+        .getElementById("btnNuevoIngrediente")
+        .style.display = "";
+
     cargarStock();
+
     return;
 }
 
+
 if (seccion === "recetas") {
+
+    document
+        .getElementById("btnNuevoIngrediente")
+        .style.display = "none";
 
     mostrarRecetas();
 
     return;
 }
 
+
 if (seccion === "consumo") {
+
+    document
+        .getElementById("btnNuevoIngrediente")
+        .style.display = "none";
 
     mostrarConsumo();
 
     return;
 }
 
+
 if (seccion === "stock-estimado") {
+
+    document
+        .getElementById("btnNuevoIngrediente")
+        .style.display = "none";
 
     mostrarStockEstimado();
 
@@ -654,7 +675,7 @@ async function mostrarRecetas() {
         </div>
 
         <div>
-            Seleccioná un producto para editar su receta
+            
         </div>
     `;
 
