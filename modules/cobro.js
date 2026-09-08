@@ -403,13 +403,75 @@ await cargarEmpleados();
 
 document.getElementById("medioPago").onchange = ()=>{
 
+    const medioPago =
+        document.getElementById("medioPago").value;
+
     document.getElementById("grupoCuentaCorriente").style.display =
-
-        document.getElementById("medioPago").value === "Cuenta Corriente"
-
+        medioPago === "Cuenta Corriente"
             ? ""
-
             : "none";
+
+
+    // ==========================
+    // CUENTA CORRIENTE
+    // ==========================
+
+if(medioPago === "Cuenta Corriente"){
+
+    const resumen =
+        calcularDescuentoCuentaCorriente(
+            items,
+            descuentoComidasCC,
+            descuentoBebidasCC
+        );
+
+    const nuevoTotal = resumen.importeFinal;
+
+    document.getElementById("totalCuenta").textContent =
+        "$ " +
+        nuevoTotal.toLocaleString("es-AR");
+
+
+    // ==========================
+    // ACTUALIZAR IMPORTE A PAGAR
+    // ==========================
+
+    const importePrincipal =
+        document.getElementById("importePagoPrincipal");
+
+    const pagosExtra =
+        document.querySelectorAll(".importePagoExtra");
+
+    let totalPagosExtra = 0;
+
+    pagosExtra.forEach(input => {
+        totalPagosExtra += Number(input.value) || 0;
+    });
+
+    if(importePrincipal){
+
+        importePrincipal.value =
+            Math.max(
+                0,
+                nuevoTotal - totalPagosExtra
+            );
+
+    }
+
+    actualizarResumenPagos();
+
+}
+
+
+    // ==========================
+    // OTRO MEDIO DE PAGO
+    // ==========================
+
+    else{
+
+        calcularTotal();
+
+    }
 
 };
 
@@ -829,6 +891,20 @@ document.querySelectorAll(".filaPagoExtra").forEach(fila => {
 
 });
 
+let resumenCuentaCorriente = null;
+
+if(
+    document.getElementById("medioPago").value === "Cuenta Corriente"
+){
+
+    resumenCuentaCorriente =
+        calcularDescuentoCuentaCorriente(
+            items,
+            descuentoComidasCC,
+            descuentoBebidasCC
+        );
+}
+
 const ventaRef = await addDoc(
 
     collection(db,"ventas"),
@@ -853,9 +929,25 @@ const ventaRef = await addDoc(
 
         motivo: document.getElementById("motivoDescuento").value,
 
-        medioPago: document.getElementById("medioPago").value,
+       medioPago:
+    document.getElementById("medioPago").value,
 
-        mediosPago,
+mediosPago,
+
+descuentoCuentaCorriente:
+    resumenCuentaCorriente
+        ? resumenCuentaCorriente.descuentoTotal
+        : 0,
+
+importeOriginalCuentaCorriente:
+    resumenCuentaCorriente
+        ? resumenCuentaCorriente.importeOriginal
+        : 0,
+
+importeCuentaCorriente:
+    resumenCuentaCorriente
+        ? resumenCuentaCorriente.importeFinal
+        : 0,
 
         totalCobrado: Number(
             document.getElementById("totalCuenta")

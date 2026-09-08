@@ -156,9 +156,15 @@ const descuentoGeneralImporte =
     subtotalDespuesProductos *
     descuentoGeneralPorcentaje / 100;
 
+const descuentoCuentaCorriente =
+    Number(
+        venta.descuentoCuentaCorriente
+    ) || 0;
+
 const descuentoReal =
     descuentoProductos +
-    descuentoGeneralImporte;
+    descuentoGeneralImporte +
+    descuentoCuentaCorriente;
 
 console.log("Descuento productos:", descuentoProductos);
 
@@ -196,22 +202,76 @@ let filasProductos = "";
 
 venta.productos.forEach(producto => {
 
-    filasProductos += `
+    const subtotalProducto =
+        producto.precio * producto.cantidad;
 
+    let descuentoProducto = 0;
+
+    // Producto NO COBRADO
+    if (producto.invitado === true) {
+
+        descuentoProducto =
+            subtotalProducto;
+
+    }
+    // Descuento aplicado al producto
+    else if (Number(producto.descuento) > 0) {
+
+        descuentoProducto =
+            subtotalProducto *
+            Number(producto.descuento) /
+            100;
+
+    }
+
+    const cobradoProducto =
+        subtotalProducto -
+        descuentoProducto;
+
+        let porcentajeDescuento = "—";
+
+if (producto.invitado === true) {
+
+    porcentajeDescuento = "100%";
+
+}
+else if (Number(producto.descuento) > 0) {
+
+    porcentajeDescuento =
+        Number(producto.descuento) + "%";
+
+}
+
+    filasProductos += `
         <tr>
 
-            <td>${producto.cantidad}</td>
+            <td>
+                ${producto.cantidad}
+            </td>
 
-            <td>${producto.nombre}</td>
+            <td>
+                ${producto.nombre}
+            </td>
 
-            <td>$${producto.precio.toLocaleString("es-AR")}</td>
+            <td>
+                $${producto.precio.toLocaleString("es-AR")}
+            </td>
 
-            <td>$${(producto.precio * producto.cantidad).toLocaleString("es-AR")}</td>
+<td>
+    ${porcentajeDescuento}
+</td>
+
+            <td>
+                ${
+                    cobradoProducto === 0
+                    ? "$0"
+                    : "$" +
+                      cobradoProducto.toLocaleString("es-AR")
+                }
+            </td>
 
         </tr>
-
     `;
-
 });
 
 document.getElementById("ticketProductos").innerHTML = `
@@ -223,9 +283,10 @@ document.getElementById("ticketProductos").innerHTML = `
         <tr>
 
 <th style="width:10%">Cant</th>
-<th style="width:50%">Producto</th>
-<th style="width:20%">P.Unit</th>
-<th style="width:20%">Total</th>
+<th style="width:40%">Producto</th>
+<th style="width:17%">P.Unit</th>
+<th style="width:16%">Desc.</th>
+<th style="width:17%">Cobrado</th>
 
         </tr>
 
@@ -269,30 +330,46 @@ const totalMostrar =
 
 document.getElementById("ticketTotales").innerHTML = `
 
-<div class="lineaTotal">
+${
+    descuentoMostrar > 0
+        ? `
+            <div class="lineaTotal">
 
-    <span>Subtotal</span>
+                <span>Subtotal</span>
 
-    <strong>
-        $${Number(venta.subtotal).toLocaleString("es-AR")}
-    </strong>
+                <strong>
+                    $${Number(venta.subtotal).toLocaleString("es-AR")}
+                </strong>
 
-</div>
+            </div>
+        `
+        : ""
+}
 
 
-<div class="lineaTotal">
+${
+    descuentoMostrar > 0
+        ? `
+            <div class="lineaTotal">
 
-    <span>
-        ${tieneDescuentoCC
-            ? "Descuento empleado"
-            : "Descuento"}
-    </span>
+                <span>
+                    ${
+                        tieneDescuentoCC
+                            ? "Descuento empleado"
+                            : Number(venta.descuentoGeneral) > 0
+                                ? `Descuento (${Number(venta.descuentoGeneral)}%)`
+                                : "Descuento"
+                    }
+                </span>
 
-    <strong>
-        $${descuentoMostrar.toLocaleString("es-AR")}
-    </strong>
+                <strong>
+                    $${descuentoMostrar.toLocaleString("es-AR")}
+                </strong>
 
-</div>
+            </div>
+        `
+        : ""
+}
 
 
 <div class="lineaTotal totalFinal">
