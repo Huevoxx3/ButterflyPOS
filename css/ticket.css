@@ -12,11 +12,18 @@
 body{
     font-family:Arial, Helvetica, sans-serif;
     background:#ddd;
+    color:#000;
 }
+
+
+/* ==========================
+   TICKET
+========================== */
 
 #ticket{
 
     width:100%;
+
     max-width:105mm;
 
     min-height:148mm;
@@ -25,7 +32,7 @@ body{
 
     background:#fff;
 
-    padding:5mm;
+    padding:5mm 4mm;
 
     color:#000;
 
@@ -50,15 +57,21 @@ body{
 
 #logoTicket{
 
-    width:62px;
+    width:58px;
 
-    margin-bottom:3px;
+    height:auto;
+
+    display:block;
+
+    margin:0 auto 3px;
 
 }
 
 .ticketHeader h2{
 
-    font-size:24px;
+    font-size:22px;
+
+    line-height:1.1;
 
     letter-spacing:2px;
 
@@ -68,7 +81,9 @@ body{
 
 .ticketHeader p{
 
-    font-size:12px;
+    font-size:11px;
+
+    line-height:1.2;
 
     margin:1px 0;
 
@@ -81,11 +96,11 @@ body{
 
 #ticketDatos{
 
-    margin:7px 0;
+    margin:6px 0;
 
-    font-size:12px;
+    font-size:11px;
 
-    line-height:1.4;
+    line-height:1.35;
 
 }
 
@@ -97,9 +112,17 @@ body{
 
     align-items:center;
 
+    gap:8px;
+
     margin:2px 0;
 
-    font-size:12px;
+    font-size:11px;
+
+}
+
+.filaDato span:last-child{
+
+    text-align:right;
 
 }
 
@@ -122,25 +145,16 @@ body{
 
     margin-bottom:6px;
 
-    font-size:10.5px;
+    font-size:10px;
 
 }
 
 .tablaTicket th,
 .tablaTicket td{
 
-    overflow-wrap:break-word;
+    overflow-wrap:anywhere;
 
-}
-
-.tablaTicket th:nth-child(1),
-.tablaTicket td:nth-child(1),
-.tablaTicket th:nth-child(3),
-.tablaTicket td:nth-child(3),
-.tablaTicket th:nth-child(4),
-.tablaTicket td:nth-child(4){
-
-    white-space:nowrap;
+    word-break:normal;
 
 }
 
@@ -164,18 +178,79 @@ body{
 
     padding:3px 2px;
 
+    font-size:9.5px;
+
+    font-weight:bold;
+
+    line-height:1.1;
+
 }
 
 .tablaTicket td{
 
     padding:2.5px 2px;
 
+    line-height:1.15;
+
+    vertical-align:top;
+
 }
 
-.tablaTicket th:last-child,
-.tablaTicket td:last-child{
+
+/* CANTIDAD */
+
+.tablaTicket th:nth-child(1),
+.tablaTicket td:nth-child(1){
+
+    text-align:center;
+
+    white-space:nowrap;
+
+}
+
+
+/* PRODUCTO */
+
+.tablaTicket th:nth-child(2),
+.tablaTicket td:nth-child(2){
+
+    text-align:left;
+
+}
+
+
+/* PRECIO UNITARIO */
+
+.tablaTicket th:nth-child(3),
+.tablaTicket td:nth-child(3){
 
     text-align:right;
+
+    white-space:nowrap;
+
+}
+
+
+/* DESCUENTO */
+
+.tablaTicket th:nth-child(4),
+.tablaTicket td:nth-child(4){
+
+    text-align:center;
+
+    white-space:nowrap;
+
+}
+
+
+/* COBRADO */
+
+.tablaTicket th:nth-child(5),
+.tablaTicket td:nth-child(5){
+
+    text-align:right;
+
+    white-space:nowrap;
 
 }
 
@@ -184,15 +259,33 @@ body{
    TOTALES
 ========================== */
 
+#ticketTotales{
+
+    margin-top:5px;
+
+}
+
 .lineaTotal{
 
     display:flex;
 
     justify-content:space-between;
 
+    align-items:center;
+
+    gap:10px;
+
     padding:2px 0;
 
-    font-size:12px;
+    font-size:11px;
+
+    line-height:1.2;
+
+}
+
+.lineaTotal strong{
+
+    white-space:nowrap;
 
 }
 
@@ -204,7 +297,7 @@ body{
 
     padding-top:5px;
 
-    font-size:19px;
+    font-size:18px;
 
     font-weight:bold;
 
@@ -217,15 +310,15 @@ body{
 
 .medioPago{
 
-    border-top:1px dashed #999;
+    border-top:1px dashed #777;
 
-    margin-top:9px;
+    margin-top:8px;
 
-    padding-top:6px;
+    padding-top:5px;
 
     text-align:center;
 
-    font-size:12px;
+    font-size:11px;
 
 }
 
@@ -235,7 +328,19 @@ body{
 
     justify-content:space-between;
 
+    align-items:center;
+
+    gap:8px;
+
     padding:1.5px 0;
+
+}
+
+.filaPagoTicket span:last-child{
+
+    font-weight:bold;
+
+    white-space:nowrap;
 
 }
 
@@ -248,9 +353,9 @@ body{
 
     border-top:1px solid #000;
 
-    margin-top:10px;
+    margin-top:9px;
 
-    padding-top:7px;
+    padding-top:6px;
 
     text-align:center;
 
@@ -258,15 +363,19 @@ body{
 
 .ticketFooter p{
 
+    font-size:11px;
+
     font-weight:bold;
 
-    margin-bottom:4px;
+    margin-bottom:3px;
 
 }
 
 .ticketFooter small{
 
-    font-size:9px;
+    font-size:8.5px;
+
+    line-height:1.2;
 
 }
 
@@ -278,6 +387,8 @@ body{
 .accionesTicket{
 
     width:105mm;
+
+    max-width:100%;
 
     margin:15px auto 8px;
 
@@ -316,6 +427,73 @@ body{
 
 @media print{
 
+    html,
+    body{
+
+        width:105mm;
+
+        margin:0;
+
+        padding:0;
+
+        background:white;
+
+    }
+
+    body{
+
+        font-family:Arial, Helvetica, sans-serif;
+
+    }
+
+    .accionesTicket{
+
+        display:none;
+
+    }
+
+    #ticket{
+
+        width:105mm;
+
+        max-width:105mm;
+
+        min-height:0;
+
+        margin:0;
+
+        padding:3mm 2mm;
+
+    }
+
+    .ticketHeader,
+    .tablaTicket,
+    #ticketTotales,
+    .medioPago,
+    .ticketFooter{
+
+        break-inside:avoid;
+
+        page-break-inside:avoid;
+
+    }
+
+    .tablaTicket{
+
+        width:100%;
+
+        max-width:100%;
+
+    }
+
+}
+
+/* ==========================
+   IMPRESIÓN
+========================== */
+
+@media print{
+
     body{
 
         background:white;
@@ -330,19 +508,19 @@ body{
 
     }
 
-    #ticket{
+#ticket{
 
-        width:100%;
+    width:100%;
 
-        max-width:100%;
+    max-width:100%;
 
-        min-height:0;
+    min-height:0;
 
-        margin:0;
+    margin:0;
 
-        padding:0;
+    padding:3mm 2mm;
 
-    }
+}
 
     .tablaTicket{
 

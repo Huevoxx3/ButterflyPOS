@@ -282,11 +282,11 @@ document.getElementById("ticketProductos").innerHTML = `
 
         <tr>
 
-<th style="width:10%">Cant</th>
-<th style="width:40%">Producto</th>
-<th style="width:17%">P.Unit</th>
-<th style="width:16%">Desc.</th>
-<th style="width:17%">Cobrado</th>
+<th style="width:9%">Cant</th>
+<th style="width:43%">Producto</th>
+<th style="width:16%">P.Unit</th>
+<th style="width:14%">Desc.</th>
+<th style="width:18%">Cobrado</th>
 
         </tr>
 
