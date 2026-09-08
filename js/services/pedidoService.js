@@ -26,15 +26,18 @@ import { obtenerCategoria } from "./cartaService.js";
 import { obtenerPendientesCocina } from "./cocinaService.js";
 
 export async function agregarProductoPedido(
-    
+
     mesa,
     productoId,
     nombre,
-    precio
+    precio,
+    cantidad = 1
+
 ){
 
-    console.time("Agregar Producto");
-    console.log("ENTRO A agregarProductoPedido");
+    const usuario = JSON.parse(
+        sessionStorage.getItem("usuario")
+    );
 
     const itemsRef = collection(
         db,
@@ -48,21 +51,20 @@ export async function agregarProductoPedido(
         where("productoId","==",productoId)
     );
 
-    console.time("Buscar Item");
     const resultado = await getDocs(consulta);
-    console.timeEnd("Buscar Item");
+
+    // ==========================
+    // ITEM DEL PEDIDO
+    // ==========================
 
     if(resultado.empty){
 
-        const nuevoItem = await addDoc(itemsRef,{
+        await addDoc(itemsRef,{
 
             productoId,
-
             nombre,
-
             precio,
-
-            cantidad:1
+            cantidad
 
         });
 
@@ -81,96 +83,112 @@ export async function agregarProductoPedido(
             ),
 
             {
-
-                cantidad:increment(1)
-
+                cantidad: increment(cantidad)
             }
 
         );
 
     }
-    
-const categoria = await obtenerCategoria(productoId);
 
-const categoriasExcluidas = [
+    // ==========================
+    // CATEGORÍA
+    // ==========================
 
-    "Cerveza Artesanal",
+    const categoria =
+        await obtenerCategoria(productoId);
 
-    "Con Alcohol",
+    const categoriasExcluidas = [
 
-    "Sin Alcohol"
+        "Cerveza Artesanal",
+        "Con Alcohol",
+        "Sin Alcohol"
 
-];
+    ];
 
-// ==========================
-// ENVIAR A COCINA
-// ==========================
+    const jornada =
+        await obtenerJornadaActual();
 
-console.time("Enviar Cocina");
+    // ==========================
+    // COCINA
+    // ==========================
 
-const jornada = await obtenerJornadaActual();
+    if(!categoriasExcluidas.includes(categoria)){
 
-console.log("ANTES DE COCINA");
+        const promesasCocina = [];
 
-if (!categoriasExcluidas.includes(categoria)) {
+        for(let i = 0; i < cantidad; i++){
 
-    await addDoc(
-        collection(db, "cocina"),
-        {
-            pedidoId: mesa.pedidoId,
-            mesa: mesa.numero,
-            nombre,
-            observacion: "",
-            estado: "Pendiente",
-            horaPedido: serverTimestamp(),
-            horaLista: null,
-            horaEntrega: null,
-            requiereConfirmacion: false,
-            ultimaModificacion: null,
-            jornada
+            promesasCocina.push(
+
+                addDoc(
+                    collection(db,"cocina"),
+                    {
+                        pedidoId: mesa.pedidoId,
+                        mesa: mesa.numero,
+                        nombre,
+                        observacion:"",
+                        estado:"Pendiente",
+                        horaPedido:serverTimestamp(),
+                        horaLista:null,
+                        horaEntrega:null,
+                        requiereConfirmacion:false,
+                        ultimaModificacion:null,
+                        jornada
+                    }
+                )
+
+            );
+
         }
+
+        await Promise.all(promesasCocina);
+
+    }
+
+    // ==========================
+    // TOTALES
+    // ==========================
+
+    const importe =
+        precio * cantidad;
+
+    await Promise.all([
+
+        updateDoc(
+            doc(db,"pedidos",mesa.pedidoId),
+            {
+                total: increment(importe)
+            }
+        ),
+
+        updateDoc(
+            doc(db,"mesas",String(mesa.numero)),
+            {
+                total: increment(importe)
+            }
+        )
+
+    ]);
+
+    // ==========================
+    // ACTIVIDAD
+    // ==========================
+
+    await registrarActividad(
+
+        usuario.nombre,
+
+        "Pedido",
+
+        "Agregar Producto",
+
+        cantidad > 1
+
+            ? `${nombre} x${cantidad} - Mesa ${mesa.numero}`
+
+            : `${nombre} - Mesa ${mesa.numero}`
+
     );
-
-}
-
-console.timeEnd("Enviar Cocina");
-console.time("Actualizar Totales");
-
-await Promise.all([
-
-    updateDoc(
-        doc(db,"pedidos",mesa.pedidoId),
-        {
-            total: increment(precio)
-        }
-    ),
-
-    updateDoc(
-        doc(db,"mesas",String(mesa.numero)),
-        {
-            total: increment(precio)
-        }
-    )
-
-]);
-
-console.timeEnd("Actualizar Totales");
-
-    console.time("Registrar Actividad");
-await registrarActividad(
-
-    usuario.nombre,
-
-    "Pedido",
-
-    "Agregar Producto",
-
-    `${nombre} - Mesa ${mesa.numero}`
-
-);
-console.timeEnd("Registrar Actividad");
-
-console.timeEnd("Agregar Producto");
 
 }
 

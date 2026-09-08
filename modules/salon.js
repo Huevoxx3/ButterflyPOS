@@ -220,8 +220,6 @@ async function dibujarMesas() {
 
     const plano = document.getElementById("planoSalon");
 
-    plano.innerHTML = "";
-
     const snapshot = await getDocs(
         collection(db, "mesas")
     );
@@ -230,97 +228,102 @@ async function dibujarMesas() {
     // ELEMENTOS FIJOS DEL PLANO
     // ==========================
 
-plano.innerHTML += `
+    let html = `
 
-    <div class="zonaAfuera">
-        AFUERA
-    </div>
-
-    <div class="puertaSalon">
-        PUERTA
-    </div>
-
-    <div class="barraSalon">
-        BARRA
-    </div>
-
-    <div
-        class="mesaCard mesaEmpleados"
-        data-mesa="EMPLEADOS"
-    >
-        <div class="mesaNumero">
-            👥 EMPLEADOS
+        <div class="zonaAfuera">
+            AFUERA
         </div>
 
-        <div class="mesaEstado libre"></div>
-    </div>
+        <div class="puertaSalon">
+            PUERTA
+        </div>
 
-`;
+        <div class="barraSalon">
+            BARRA
+        </div>
 
+        <div
+            class="mesaCard mesaEmpleados"
+            data-mesa="EMPLEADOS"
+        >
+            <div class="mesaNumero">
+                👥 EMPLEADOS
+            </div>
+
+            <div class="mesaEstado libre"></div>
+        </div>
+
+    `;
+
+    // ==========================
+    // POSICIONES DE LAS MESAS
+    // ==========================
+
+    const posiciones = {
+
+        // AFUERA
+        "AFUERA1": "pos-af1",
+        "AFUERA2": "pos-af2",
+        "AFUERA3": "pos-af3",
+        "AFUERA4": "pos-af4",
+        "AFUERA5": "pos-af5",
+        "AFUERA6": "pos-af6",
+        "AFUERA7": "pos-af7",
+        "AFUERA8": "pos-af8",
+
+        // BOX
+        "BOX1": "pos-box1",
+        "BOX2": "pos-box2",
+        "BOX3": "pos-box3",
+        "BOX4": "pos-box4",
+        "BOX5": "pos-box5",
+
+        // MESAS
+        "MESA6": "pos-mesa6",
+        "MESA7": "pos-mesa7",
+        "MESA8": "pos-mesa8",
+        "MESA9": "pos-mesa9",
+        "MESA10": "pos-mesa10",
+        "MESA11": "pos-mesa11",
+        "MESA12": "pos-mesa12",
+        "MESA14": "pos-mesa14",
+
+        // MESAS ADICIONALES
+        "6A": "pos-mesa6a",
+        "7A": "pos-mesa7a",
+        "10A": "pos-mesa10a",
+        "C1": "pos-c1",
+        "C2": "pos-c2",
+        "C3": "pos-c3",
+        "AD1": "pos-ad1",
+        "AD2": "pos-ad2",
+
+        // COMUNITARIA
+        "COMUNITARIA-PUERTA":
+            "pos-com-puerta",
+
+        "COMUNITARIA-CENTRO-PUERTA":
+            "pos-com-centro-puerta",
+
+        "COMUNITARIA-CENTRO":
+            "pos-com-centro",
+
+        "COMUNITARIA-CENTRO-PUNTA":
+            "pos-com-centro-punta",
+
+        "COMUNITARIA-PUNTA":
+            "pos-com-punta"
+    };
+
+    // ==========================
+    // CONSTRUIR MESAS EN MEMORIA
+    // ==========================
 
     snapshot.forEach(documento => {
 
         const mesa = documento.data();
 
-        const posiciones = {
-
-            // AFUERA
-            "AFUERA1": "pos-af1",
-            "AFUERA2": "pos-af2",
-            "AFUERA3": "pos-af3",
-            "AFUERA4": "pos-af4",
-            "AFUERA5": "pos-af5",
-            "AFUERA6": "pos-af6",
-            "AFUERA7": "pos-af7",
-            "AFUERA8": "pos-af8",
-
-            // BOX
-            "BOX1": "pos-box1",
-            "BOX2": "pos-box2",
-            "BOX3": "pos-box3",
-            "BOX4": "pos-box4",
-            "BOX5": "pos-box5",
-
-            // MESAS
-            "MESA6": "pos-mesa6",
-            "MESA7": "pos-mesa7",
-            "MESA8": "pos-mesa8",
-            "MESA9": "pos-mesa9",
-            "MESA10": "pos-mesa10",
-            "MESA11": "pos-mesa11",
-            "MESA12": "pos-mesa12",
-            "MESA14": "pos-mesa14",
-
-            // MESAS ADICIONALES
-"6A": "pos-mesa6a",
-"7A": "pos-mesa7a",
-"10A": "pos-mesa10a",
-"C1": "pos-c1",
-"C2": "pos-c2",
-"C3": "pos-c3",
-"AD1": "pos-ad1",
-"AD2": "pos-ad2",
-
-            // COMUNITARIA
-            "COMUNITARIA-PUERTA":
-                "pos-com-puerta",
-
-            "COMUNITARIA-CENTRO-PUERTA":
-                "pos-com-centro-puerta",
-
-            "COMUNITARIA-CENTRO":
-                "pos-com-centro",
-
-            "COMUNITARIA-CENTRO-PUNTA":
-                "pos-com-centro-punta",
-
-            "COMUNITARIA-PUNTA":
-                "pos-com-punta"
-
-        };
-
-        const clase =
-            posiciones[mesa.numero];
+        const clase = posiciones[mesa.numero];
 
         if(!clase){
 
@@ -330,10 +333,9 @@ plano.innerHTML += `
             );
 
             return;
-
         }
 
-        plano.innerHTML += `
+        html += `
 
             <div
                 class="mesaCard ${clase}"
@@ -341,9 +343,7 @@ plano.innerHTML += `
             >
 
                 <div class="mesaNumero">
-
                     ${mesa.numero}
-
                 </div>
 
                 <div
@@ -353,9 +353,13 @@ plano.innerHTML += `
             </div>
 
         `;
-
     });
 
+    // ==========================
+    // DIBUJAR TODO DE UNA VEZ
+    // ==========================
+
+    plano.innerHTML = html;
 
     // ==========================
     // CLICK EN MESA
@@ -365,36 +369,37 @@ plano.innerHTML += `
         .querySelectorAll(".mesaCard")
         .forEach(mesa => {
 
-mesa.addEventListener("click", () => {
+            mesa.addEventListener("click", () => {
 
-    if(modoSoloLectura){
-        alert(
-            "Modo solo lectura."
-        );
+                if(modoSoloLectura){
 
-        return;
-    }
+                    alert(
+                        "Modo solo lectura."
+                    );
 
-    // ==========================
-    // CONSUMO EMPLEADOS
-    // ==========================
+                    return;
+                }
 
-    if(mesa.dataset.mesa === "EMPLEADOS"){
+                // ==========================
+                // CONSUMO EMPLEADOS
+                // ==========================
 
-        abrirMesaEmpleados();
+                if(mesa.dataset.mesa === "EMPLEADOS"){
 
-        return;
-    }
+                    abrirMesaEmpleados();
 
-    // ==========================
-    // MESA NORMAL
-    // ==========================
+                    return;
+                }
 
-    abrirMesa(
-        mesa.dataset.mesa
-    );
+                // ==========================
+                // MESA NORMAL
+                // ==========================
 
-});
+                abrirMesa(
+                    mesa.dataset.mesa
+                );
+
+            });
 
         });
 
@@ -1976,25 +1981,17 @@ async function aceptarPedidoCarta(mesa){
 
     }
 
-    for(const item of carritoCarta){
+for(const item of carritoCarta){
 
-        for(let i=0;i<item.cantidad;i++){
+    await agregarProductoPedido(
+        mesa,
+        item.id,
+        item.nombre,
+        item.precio,
+        item.cantidad
+    );
 
-            await agregarProductoPedido(
-
-                mesa,
-
-                item.id,
-
-                item.nombre,
-
-                item.precio
-
-            );
-
-        }
-
-    }
+}
 
     carritoCarta = [];
 
@@ -2041,74 +2038,65 @@ const productos = await obtenerCarta();
 
     });
 
-    Object.keys(categorias).sort().forEach(categoria=>{
+let htmlCarta = "";
 
-        lista.innerHTML += `
+Object.keys(categorias).sort().forEach(categoria => {
 
-<div class="tituloCategoria">
-
-    ${categoria}
-
-</div>
-
-        `;
-
-        categorias[categoria].forEach(producto=>{
-
-    lista.innerHTML += `
-
-    <div class="filaProducto">
-
-        <div class="filaNombre">
-
-            ${producto.nombre}
-
+    htmlCarta += `
+    
+        <div class="tituloCategoria">
+            ${categoria}
         </div>
-
-        <div class="filaPrecio">
-
-            $ ${producto.precio.toLocaleString()}
-
-        </div>
-
-        <div class="selectorCantidad">
-
-    <button
-        class="btnMenosCarta"
-        data-id="${producto.id}">
-
-        −
-
-    </button>
-
-    <span
-        class="cantidadCarta"
-        id="cant-${producto.id}">
-
-        0
-
-    </span>
-
-    <button
-        class="btnMasCarta"
-        data-id="${producto.id}"
-        data-nombre="${producto.nombre}"
-        data-precio="${producto.precio}">
-
-        +
-
-    </button>
-
-</div>
-
-    </div>
 
     `;
 
-});
+    categorias[categoria].forEach(producto => {
+
+        htmlCarta += `
+        
+            <div class="filaProducto">
+
+                <div class="filaNombre">
+                    ${producto.nombre}
+                </div>
+
+                <div class="filaPrecio">
+                    $ ${producto.precio.toLocaleString()}
+                </div>
+
+                <div class="selectorCantidad">
+
+                    <button
+                        class="btnMenosCarta"
+                        data-id="${producto.id}">
+                        −
+                    </button>
+
+                    <span
+                        class="cantidadCarta"
+                        id="cant-${producto.id}">
+                        0
+                    </span>
+
+                    <button
+                        class="btnMasCarta"
+                        data-id="${producto.id}"
+                        data-nombre="${producto.nombre}"
+                        data-precio="${producto.precio}">
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
 
     });
 
+});
+
+lista.innerHTML = htmlCarta;
     document.querySelectorAll(".btnMasCarta").forEach(btn=>{
 
     btn.onclick=()=>{
