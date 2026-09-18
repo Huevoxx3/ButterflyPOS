@@ -123,26 +123,30 @@ let descuentoProductos = 0;
 
 venta.productos.forEach(producto => {
 
-    const subtotalProducto =
-        producto.precio * producto.cantidad;
+const subtotalProducto =
+    producto.precio * producto.cantidad;
 
-    // Producto marcado como NO COBRAR
-    if (producto.invitado === true) {
+let descuentoProducto = 0;
 
-        descuentoProductos += subtotalProducto;
+// Producto NO COBRADO
+if (producto.invitado === true) {
 
-        return;
+    const cantidadNoCobrar =
+        Number(producto.cantidadNoCobrar) || producto.cantidad;
 
-    }
+    descuentoProducto =
+        producto.precio * cantidadNoCobrar;
 
-    // Descuento aplicado directamente al producto
-    if (producto.descuento > 0) {
+}
+// Descuento aplicado al producto
+else if (Number(producto.descuento) > 0) {
 
-        descuentoProductos +=
-            subtotalProducto *
-            producto.descuento / 100;
+    descuentoProducto =
+        subtotalProducto *
+        Number(producto.descuento) /
+        100;
 
-    }
+}
 
 });
 
@@ -228,11 +232,18 @@ venta.productos.forEach(producto => {
         subtotalProducto -
         descuentoProducto;
 
-        let porcentajeDescuento = "—";
+let porcentajeDescuento = "—";
 
 if (producto.invitado === true) {
 
-    porcentajeDescuento = "100%";
+    const cantidadNoCobrar =
+        Number(producto.cantidadNoCobrar) || producto.cantidad;
+
+    const porcentajeInvitado =
+        (cantidadNoCobrar / producto.cantidad) * 100;
+
+    porcentajeDescuento =
+        Math.round(porcentajeInvitado) + "%";
 
 }
 else if (Number(producto.descuento) > 0) {

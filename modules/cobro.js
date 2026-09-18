@@ -1171,24 +1171,33 @@ document.getElementById("btnTicketCobro").onclick = () => {
                 document.querySelectorAll(".txtDescuento")[index].value
             ) || 0;
 
-        const invitado =
-            document.querySelectorAll(".chkNoCobrar")[index].checked;
+const controlNoCobrar =
+    document.querySelectorAll(".chkNoCobrar")[index];
 
-        return {
+const invitado =
+    controlNoCobrar.checked;
 
-            ...item,
+const cantidadNoCobrar =
+    Number(controlNoCobrar.dataset.cantidadNoCobrar) || 0;
 
-            descuento,
+return {
+    ...item,
 
-            motivoDescuento:
-                motivosDescuento[index] || "",
+    descuento,
 
-            invitado,
+    motivoDescuento:
+        motivosDescuento[index] || "",
 
-            motivoNoCobrar:
-                motivosNoCobrar[index] || ""
+    invitado,
 
-        };
+    cantidadNoCobrar,
+
+    cantidadCobrada:
+        item.cantidad - cantidadNoCobrar,
+
+    motivoNoCobrar:
+        motivosNoCobrar[index] || ""
+};
 
     });
 
@@ -1300,19 +1309,53 @@ document.getElementById("btnTicketCobro").onclick = () => {
 // ==========================
 
 document.querySelectorAll(".chkNoCobrar").forEach((control,index)=>{
-
     control.onchange = () => {
+
+        const item = items[index];
 
         if(control.checked){
 
-            const motivo = prompt("Ingrese el motivo por el cual NO se cobrará este producto:");
+            let cantidadNoCobrar = 1;
+
+            // Si hay más de una unidad, preguntamos cuántas
+            if(item.cantidad > 1){
+
+                const respuesta = prompt(
+                    `¿Cuántas unidades de ${item.nombre} NO se cobrarán?\n\n` +
+                    `Cantidad disponible: ${item.cantidad}`,
+                    "1"
+                );
+
+                cantidadNoCobrar = Number(respuesta);
+
+                // Validar cantidad
+                if(
+                    !Number.isInteger(cantidadNoCobrar) ||
+                    cantidadNoCobrar < 1 ||
+                    cantidadNoCobrar > item.cantidad
+                ){
+                    alert(
+                        `Debe ingresar una cantidad entre 1 y ${item.cantidad}.`
+                    );
+
+                    control.checked = false;
+                    return;
+                }
+            }
+
+            // Guardamos cuántas unidades no se cobran
+            control.dataset.cantidadNoCobrar = cantidadNoCobrar;
+
+            const motivo = prompt(
+                "Ingrese el motivo por el cual NO se cobrará este producto:"
+            );
 
             if(!motivo || motivo.trim() === ""){
 
                 alert("Debe ingresar un motivo.");
 
                 control.checked = false;
-
+                delete control.dataset.cantidadNoCobrar;
                 delete motivosNoCobrar[index];
 
             }else{
@@ -1323,16 +1366,14 @@ document.querySelectorAll(".chkNoCobrar").forEach((control,index)=>{
 
         }else{
 
+            delete control.dataset.cantidadNoCobrar;
             delete motivosNoCobrar[index];
 
         }
 
         calcularTotal();
-
         validarCobro();
-
     };
-
 });
 
 // ==========================
@@ -1488,13 +1529,26 @@ const subtotal = Number(subtotalTexto);
 
         ) || 0;
 
-        if(noCobrar){
+const controlNoCobrar = columnas[4]
+    .querySelector("input");
 
-            return;
+const cantidadNoCobrar =
+    Number(controlNoCobrar.dataset.cantidadNoCobrar) || 0;
 
-        }
+const cantidadCobrada =
+    Number(columnas[1].textContent) - cantidadNoCobrar;
 
-        total += subtotal * (1-descuento/100);
+if(cantidadCobrada <= 0){
+    return;
+}
+
+const precioUnitario =
+    subtotal / Number(columnas[1].textContent);
+
+const subtotalCobrado =
+    precioUnitario * cantidadCobrada;
+
+total += subtotalCobrado * (1-descuento/100);
 
     });
 
