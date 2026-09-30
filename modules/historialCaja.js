@@ -37,6 +37,11 @@ function imprimirCierre(cierre){
                 .replace("_MEDIODIA"," - MEDIODÍA")
                 .replace("_NOCHE"," - NOCHE")
             : "-";
+        
+    const detalleEgresos =
+    Array.isArray(cierre.egresos)
+        ? cierre.egresos
+        : [];
 
 
     ventana.document.write(`
@@ -205,6 +210,49 @@ body{
 
     font-size:9.5px;
 
+}
+
+/* ==========================
+   DETALLE DE EGRESOS
+========================== */
+
+.detalleEgresos{
+    margin-top:2px;
+    margin-left:8px;
+    padding-left:5px;
+    border-left:2px solid #ddd;
+}
+
+.tituloDetalleEgresos{
+    font-size:8px;
+    font-weight:bold;
+    color:#666;
+    margin:2px 0 1px 0;
+}
+
+.detalleEgreso{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    padding:1px 0;
+    font-size:8px;
+    line-height:1.15;
+}
+
+.detalleEgreso span{
+    flex:1;
+}
+
+.detalleEgreso strong{
+    white-space:nowrap;
+    font-size:8px;
+}
+
+.observacionEgreso{
+    margin-left:5px;
+    margin-bottom:1px;
+    font-size:7px;
+    color:#777;
 }
 
 
@@ -402,6 +450,45 @@ Jornada: <strong>${jornadaTexto}</strong>
     </strong>
 
 </div>
+
+${
+    detalleEgresos.length > 0
+        ? `
+            <div class="detalleEgresos">
+
+                <div class="tituloDetalleEgresos">
+                    Detalle de egresos
+                </div>
+
+                ${detalleEgresos.map(egreso => `
+                    <div class="detalleEgreso">
+
+                        <span>
+                            ${egreso.concepto || egreso.tipo || "Egreso"}
+                        </span>
+
+                        <strong>
+                            $ ${Number(egreso.importe || 0).toLocaleString("es-AR")}
+                        </strong>
+
+                    </div>
+
+                    ${
+                        egreso.observacion
+                            ? `
+                                <div class="observacionEgreso">
+                                    ${egreso.observacion}
+                                </div>
+                            `
+                            : ""
+                    }
+
+                `).join("")}
+
+            </div>
+        `
+        : ""
+}
 
 <div class="fila destacado">
 

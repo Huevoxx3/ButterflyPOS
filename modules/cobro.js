@@ -23,6 +23,8 @@ let volverAMesa = null;
 
 let actualizarSalon = null;
 
+let cobrando = false;
+
 let motivosNoCobrar = {};
 
 let motivosDescuento = {};
@@ -98,7 +100,9 @@ export async function abrirCobro(
     callbackActualizarSalon
 
 ){
-
+    
+    cobrando = false;
+    
     crearPagoInicial(mesa.total);
 
     volverAMesa = callbackVolver;
@@ -805,6 +809,17 @@ function calcularDescuentoCuentaCorriente(
 }
 
 document.getElementById("btnConfirmarCobro").onclick = async () => {
+
+    // Evitar doble clic mientras el cobro está procesándose
+    if (cobrando) return;
+
+    cobrando = true;
+
+    const botonCobrar =
+        document.getElementById("btnConfirmarCobro");
+
+    botonCobrar.disabled = true;
+    botonCobrar.textContent = "⏳ Procesando cobro...";
 
     const totalCuenta = Number(
     document.getElementById("totalCuenta")

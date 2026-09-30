@@ -39,6 +39,7 @@ function imprimirResumenCaja({
     efectivoRetirado,
     efectivoRestante,
     totalEgresos,
+    detalleEgresos,
     efectivo,
     mercadoPago,
     bancoProvincia,
@@ -65,6 +66,24 @@ function imprimirResumenCaja({
         return;
 
     }
+
+const detalleEgresosHTML =
+    detalleEgresos.length > 0
+        ? detalleEgresos.map(egreso => `
+            <div class="detalleEgreso">
+                <span>
+                    ${egreso.concepto || egreso.tipo || "Egreso"}
+                </span>
+                <strong>
+                    $ ${egreso.importe.toLocaleString("es-AR")}
+                </strong>
+            </div>
+        `).join("")
+        : `
+            <div class="sinEgresos">
+                No se registraron egresos.
+            </div>
+        `;
 
     ventana.document.write(`
 
@@ -234,6 +253,48 @@ body{
 
 }
 
+/* ==========================
+   DETALLE DE EGRESOS
+========================== */
+
+.detalleEgresos{
+    margin-top:2px;
+    margin-left:8px;
+    padding-left:5px;
+    border-left:2px solid #ddd;
+}
+
+.tituloDetalleEgresos{
+    font-size:8px;
+    font-weight:bold;
+    color:#666;
+    margin:2px 0 1px 0;
+}
+
+.detalleEgreso{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    padding:1px 0;
+    font-size:8px;
+    line-height:1.15;
+}
+
+.detalleEgreso span{
+    flex:1;
+}
+
+.detalleEgreso strong{
+    white-space:nowrap;
+    font-size:8px;
+}
+
+.observacionEgreso{
+    margin-left:5px;
+    margin-bottom:1px;
+    font-size:7px;
+    color:#777;
+}
 
 /* ==========================
    EFECTIVO ESPERADO
@@ -423,6 +484,45 @@ body{
     </strong>
 
 </div>
+
+${
+    detalleEgresos.length > 0
+        ? `
+            <div class="detalleEgresos">
+
+                <div class="tituloDetalleEgresos">
+                    Detalle de egresos
+                </div>
+
+                ${detalleEgresos.map(egreso => `
+                    <div class="detalleEgreso">
+
+                        <span>
+                            ${egreso.concepto || egreso.tipo || "Egreso"}
+                        </span>
+
+                        <strong>
+                            $ ${egreso.importe.toLocaleString("es-AR")}
+                        </strong>
+
+                    </div>
+
+                    ${
+                        egreso.observacion
+                            ? `
+                                <div class="observacionEgreso">
+                                    ${egreso.observacion}
+                                </div>
+                            `
+                            : ""
+                    }
+
+                `).join("")}
+
+            </div>
+        `
+        : ""
+}
 
 <div class="fila">
 
@@ -1238,6 +1338,8 @@ if(imprimir){
         efectivoRestante,
 
         totalEgresos,
+
+        detalleEgresos,
 
         efectivo,
 
