@@ -900,6 +900,10 @@ cierreAbierto = boton.dataset.id;
             );
 
             const cierre = documento.data();
+            const detalleEgresos =
+    Array.isArray(cierre.egresos)
+        ? cierre.egresos
+        : [];
 
 document.getElementById("panelDetalleHistorial").innerHTML = `
 
@@ -952,6 +956,46 @@ document.getElementById("panelDetalleHistorial").innerHTML = `
     </strong>
 
 </div>
+
+${
+    detalleEgresos.length > 0
+        ? `
+            <div class="detalleEgresosHistorial">
+
+                <div class="tituloDetalleEgresosHistorial">
+                    Detalle de gastos
+                </div>
+
+                ${detalleEgresos.map(egreso => `
+                    
+                    <div class="detalleEgresoHistorial">
+
+                        <span>
+                            ${egreso.concepto || egreso.tipo || "Egreso"}
+                        </span>
+
+                        <strong>
+                            $ ${Number(egreso.importe || 0).toLocaleString("es-AR")}
+                        </strong>
+
+                    </div>
+
+                    ${
+                        egreso.observacion
+                            ? `
+                                <div class="observacionEgresoHistorial">
+                                    ${egreso.observacion}
+                                </div>
+                            `
+                            : ""
+                    }
+
+                `).join("")}
+
+            </div>
+        `
+        : ""
+}
 
 <div class="filaDetalle">
 

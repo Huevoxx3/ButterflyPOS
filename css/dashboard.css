@@ -1398,6 +1398,68 @@ font-weight:bold;
 
 }
 
+.detalleEgresosHistorial{
+
+    margin:4px 0 8px 10px;
+
+    padding-left:8px;
+
+    border-left:3px solid #ddd;
+
+}
+
+.tituloDetalleEgresosHistorial{
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    color:#666;
+
+    margin-bottom:4px;
+
+}
+
+.detalleEgresoHistorial{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:3px 0;
+
+    font-size:13px;
+
+}
+
+.detalleEgresoHistorial span{
+
+    flex:1;
+
+}
+
+.detalleEgresoHistorial strong{
+
+    white-space:nowrap;
+
+}
+
+.observacionEgresoHistorial{
+
+    margin-left:5px;
+
+    margin-bottom:3px;
+
+    font-size:11px;
+
+    color:#777;
+
+}
+
 /* ==========================================
    MOTIVOS EN COBRO
 ========================================== */
