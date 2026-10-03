@@ -255,7 +255,7 @@ const jornada = cajaActual.fechaJornada;
 
             tipo: "Adelanto",
 
-            importe: -importe,
+            importe: importe,
 
             jornada,
 
