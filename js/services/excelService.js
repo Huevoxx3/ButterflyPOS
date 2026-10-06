@@ -1101,16 +1101,101 @@ export async function generarExcelCierre(jornada){
     }
 
 
-    // =====================================================
-    // DESCARGAR
-    // =====================================================
+      // ==========================
+    // GENERAR ARCHIVO EXCEL
+    // ==========================
 
-    XLSX.writeFile(
+    const nombreArchivo =
+        `Butterfly_Cierre_${jornada}.xlsx`;
 
+    // Generar el Excel en memoria
+    const excelBase64 = XLSX.write(
         libro,
-
-        `Butterfly_Cierre_${jornada}.xlsx`
-
+        {
+            bookType: "xlsx",
+            type: "base64"
+        }
     );
 
+    // Descargar normalmente en el ordenador
+    XLSX.writeFile(
+        libro,
+        nombreArchivo
+    );
+
+    // ==========================
+    // ENVIAR POR EMAIL
+    // ==========================
+
+    try {
+
+        const datosEnvio = JSON.stringify({
+
+            archivo: excelBase64,
+
+            nombre: nombreArchivo,
+
+            asunto:
+                `Cierre de Caja - Jornada ${jornada}`,
+
+            mensaje:
+                `Se adjunta el cierre de caja correspondiente a la jornada ${jornada} de ButterflyPOS.`
+
+        });
+
+        const iframe =
+            document.createElement("iframe");
+
+        iframe.style.display = "none";
+
+        iframe.name =
+            "butterflyEnvioEmail";
+
+        document.body.appendChild(iframe);
+
+        const formulario =
+            document.createElement("form");
+
+        formulario.method = "POST";
+
+        formulario.action =
+            "https://script.google.com/macros/s/AKfycbxQ7LpM-npH2ABXerhHlGkNGqlVrhCmzpakwE-6hhELV6_KGiv1Bt2bD9M60kFJ2k2rLw/exec";
+
+        formulario.target =
+            "butterflyEnvioEmail";
+
+        const campo =
+            document.createElement("input");
+
+        campo.type = "hidden";
+
+        campo.name = "datos";
+
+        campo.value = datosEnvio;
+
+        formulario.appendChild(campo);
+
+        document.body.appendChild(formulario);
+
+        formulario.submit();
+
+        setTimeout(() => {
+
+            formulario.remove();
+            iframe.remove();
+
+        }, 10000);
+
+        console.log(
+            "📧 Cierre enviado a la cola de correo."
+        );
+
+    } catch(error) {
+
+        console.error(
+            "⚠️ No se pudo preparar el envío por email:",
+            error
+        );
+
+    }
 }
