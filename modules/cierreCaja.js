@@ -1822,42 +1822,155 @@ alert("✅ Caja cerrada correctamente.");
 
 };
 
+
 document.getElementById("btnImprimirResumen").onclick = () => {
 
-    imprimirResumenCaja({
+    const ventana = window.open("", "_blank", "width=800,height=600");
 
-        jornada,
+    if (!ventana) {
+        alert("El navegador bloqueó la ventana de impresión. Permití las ventanas emergentes para ButterflyPOS.");
+        return;
+    }
 
-        montoInicial,
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Estado actual de caja</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 30px;
+                    color: #202938;
+                }
 
-        total,
+                h1 {
+                    text-align: center;
+                    margin-bottom: 5px;
+                }
 
-        esperadoEnCaja,
-        
-        efectivoRetirado,
-        
-        efectivoRestante,
+                .fecha {
+                    text-align: center;
+                    color: #666;
+                    margin-bottom: 25px;
+                }
 
-        totalEgresos,
+                .resumen {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 12px;
+                }
 
-        efectivo,
+                .dato {
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    padding: 16px;
+                }
 
-        mercadoPago,
+                .dato span {
+                    display: block;
+                    color: #555;
+                    margin-bottom: 8px;
+                }
 
-        bancoProvincia,
+                .dato strong {
+                    font-size: 22px;
+                }
 
-        cuenta,
+                h2 {
+                    margin-top: 28px;
+                    border-bottom: 1px solid #ccc;
+                    padding-bottom: 8px;
+                }
 
-        pendiente,
+                .medio {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 12px 4px;
+                    border-bottom: 1px solid #eee;
+                }
 
-        cantidadVentas,
+                @media print {
+                    body {
+                        margin: 10mm;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Butterfly Espacio Cervecero</h1>
+            <div class="fecha">
+                Estado actual de caja — Jornada: ${jornada}<br>
+                Impreso: ${new Date().toLocaleString("es-AR")}
+            </div>
 
-        productosVendidos,
+            <div class="resumen">
+                <div class="dato">
+                    <span>💰 Efectivo en caja</span>
+                    <strong>${esperadoEnCaja.toLocaleString("es-AR")}</strong>
+                </div>
 
-        ticketPromedio
+                <div class="dato">
+                    <span>💵 Saldo inicial</span>
+                    <strong>${montoInicial.toLocaleString("es-AR")}</strong>
+                </div>
 
-    });
+                <div class="dato">
+                    <span>💸 Gastos</span>
+                    <strong>${totalEgresos.toLocaleString("es-AR")}</strong>
+                </div>
+
+                <div class="dato">
+                    <span>🧾 Ventas</span>
+                    <strong>${cantidadVentas}</strong>
+                </div>
+
+                <div class="dato">
+                    <span>💰 Total de ventas</span>
+                    <strong>${total.toLocaleString("es-AR")}</strong>
+                </div>
+            </div>
+
+            <h2>💳 Medios de pago</h2>
+
+            <div class="medio">
+                <span>💵 Efectivo</span>
+                <strong>${efectivo.toLocaleString("es-AR")}</strong>
+            </div>
+
+            <div class="medio">
+                <span>📱 MercadoPago</span>
+                <strong>${mercadoPago.toLocaleString("es-AR")}</strong>
+            </div>
+
+            <div class="medio">
+                <span>🏦 Banco Provincia</span>
+                <strong>${bancoProvincia.toLocaleString("es-AR")}</strong>
+            </div>
+
+            <div class="medio">
+                <span>📒 Cuenta Corriente</span>
+                <strong>${cuenta.toLocaleString("es-AR")}</strong>
+            </div>
+
+            <div class="medio">
+                <span>⏳ Pendiente</span>
+                <strong>${pendiente.toLocaleString("es-AR")}</strong>
+            </div>
+
+            <script>
+                window.onload = function() {
+                    window.print();
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+
+    ventana.document.close();
 
 };
+
 
 }
