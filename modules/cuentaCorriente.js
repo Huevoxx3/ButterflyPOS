@@ -684,11 +684,28 @@ else if(movimiento.tipo === "Adelanto"){
     `;
 
 }
+
 else{
+
+    const fechaMovimiento =
+        fecha.toLocaleDateString("es-AR");
+
+    const horaMovimiento =
+        fecha.toLocaleTimeString("es-AR", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
 
     html += `
 
-    <div class="movimientoCuenta">
+    <div
+        class="movimientoCuenta movimientoConsumo"
+        data-venta-id="${movimiento.ventaId || ""}"
+        data-fecha="${fechaMovimiento}"
+        data-hora="${horaMovimiento}"
+        data-mesa="${movimiento.mesa || ""}"
+        style="cursor:pointer;"
+        title="Haga clic para consultar el ticket">
 
         <div class="movIzquierda">
 
@@ -712,39 +729,24 @@ else{
                 ">
 
                 <div>
-
                     Consumido:
-
                     <strong>
-
                         $ ${(movimiento.importeOriginal || 0).toLocaleString()}
-
                     </strong>
-
                 </div>
 
                 <div style="color:#16a34a;">
-
                     Beneficio empleado:
-
                     <strong>
-
                         - $ ${(movimiento.descuentoTotal || 0).toLocaleString()}
-
                     </strong>
-
                 </div>
 
                 <div style="margin-top:4px;">
-
                     Total a descontar:
-
                     <strong>
-
                         $ ${(movimiento.importeFinal || 0).toLocaleString()}
-
                     </strong>
-
                 </div>
 
             </div>
@@ -764,6 +766,7 @@ else{
     `;
 
 }
+
 
     });
 
@@ -794,6 +797,98 @@ html += `
     document.getElementById("detalleCuentaCorriente").innerHTML =
 
         html;
+    
+    // ==========================
+    // ABRIR TICKET DEL CONSUMO
+    // ==========================
+
+    document
+        .querySelectorAll(".movimientoConsumo")
+        .forEach(movimiento => {
+
+            movimiento.onclick = async () => {
+
+                const ventaId =
+                    movimiento.dataset.ventaId;
+
+                const fecha =
+                    movimiento.dataset.fecha;
+
+                const hora =
+                    movimiento.dataset.hora;
+
+                const mesa =
+                    movimiento.dataset.mesa;
+
+                const mensajeNoEncontrado =
+                    `El ticket del ${fecha}, Mesa ${mesa}, ` +
+                    `a las ${hora}, no se encuentra disponible.\n\n` +
+                    `Consulte el Excel del cierre de caja.`;
+
+                if(!ventaId){
+
+                    alert(mensajeNoEncontrado);
+                    return;
+
+                }
+
+                // Abrir una pestaña para evitar
+                // que el navegador bloquee la apertura.
+
+                const ventanaTicket =
+                    window.open("about:blank", "_blank");
+
+                if(!ventanaTicket){
+
+                    alert(
+                        "El navegador bloqueó la apertura del ticket. " +
+                        "Permita las ventanas emergentes."
+                    );
+
+                    return;
+
+                }
+
+                try{
+
+                    const documentoVenta = await getDoc(
+                        doc(db, "ventas", ventaId)
+                    );
+
+                    if(!documentoVenta.exists()){
+
+                        ventanaTicket.close();
+
+                        alert(mensajeNoEncontrado);
+
+                        return;
+
+                    }
+
+                    ventanaTicket.location.href =
+                        `../modules/ticket.html?venta=${encodeURIComponent(ventaId)}`;
+
+                }
+                catch(error){
+
+                    console.error(
+                        "Error al consultar el ticket:",
+                        error
+                    );
+
+                    ventanaTicket.close();
+
+                    alert(
+                        "No se pudo consultar el ticket. " +
+                        "Verifique la conexión e intente nuevamente."
+                    );
+
+                }
+
+            };
+
+        });
+
 
     document.getElementById("modalCuentaCorriente")
 

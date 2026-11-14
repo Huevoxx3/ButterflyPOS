@@ -1876,6 +1876,183 @@ async function mostrarConsumo() {
                             productosVendidos
                         );
 
+
+// =========================================
+// ANALISIS COMERCIAL DE PRODUCTOS ACTIVOS
+// =========================================
+
+const snapshotCarta = await getDocs(
+    collection(db, "carta")
+);
+
+const productosActivos = [];
+
+snapshotCarta.forEach(documento => {
+
+    const producto = documento.data();
+
+    // Excluir productos no disponibles
+    if (producto.disponible === false) return;
+
+    productosActivos.push({
+        id: documento.id,
+        nombre: producto.nombre
+    });
+
+});
+
+// Comparar carta activa contra ventas del período
+const productosSinVentas = [];
+const productosBajaRotacion = [];
+
+productosActivos.forEach(producto => {
+
+    const vendido = productosVendidos[producto.id];
+
+    const cantidad = vendido
+        ? vendido.cantidad
+        : 0;
+
+    if (cantidad === 0) {
+
+        productosSinVentas.push(producto);
+
+    } else if (cantidad <= 3) {
+
+        productosBajaRotacion.push({
+            ...producto,
+            cantidad
+        });
+
+    }
+
+});
+
+// Ordenar alfabéticamente
+productosSinVentas.sort((a, b) =>
+    a.nombre.localeCompare(b.nombre)
+);
+
+productosBajaRotacion.sort((a, b) =>
+    a.nombre.localeCompare(b.nombre)
+);
+
+// Construir informe
+const htmlAnalisisComercial = `
+
+    <hr style="margin:30px 0;">
+
+    <h3>📊 Análisis comercial</h3>
+
+    <p style="color:#666;">
+        Productos activos de la carta que no tuvieron salida
+        o registraron una rotación muy baja.
+    </p>
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+        gap:12px;
+        margin:20px 0;
+    ">
+
+        <div style="
+            background:#fee2e2;
+            padding:16px;
+            border-radius:8px;
+        ">
+            <strong>🔴 Sin ventas</strong>
+            <h2 style="margin:8px 0;">
+                ${productosSinVentas.length}
+            </h2>
+        </div>
+
+        <div style="
+            background:#fef3c7;
+            padding:16px;
+            border-radius:8px;
+        ">
+            <strong>🟠 Baja rotación</strong>
+            <h2 style="margin:8px 0;">
+                ${productosBajaRotacion.length}
+            </h2>
+        </div>
+
+    </div>
+
+    <h4>🔴 Productos sin ninguna venta</h4>
+
+    <table class="tabla-receta">
+
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Unidades vendidas</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            ${
+                productosSinVentas.length > 0
+                ? productosSinVentas.map(producto => `
+                    <tr>
+                        <td>${producto.nombre}</td>
+                        <td><strong>0</strong></td>
+                    </tr>
+                `).join("")
+                : `
+                    <tr>
+                        <td colspan="2">
+                            ¡Todos los productos activos tuvieron ventas!
+                        </td>
+                    </tr>
+                `
+            }
+
+        </tbody>
+
+    </table>
+
+    <h4 style="margin-top:25px;">
+        🟠 Productos con baja rotación (1 a 3 unidades)
+    </h4>
+
+    <table class="tabla-receta">
+
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Unidades vendidas</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            ${
+                productosBajaRotacion.length > 0
+                ? productosBajaRotacion.map(producto => `
+                    <tr>
+                        <td>${producto.nombre}</td>
+                        <td><strong>${producto.cantidad}</strong></td>
+                    </tr>
+                `).join("")
+                : `
+                    <tr>
+                        <td colspan="2">
+                            No hay productos con baja rotación.
+                        </td>
+                    </tr>
+                `
+            }
+
+        </tbody>
+
+    </table>
+
+`;
+
+
 // =========================================
 // BUSCAR RECETAS DE LOS PRODUCTOS
 // =========================================
@@ -1987,21 +2164,23 @@ const listaConsumo =
                     // MOSTRAR RESULTADO
                     // =========================================
 
-                    if (
-                        listaProductos.length === 0
-                    ) {
 
-                        resultado.innerHTML = `
+if (listaProductos.length === 0) {
 
-                            <p>
-                                No se encontraron ventas
-                                en el período seleccionado.
-                            </p>
+    resultado.innerHTML = `
 
-                        `;
+        <p>
+            No se encontraron ventas
+            en el período seleccionado.
+        </p>
 
-                        return;
-                    }
+        ${htmlAnalisisComercial}
+
+    `;
+
+    return;
+}
+
 
 
  resultado.innerHTML = `
@@ -2117,9 +2296,11 @@ const listaConsumo =
                     `
             }
 
-        </tbody>
+            </tbody>
 
-    </table>
+        </table>
+
+        ${htmlAnalisisComercial}
 
 `;
                 } catch (error) {
