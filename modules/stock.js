@@ -1885,6 +1885,18 @@ const snapshotCarta = await getDocs(
     collection(db, "carta")
 );
 
+// Relacionar cada producto vendido con su categoría
+const categoriasCarta = {};
+
+snapshotCarta.forEach(documento => {
+    const producto = documento.data();
+    categoriasCarta[documento.id] = producto.categoria || "Sin categoría";
+});
+
+listaProductos.forEach(producto => {
+    producto.categoria = categoriasCarta[producto.id] || "Sin categoría";
+});
+
 const productosActivos = [];
 
 snapshotCarta.forEach(documento => {
@@ -2203,40 +2215,71 @@ if (listaProductos.length === 0) {
 
         <tbody>
 
-            ${
-                listaProductos.map(
-                    producto => `
+${
+    Object.keys(
+        listaProductos.reduce((grupos, producto) => {
+            const categoria = producto.categoria || "Sin categoría";
 
-<tr class="${
-    producto.receta.length > 0
-        ? "producto-con-receta"
-        : "producto-sin-receta"
-}">
-
-    <td>
-        ${producto.nombre}
-    </td>
-
-    <td>
-        ${producto.cantidad}
-    </td>
-
-    <td>
-
-        ${
-            producto.receta.length > 0
-                ? `<span class="estado-receta encontrada">Encontrada</span>`
-                : `<span class="estado-receta sin-receta">Sin receta</span>`
-        }
-
-    </td>
-
-</tr>
-
-                    `
-                ).join("")
+            if (!grupos[categoria]) {
+                grupos[categoria] = [];
             }
 
+            grupos[categoria].push(producto);
+
+            return grupos;
+        }, {})
+    )
+    .sort((a, b) => a.localeCompare(b))
+    .map(categoria => {
+
+        const productosCategoria = listaProductos
+            .filter(producto =>
+                (producto.categoria || "Sin categoría") === categoria
+            )
+            .sort((a, b) => b.cantidad - a.cantidad);
+
+        return `
+
+            <tr>
+                <td colspan="3" style="
+                    background:#e9ecef;
+                    font-weight:bold;
+                    padding:12px;
+                ">
+                    ${categoria.toUpperCase()}
+                </td>
+            </tr>
+
+            ${
+                productosCategoria.map(producto => `
+
+                    <tr class="${
+                        producto.receta.length > 0
+                            ? "producto-con-receta"
+                            : "producto-sin-receta"
+                    }">
+
+                        <td>${producto.nombre}</td>
+
+                        <td>${producto.cantidad}</td>
+
+                        <td>
+                            ${
+                                producto.receta.length > 0
+                                    ? `<span class="estado-receta encontrada">Encontrada</span>`
+                                    : `<span class="estado-receta sin-receta">Sin receta</span>`
+                            }
+                        </td>
+
+                    </tr>
+
+                `).join("")
+            }
+
+        `;
+
+    }).join("")
+}
         </tbody>
 
     </table>
