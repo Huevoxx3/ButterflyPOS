@@ -154,6 +154,84 @@ async function cargarEmpleadosAdelanto(){
 
 }
 
+function preguntarImpactoCaja() {
+
+    return new Promise(resolve => {
+
+        const fondo = document.createElement("div");
+
+        fondo.style.cssText = `
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.55);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:99999;
+        `;
+
+        fondo.innerHTML = `
+            <div style="
+                background:white;
+                padding:25px;
+                border-radius:12px;
+                width:90%;
+                max-width:420px;
+                text-align:center;
+                box-shadow:0 5px 25px rgba(0,0,0,0.25);
+            ">
+                <h3>¿Este movimiento impacta en caja?</h3>
+
+                <p style="color:#666;">
+                    Elegí cómo querés registrar este adelanto.
+                </p>
+
+                <div style="
+                    display:flex;
+                    gap:10px;
+                    flex-wrap:wrap;
+                    justify-content:center;
+                    margin-top:25px;
+                ">
+                    <button id="impactoSi"
+                        style="background:#16a34a;color:white;padding:12px 18px;border:0;border-radius:7px;cursor:pointer;">
+                        SÍ
+                    </button>
+
+                    <button id="impactoNo"
+                        style="background:#dc2626;color:white;padding:12px 18px;border:0;border-radius:7px;cursor:pointer;">
+                        NO
+                    </button>
+
+                    <button id="impactoCancelar"
+                        style="background:#64748b;color:white;padding:12px 18px;border:0;border-radius:7px;cursor:pointer;">
+                        CANCELAR
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(fondo);
+
+        fondo.querySelector("#impactoSi").onclick = () => {
+            fondo.remove();
+            resolve("si");
+        };
+
+        fondo.querySelector("#impactoNo").onclick = () => {
+            fondo.remove();
+            resolve("no");
+        };
+
+        fondo.querySelector("#impactoCancelar").onclick = () => {
+            fondo.remove();
+            resolve(null);
+        };
+
+    });
+
+}
+
 async function guardarAdelanto(){
 
     const selector =
@@ -198,9 +276,9 @@ async function guardarAdelanto(){
     // OBTENER JORNADA ACTUAL
     // ==========================
 
-// ==========================
-// VERIFICAR ESTADO REAL DE CAJA
-// ==========================
+const impactoCaja = await preguntarImpactoCaja();
+
+if (impactoCaja === null) return;
 
 const referenciaCaja = doc(
     db,
@@ -214,7 +292,10 @@ const documentoCaja = await getDoc(
 
 const cajaActual = documentoCaja.data();
 
-if(!cajaActual || cajaActual.abierta !== true){
+if (
+    impactoCaja === "si" &&
+    (!cajaActual || cajaActual.abierta !== true)
+) {
 
     alert(
         "⚠️ No hay una caja abierta.\n\n" +
@@ -224,7 +305,7 @@ if(!cajaActual || cajaActual.abierta !== true){
     return;
 }
 
-const jornada = cajaActual.fechaJornada;
+const jornada = cajaActual?.fechaJornada || null;
 
     // ==========================
     // CONFIRMAR
@@ -270,9 +351,9 @@ const jornada = cajaActual.fechaJornada;
     );
 
 
-    // ==========================
-    // REGISTRAR EGRESO DE CAJA
-    // ==========================
+// REGISTRAR EGRESO SOLAMENTE SI IMPACTA EN CAJA
+
+if (impactoCaja === "si") {
 
     await addDoc(
 
@@ -301,6 +382,8 @@ const jornada = cajaActual.fechaJornada;
         }
 
     );
+
+}
 
 
     // ==========================
